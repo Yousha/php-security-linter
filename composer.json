@@ -33,16 +33,16 @@
         "source": "https://github.com/yousha/php-security-linter"
     },
     "require": {
-        "php": "7.4.*",
+        "php": "8.3.*",
         "ext-pcre": "*"
     },
     "require-dev": {
-        "ergebnis/composer-normalize": "2.45.*",
-        "friendsofphp/php-cs-fixer": "3.75.*",
-        "icanhazstring/composer-unused": "0.8.*",
-        "maglnet/composer-require-checker": "3.8.*",
-        "overtrue/phplint": "3.4.*",
-        "phpunit/phpunit": "9.6.*"
+        "ergebnis/composer-normalize": "2.*",
+        "friendsofphp/php-cs-fixer": "3.*",
+        "icanhazstring/composer-unused": "0.*",
+        "maglnet/composer-require-checker": "3.*",
+        "overtrue/phplint": "3.*",
+        "phpunit/phpunit": "9.*"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

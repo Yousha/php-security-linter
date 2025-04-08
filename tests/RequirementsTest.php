@@ -67,7 +67,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
          */
         final public function testProjectRequiredPhpVersion(): void
         {
-            $_result = (PHP_MAJOR_VERSION == 7) && (PHP_MINOR_VERSION >= 4);
+            $_result = (PHP_MAJOR_VERSION == 8) && (PHP_MINOR_VERSION >= 3);
             $this->assertTrue($_result);
         }
 
