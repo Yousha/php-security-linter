@@ -78,3 +78,4 @@ composer.lock
 ##### Custom
 /storage/
 *.cache
+.phplint-cache
