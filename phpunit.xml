@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+    bootstrap="tests/bootstrap.php"
+    colors="true"
+    testdox="true"
+    stopOnError="true" stopOnFailure="false" stopOnSkipped="false" stopOnRisky="false"
+    failOnWarning="true" failOnRisky="false"
+    timeoutForSmallTests="5" timeoutForMediumTests="30" timeoutForLargeTests="60"
+    beStrictAboutTestsThatDoNotTestAnything="true" beStrictAboutOutputDuringTests="true">
+    <!-- Test suite configuration -->
+    <testsuites>
+        <testsuite name="all">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

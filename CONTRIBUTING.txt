@@ -1,0 +1,20 @@
+All kinds of contributions are welcome. If you feel like contributing, fork the project and open a pull request. You can:
+
+* Send feedbacks.
+* Submit bug reports.
+   * Ensure the bug you are reporting hasn't already been fixed.
+   * Make sure that your bug hasn't been submitted already.
+   * It is also very helpful to gather additional information that can be used to track down a bug, such as traces and logs.
+   * Do not use the bug tracker for personal support requests.
+* Write/Edit the documents.
+* Fix bugs or add new features.
+   * Enter a meaningful explanation in the commit log message.
+   * Don't do reformatting commits, unless you're the original author of the code. This includes changing line endings.
+   * Never remove copyright notices from the code.
+   * Never remove licensing info from code.
+   * Never commit code you didn't write yourself.
+* Ensure contributions work across:
+  * Microsoft Windows
+  * GNU/Linux
+  * Apple macOS (Intel/Apple Silicon)
+* Use UTF-8 for all text assets.

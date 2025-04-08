@@ -1,0 +1,40 @@
+%% Component Diagram
+graph TD
+    %% Main Components
+    subgraph Console
+        console["bin/php-sl"]
+        CLIInterface["CLI Interface"]
+        CommandParser["Command Parser"]
+    end
+
+    subgraph Linter
+        linter["Linter"]
+        FileLinter["File Linter"]
+        RuleEngine["Rule Engine"]
+        ResultsAggregator["Results Aggregator"]
+    end
+
+    subgraph Rules
+        rules["Rules"]
+        CISRules["CIS Rules"]
+        OWASPRules["OWASP Rules"]
+    end
+
+    subgraph Exceptions
+        exceptions["Exceptions"]
+        LinterException["LinterException"]
+    end
+
+    subgraph Tests
+        tests["Tests"]
+        FunctionalTests["Functional Tests"]
+        ExceptionTests["Exception Tests"]
+        IntegrationTests["Integration Tests"]
+    end
+
+    %% Relationships
+    console -->|invokes| linter
+    linter -->|applies| rules
+    linter -->|throws| exceptions
+    tests -->|verifies| linter
+    tests -->|verifies| exceptions

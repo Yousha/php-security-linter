@@ -1,0 +1,6 @@
+This product includes softwares developed by the following copyright owners:
+
+* .gitignore (CC0-1.0) <https://github.com/github/gitignore>
+* Git (GPL-2.0-only) <https://git-scm.com/>
+* PHP (GNU GPL v2 and v3) <https://php.net/>
+* Composer (MIT) <https://getcomposer.org/>

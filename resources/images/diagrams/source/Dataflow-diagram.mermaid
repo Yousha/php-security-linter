@@ -1,0 +1,8 @@
+flowchart TD
+    A[CLI Input] --> B[Directory Traversal]
+    B --> C[File Content Analysis]
+    C --> D[Rule Matching]
+    D --> E[Issue Aggregation]
+    E --> F[Results Output]
+    C -->|Error| G[Exception Handling]
+    G --> F

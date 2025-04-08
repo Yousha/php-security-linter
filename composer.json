@@ -1,0 +1,100 @@
+{
+    "name": "yousha/php-security-linter",
+    "description": "A PHP tool to lint PHP files for security issues based on CIS and OWASP best practices.",
+    "license": "GPL-3.0-only",
+    "type": "library",
+    "keywords": [
+        "yousha",
+        "php",
+        "security",
+        "linter",
+        "static-analysis",
+        "code-analysis",
+        "vulnerability-detection",
+        "security-linter",
+        "security-audit",
+        "secure-coding",
+        "owasp",
+        "cis",
+        "security-best-practices"
+    ],
+    "authors": [
+        {
+            "name": "Yousha Aleayoub",
+            "email": "yousha.a@hotmail.com",
+            "homepage": "https://yousha.blog.ir/",
+            "role": "Maintainer, Developer"
+        }
+    ],
+    "homepage": "https://github.com/yousha/php-security-linter",
+    "support": {
+        "email": "yousha.a@hotmail.com",
+        "issues": "https://github.com/yousha/php-security-linter/issues",
+        "source": "https://github.com/yousha/php-security-linter"
+    },
+    "require": {
+        "php": "7.4.*",
+        "ext-pcre": "*"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "2.45.*",
+        "friendsofphp/php-cs-fixer": "3.75.*",
+        "icanhazstring/composer-unused": "0.8.*",
+        "maglnet/composer-require-checker": "3.8.*",
+        "overtrue/phplint": "3.4.*",
+        "phpunit/phpunit": "9.6.*"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Yousha\\PhpSecurityLinter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Yousha\\PhpSecurityLinter\\Tests\\": "tests/"
+        }
+    },
+    "bin": [
+        "bin/php-sl.php"
+    ],
+    "archive": {
+        "exclude": [
+            "*.log",
+            "*.cache",
+            "composer.lock"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "composer-unused/composer-unused-plugin": true,
+            "ergebnis/composer-normalize": true
+        },
+        "archive-format": "zip",
+        "bin-compat": "full",
+        "classmap-authoritative": true,
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": false,
+        "vendor-dir": "vendor"
+    },
+    "extra": {
+        "composer-normalize": {
+            "indent-size": 4,
+            "indent-style": "space"
+        }
+    },
+    "scripts": {
+        "check": "php-cs-fixer.bat check",
+        "lint": "phplint",
+        "reformat": "php-cs-fixer.bat fix",
+        "test": "phpunit --configuration phpunit.xml"
+    },
+    "scripts-descriptions": {
+        "check": "Scan codes for issues.",
+        "lint": "Scan codes for syntax errors.",
+        "reformat": "Reformat all codes.",
+        "test": "Run all tests."
+    }
+}
