@@ -10,7 +10,7 @@ static $rules = [
     '@PSR2'  => true,
     '@PSR12' => true,
     '@PER-CS2.0' => true,
-    '@PHP83Migration' => true
+    '@PHP74Migration' => true
 ];
 
 static $excludeFolders = [
