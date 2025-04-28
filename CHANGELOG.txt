@@ -1,12 +1,16 @@
+3.0.1.3 - 2025-4-28
+-------------------------
+* Update .gitattributes file.
+* Remove classmap-authoritative from composer.json file.
+* Fix minor bug in composer.json file.
+
 3.0.0.3 - 2025-4-8
 -------------------------
 * Update to PHP version 8.3.*.
 
-
 2.0.0.2 - 2023-12-7
 -------------------------
 * Update to PHP version 7.4.*.
-
 
 1.0.0.1 - 2019-3-9
 -------------------------
