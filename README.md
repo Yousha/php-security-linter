@@ -2,7 +2,7 @@
 
 A PHP tool to lint PHP files for security issues based on CIS and OWASP best practices.
 
-[![current version](https://img.shields.io/packagist/v/yousha/php-security-linter.svg)](https://packagist.org/packages/yousha/php-security-linter) [![issues](https://img.shields.io/github/issues/yousha/php-security-linter)](https://github.com/yousha/php-security-linter/issues) ![repo size](https://img.shields.io/github/repo-size/yousha/php-security-linter) [![GitHub license](https://img.shields.io/github/license/yousha/php-security-linter)](LICENSE) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.txt)
+[![current version](https://img.shields.io/packagist/v/yousha/php-security-linter.svg)](https://packagist.org/packages/yousha/php-security-linter) [![PHP](https://img.shields.io/badge/PHP-7.4-617CBE)](https://php.net/) [![issues](https://img.shields.io/github/issues/yousha/php-security-linter)](https://github.com/yousha/php-security-linter/issues) ![repo size](https://img.shields.io/github/repo-size/yousha/php-security-linter) [![GitHub license](https://img.shields.io/github/license/yousha/php-security-linter)](LICENSE) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.txt)
 
 ## Contents
 
@@ -60,7 +60,6 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
 |-----------------|---------------|-------------|----------------|
 | dev-main        | `main`        | 8.3         | Active         |
 | 3.*             | `main`        | 8.3         | Active         |
-| dev-main-php7.4 | `main-php7.4` | 7.4         | Maintenance    |
 | 2.*             | `main-php7.4` | 7.4         | Maintenance    |
 | 1.*             |               | 5.6         | EOL            |
 
