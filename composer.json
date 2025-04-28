@@ -86,9 +86,9 @@
         }
     },
     "scripts": {
-        "check": "php-cs-fixer.bat check",
+        "check": "php-cs-fixer check",
         "lint": "phplint",
-        "reformat": "php-cs-fixer.bat fix",
+        "reformat": "php-cs-fixer fix",
         "test": "phpunit --configuration phpunit.xml"
     },
     "scripts-descriptions": {
