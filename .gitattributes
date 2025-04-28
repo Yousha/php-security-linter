@@ -70,6 +70,8 @@ readme text
 *README* text
 TODO text
 # Configuration
+*.lock text
+*.env text
 *.cnf text
 *.cfg text
 *.conf text
