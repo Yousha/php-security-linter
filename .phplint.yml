@@ -5,6 +5,7 @@ path:
 extensions:
   - php
 exclude:
+  - .git/
   - resources/
   - vendor/
 jobs: 1
