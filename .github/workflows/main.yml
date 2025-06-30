@@ -1,0 +1,57 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          coverage: none
+          extensions: pcre
+          tools: composer:v2
+
+      - name: Validate manifest file
+        run: composer validate --strict
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress
+
+      - name: Lint project files
+        run: |
+          set -e  # Stop on error.
+          find . -path ./vendor -prune -o -name "*.php" -print0 | xargs -0 -n 1 php -l
+
+      - name: Lint codes
+        run: composer lint
+
+      - name: Check coding convention
+        run: composer check
+
+      - name: Security check
+        run: composer audit
+
+      - name: Run tests
+        run: composer test
