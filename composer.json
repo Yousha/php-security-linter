@@ -4,7 +4,6 @@
     "license": "GPL-3.0-only",
     "type": "library",
     "keywords": [
-        "yousha",
         "php",
         "security",
         "linter",
@@ -37,12 +36,12 @@
         "ext-pcre": "*"
     },
     "require-dev": {
-        "ergebnis/composer-normalize": "2.*",
+        "ergebnis/composer-normalize": "2.47.*",
         "friendsofphp/php-cs-fixer": "3.*",
         "icanhazstring/composer-unused": "0.*",
         "maglnet/composer-require-checker": "3.*",
-        "overtrue/phplint": "3.*",
-        "phpunit/phpunit": "9.*"
+        "overtrue/phplint": "9.6.*",
+        "phpunit/phpunit": "12.1.*",
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -75,6 +74,7 @@
         "bin-compat": "full",
         "optimize-autoloader": true,
         "preferred-install": "dist",
+        "process-timeout": 300,
         "sort-packages": false,
         "vendor-dir": "vendor"
     },
@@ -85,15 +85,15 @@
         }
     },
     "scripts": {
-        "check": "php-cs-fixer check",
+        "format-check": "php-cs-fixer check",
         "lint": "phplint",
         "reformat": "php-cs-fixer fix",
         "test": "phpunit --configuration phpunit.xml"
     },
     "scripts-descriptions": {
-        "check": "Scan codes for issues.",
-        "lint": "Scan codes for syntax errors.",
-        "reformat": "Reformat all codes.",
+        "format-check": "Check coding style issues.",
+        "lint": "Check PHP files for syntax errors.",
+        "reformat": "Fix coding style issues.",
         "test": "Run all tests."
     }
 }
