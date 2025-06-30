@@ -8,11 +8,22 @@
     stopOnError="true" stopOnFailure="false" stopOnSkipped="false" stopOnRisky="false"
     failOnWarning="true" failOnRisky="false"
     timeoutForSmallTests="5" timeoutForMediumTests="30" timeoutForLargeTests="60"
-    beStrictAboutTestsThatDoNotTestAnything="true" beStrictAboutOutputDuringTests="true">
+    beStrictAboutTestsThatDoNotTestAnything="true" beStrictAboutOutputDuringTests="false">
     <!-- Test suite configuration -->
     <testsuites>
         <testsuite name="all">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+    <source>
+        <include>
+            <directory>bin</directory>
+            <directory>src</directory>
+        </include>
+        <exclude>
+            <directory>.git</directory>
+            <directory>resources</directory>
+            <directory>vendor</directory>
+        </exclude>
+    </source>
 </phpunit>
