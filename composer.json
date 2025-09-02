@@ -36,7 +36,7 @@
         "ext-pcre": "*"
     },
     "require-dev": {
-        "ergebnis/composer-normalize": "2.47.*",
+        "ergebnis/composer-normalize": "2.47.* || 2.48.*",
         "friendsofphp/php-cs-fixer": "3.*",
         "icanhazstring/composer-unused": "0.*",
         "overtrue/phplint": "9.6.*",
