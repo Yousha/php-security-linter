@@ -40,7 +40,7 @@
         "friendsofphp/php-cs-fixer": "3.*",
         "icanhazstring/composer-unused": "0.*",
         "overtrue/phplint": "9.6.*",
-        "phpunit/phpunit": "12.3.*"
+        "phpunit/phpunit": "12.4.*"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
