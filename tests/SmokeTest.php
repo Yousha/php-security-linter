@@ -97,7 +97,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
          *
          * @return void
          */
-        public function testCliInclusion()
+        public function testCliInclusion(): void
         {
             try {
                 $argv = ['--help'];

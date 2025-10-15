@@ -71,7 +71,7 @@ final class LinterTest extends TestCase
      *
      * @return void
      */
-    public function testClassIsFinal()
+    public function testClassIsFinal(): void
     {
         $reflection = new \ReflectionClass(Linter::class);
         $this->assertTrue($reflection->isFinal(), 'Linter class should be final');
@@ -84,7 +84,7 @@ final class LinterTest extends TestCase
      *
      * @return void
      */
-    public function testClassHasCorrectNamespace()
+    public function testClassHasCorrectNamespace(): void
     {
         $this->assertStringStartsWith(
             'Yousha\PhpSecurityLinter',
@@ -100,7 +100,7 @@ final class LinterTest extends TestCase
      *
      * @return void
      */
-    public function testLinterInitializesWithRules()
+    public function testLinterInitializesWithRules(): void
     {
         $reflection = new \ReflectionClass(Linter::class);
         $property = $reflection->getProperty('rules');
@@ -121,7 +121,7 @@ final class LinterTest extends TestCase
      *
      * @return void
      */
-    public function testScanMethodExists()
+    public function testScanMethodExists(): void
     {
         $this->assertTrue(
             method_exists(Linter::class, 'scan')
@@ -135,7 +135,7 @@ final class LinterTest extends TestCase
      *
      * @return void
      */
-    public function testScanMethodSignature()
+    public function testScanMethodSignature(): void
     {
         $method = new \ReflectionMethod(Linter::class, 'scan');
 
@@ -163,7 +163,7 @@ final class LinterTest extends TestCase
      *
      * @return void
      */
-    public function testScanDirectoryWithNonPhpFiles()
+    public function testScanDirectoryWithNonPhpFiles(): void
     {
         $tempDir = sys_get_temp_dir() . '/test_dir_' . uniqid();
         mkdir($tempDir);
@@ -185,7 +185,7 @@ final class LinterTest extends TestCase
      *
      * @return void
      */
-    public function testScanReturnsMetadataWithFiles()
+    public function testScanReturnsMetadataWithFiles(): void
     {
         // Create temp dir with sample PHP file
         $tempDir = sys_get_temp_dir() . '/test_dir_' . uniqid();
@@ -209,7 +209,7 @@ final class LinterTest extends TestCase
      *
      * @return void
      */
-    public function testScanThrowsExceptionForInvalidPath()
+    public function testScanThrowsExceptionForInvalidPath(): void
     {
         $this->expectException(LinterException::class);
         $this->expectExceptionMessage('Path does not exist: /nonexistent/path');
@@ -224,7 +224,7 @@ final class LinterTest extends TestCase
      *
      * @return void
      */
-    public function testCanScanEmptyDirectory()
+    public function testCanScanEmptyDirectory(): void
     {
         $tempDir = sys_get_temp_dir() . '/empty_test_dir_' . uniqid();
         mkdir($tempDir);
@@ -253,7 +253,7 @@ final class LinterTest extends TestCase
      *
      * @return void
      */
-    public function testShouldExcludeMethodIsPrivate()
+    public function testShouldExcludeMethodIsPrivate(): void
     {
         $method = new \ReflectionMethod(Linter::class, 'shouldExclude');
         $this->assertTrue($method->isPrivate());
@@ -266,7 +266,7 @@ final class LinterTest extends TestCase
      *
      * @return void
      */
-    public function testScanFileMethodIsPrivate()
+    public function testScanFileMethodIsPrivate(): void
     {
         $method = new \ReflectionMethod(Linter::class, 'scanFile');
         $this->assertTrue($method->isPrivate());
@@ -279,7 +279,7 @@ final class LinterTest extends TestCase
      *
      * @return void
      */
-    public function testInvalidDirectory()
+    public function testInvalidDirectory(): void
     {
         $this->expectException(LinterException::class);
         $linter = new Linter();
