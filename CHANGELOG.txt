@@ -1,3 +1,13 @@
+3.1.6.4 - 2025-10-15
+-------------------------
+* Fix issue #17. (config and rule exclude bug)
+* Fix issue #16. (vendor path bug)
+* Add more security rules.
+* Add more unit tests.
+* Update documents.
+* Minor optimizations.
+* Cleanup codes.
+
 3.0.1.3 - 2025-4-28
 -------------------------
 * Update .gitattributes file.
