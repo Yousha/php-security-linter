@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 /**
@@ -5,6 +6,10 @@
  *
  * @package PhpSecurityLinter
  */
+
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
 
 if (PHP_SAPI !== 'cli') {
     fwrite(STDERR, "Error: This script can only be run from terminal.\n");
@@ -38,7 +43,7 @@ use Yousha\PhpSecurityLinter\Exceptions\LinterException;
 function showHelp(): void
 {
     echo <<<HELP
-        PHP Security Linter 3.0.0.3
+        PHP Security Linter
         Usage: php bin/php-sl.php [options]
 
         Options:
@@ -160,7 +165,4 @@ function runCli(array $argv): int
     }
 }
 
-// Only execute if run directly (not when included).
-if (realpath($argv[0]) === realpath(__FILE__)) {
-    runCli($argv);
-}
+runCli($argv);
