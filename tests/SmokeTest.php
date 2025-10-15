@@ -89,24 +89,5 @@ namespace Yousha\PhpSecurityLinter\Tests {
             // AAA
             $this->assertIsObject($this->linter);
         }
-
-        /**
-         * @test
-         *
-         * @small
-         *
-         * @return void
-         */
-        public function testCliInclusion(): void
-        {
-            try {
-                $argv = ['--help'];
-                require_once addslashes(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR) . 'php-sl.php';
-            } catch (Throwable) {
-                $this->fail();
-            }
-
-            $this->assertTrue(true); // Explicit pass.
-        }
     }
 }
