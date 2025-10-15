@@ -55,12 +55,13 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
 
 ### Versions
 
-| Package version | Branch        | PHP version | Status         |
-|-----------------|---------------|-------------|----------------|
-| dev-main        | `main`        | 8.3         | Active         |
-| 3.*             | `main`        | 8.3         | Active         |
-| 2.*             | `main-php7.4` | 7.4         | Maintenance    |
-| 1.*             |               | 5.6         | EOL            |
+| Package version | Branch name       | PHP version | Status         |
+|-----------------|-------------------|-------------|----------------|
+| dev-main        | `main`            | 8.3         | Active         |
+| 3.*             | `main`            | 8.3         | Active         |
+| dev-main-php7.4 | `main-php7.4`     | 7.4         | Maintenance    |
+| 2.*             | `main-php7.4`     | 7.4         | Maintenance    |
+| 1.*             |                   | 5.6         | EOL            |
 
 * **Active**: Full support
 * **Maintenance**: Critical/Security fixes only
