@@ -10,7 +10,6 @@ A PHP tool to lint PHP files for security issues based on CIS and OWASP best pra
 * [Features](#features)
 * [Requirements](#requirements)
 * [Installation](#installation)
-* [Configuration](#configuration)
 * [Usage](#usage)
 * [FAQ](#faq)
 * [Support](#support)
@@ -43,7 +42,7 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
   * Custom rule sets
 * **Fast static analysis** without executing code
 * **Multiple output formats** (Console, JSON)
-* **Configurable ruleset** with severity levels
+* **Configurable ruleset**
 * **DevSecOps ready** CI/CD pipeline integration
 * **Exclusion support** for ignoring specific paths
 * **Supported PHP:** 7.4, 8.3
@@ -95,25 +94,13 @@ Or Composer global installation:
 composer global require yousha/php-security-linter
 ```
 
-## Configuration
-
-Customize rules by creating a `php-security-config.json`:
-
-```json
-{
-    "excludeRules": ["CIS-001", "OWASP-003"],
-    "severityLevel": "medium",
-    "customRules": {
-        "CUSTOM-001": {
-            "pattern": "dangerous_function\\s*\\(",
-            "message": "Custom dangerous function detected",
-            "severity": "high"
-        }
-    }
-}
-```
-
 ## Usage
+
+Lint current directory:
+
+```shell
+php vendor/bin/php-security-linter --path .
+```
 
 Lint a directory:
 
@@ -121,10 +108,16 @@ Lint a directory:
 php vendor/bin/php-security-linter --path ./src
 ```
 
-Lint with exclusions:
+Lint with path exclusion:
 
 ```shell
-php vendor/bin/php-security-linter --path ./app --exclude vendor,tests
+php vendor/bin/php-security-linter --path ./app --exclude storage,tests
+```
+
+Excluding a specific directory, path exclusion, and rule exclusion:
+
+```bash
+php bin/php-sl.php --path ./src --exclude storage --exclude-rules CIS-003,OWASP-001
 ```
 
 JSON output:
@@ -139,6 +132,7 @@ php vendor/bin/php-security-linter --path ./public --format json
 | ------------ | -------------------------------- |
 | `-p, --path` | Path to scan (required)          |
 | `--exclude`  | Comma-separated paths to exclude |
+| `--exclude-rules` | Comma-separated rule IDs to ignore |
 | `--help`     | Show help message                |
 
 ### Example console output
