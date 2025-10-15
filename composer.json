@@ -36,11 +36,12 @@
         "ext-pcre": "*"
     },
     "require-dev": {
-        "ergebnis/composer-normalize": "2.48.*",
+        "ergebnis/composer-normalize": "2.*",
         "friendsofphp/php-cs-fixer": "3.*",
         "icanhazstring/composer-unused": "0.*",
-        "overtrue/phplint": "9.6.*",
-        "phpunit/phpunit": "12.4.*"
+        "overtrue/phplint": "9.*",
+        "phpunit/phpunit": "12.*",
+        "rector/rector": "2.*"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -86,12 +87,16 @@
     "scripts": {
         "format-check": "php-cs-fixer check",
         "lint": "phplint",
+        "refactor": "rector process",
+        "check-refactor": "rector --dry-run",
         "reformat": "php-cs-fixer fix",
         "test": "phpunit --configuration phpunit.xml"
     },
     "scripts-descriptions": {
         "format-check": "Check coding style issues.",
         "lint": "Check PHP files for syntax errors.",
+        "refactor": "Apply code refactoring.",
+        "check-refactor": "Check code refactoring rules.",
         "reformat": "Fix coding style issues.",
         "test": "Run all tests."
     }

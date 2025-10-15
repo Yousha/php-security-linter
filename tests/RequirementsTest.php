@@ -138,6 +138,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
                 '.php-cs-fixer.php',
                 'phpunit.xml',
                 'README.md',
+                'rector.php',
                 'TODO.txt',
                 'VERSION.txt',
             ];
