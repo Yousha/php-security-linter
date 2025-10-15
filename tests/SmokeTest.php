@@ -102,7 +102,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
             try {
                 $argv = ['--help'];
                 require_once addslashes(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR) . 'php-sl.php';
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 $this->fail();
             }
 

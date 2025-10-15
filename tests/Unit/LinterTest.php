@@ -104,7 +104,6 @@ final class LinterTest extends TestCase
     {
         $reflection = new \ReflectionClass(Linter::class);
         $property = $reflection->getProperty('rules');
-        $property->setAccessible(true);
         $rules = $property->getValue($this->linter);
         $this->assertIsArray($rules);
         $this->assertNotEmpty($rules);

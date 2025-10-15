@@ -22,11 +22,6 @@ use Throwable;
 final class LinterException extends \RuntimeException
 {
     /**
-     * @var string Additional context abouterror.
-     */
-    protected $context;
-
-    /**
      * LinterException constructor
      *
      * @param string $message The exception message
@@ -38,10 +33,9 @@ final class LinterException extends \RuntimeException
         string $message = "",
         int $code = 0,
         ?Throwable $previous = null,
-        ?string $context = null
+        protected ?string $context = null
     ) {
         parent::__construct($message, $code, $previous);
-        $this->context = $context;
     }
 
     /**
@@ -110,7 +104,7 @@ final class LinterException extends \RuntimeException
      */
     public function __toString(): string
     {
-        $str = __CLASS__ . ": [{$this->code}]: {$this->message}\n";
+        $str = self::class . ": [{$this->code}]: {$this->message}\n";
 
         if ($this->context) {
             $str .= "Context: {$this->context}\n";

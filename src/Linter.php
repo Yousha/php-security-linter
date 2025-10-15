@@ -125,10 +125,11 @@ final class Linter
         $filePath = str_replace('\\', '/', $filePath);
 
         foreach ($exclude as $excludedPattern) {
-            $excludedPattern = trim($excludedPattern);
+            $excludedPattern = trim((string) $excludedPattern);
             if (empty($excludedPattern)) {
                 continue;
             }
+
             if (($this->isAbsolutePathMatch($filePath, $excludedPattern)) ||
                 ($this->isBasenameOrRelativePathMatch($filePath, $excludedPattern))
             ) {
@@ -159,7 +160,7 @@ final class Linter
         }
 
         $excludedPath = str_replace('\\', '/', $excludedPath);
-        return strpos($filePath, $excludedPath) === 0;
+        return str_starts_with($filePath, $excludedPath);
     }
 
     /**
@@ -170,7 +171,7 @@ final class Linter
      */
     private function isAbsolutePath(string $path): bool
     {
-        return strpos($path, '/') === 0 ||  // Unix
+        return str_starts_with($path, '/') ||  // Unix
             preg_match('/^[A-Za-z]:[\/\\\\]/', $path);  // Windows
     }
 
@@ -184,7 +185,7 @@ final class Linter
     private function isBasenameOrRelativePathMatch(string $filePath, string $excludedPattern): bool
     {
         return basename($filePath) === $excludedPattern ||
-            strpos($filePath, $excludedPattern) !== false;
+            str_contains($filePath, $excludedPattern);
     }
 
     /**
@@ -217,8 +218,10 @@ final class Linter
                             'line' => $lineNumber,
                         ];
                     }
+
                     $lineNumber++;
                 }
+
                 // If no specific line was found, default to line 1.
                 if (empty($issues) || $issues[count($issues) - 1]['message'] !== $rule['message']) {
                     $issues[] = [

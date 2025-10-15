@@ -6,7 +6,7 @@
  * @package PhpSecurityLinter
  */
 
-if (php_sapi_name() !== 'cli') {
+if (PHP_SAPI !== 'cli') {
     fwrite(STDERR, "Error: This script can only be run from terminal.\n");
     exit(1);
 }
@@ -64,11 +64,12 @@ function outputResults(array $results): void
         foreach ($issues as $issue) {
             echo sprintf(
                 "  ✗ [%s] %s (Line %d)\n",
-                strtoupper($issue['severity']),
+                strtoupper((string) $issue['severity']),
                 $issue['message'],
                 $issue['line']
             );
         }
+
         echo "\n";
     }
 
