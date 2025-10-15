@@ -20,7 +20,7 @@ on:
 
 env:
   COMPOSER_NO_INTERACTION: 1
-  COMPOSER_PROCESS_TIMEOUT: 300   # Seconds.
+  COMPOSER_PROCESS_TIMEOUT: 300 # Seconds.
 
 jobs:
   build:
@@ -63,7 +63,7 @@ jobs:
           ini-values: memory_limit=256M, zend.assertions=1, \
             error_reporting=-1, display_errors=On
 
-     - name: Lint PHP files
+      - name: Lint PHP files
         run: |
           set -e
           set -o nounset
