@@ -11,7 +11,18 @@ if (PHP_SAPI !== 'cli') {
     exit(1);
 }
 
-require_once __DIR__ . '/../vendor/autoload.php';
+$autoloadPath = __DIR__ . '/../../../../vendor/autoload.php'; // Path for Composer-installed package as user.
+
+if (!file_exists($autoloadPath)) {
+    $autoloadPath = __DIR__ . '/../vendor/autoload.php'; // Path for local development.
+}
+
+if (!file_exists($autoloadPath)) {
+    fwrite(STDERR, "Error: Vendor autoload file not found. Run 'composer install'.\n");
+    exit(1);
+}
+
+require_once $autoloadPath;
 
 use Yousha\PhpSecurityLinter\Linter;
 use Yousha\PhpSecurityLinter\Exceptions\LinterException;
