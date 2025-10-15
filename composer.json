@@ -85,18 +85,18 @@
         }
     },
     "scripts": {
-        "format-check": "php-cs-fixer check",
         "lint": "phplint",
         "refactor": "rector process",
-        "check-refactor": "rector --dry-run",
+        "refactor-check": "rector --dry-run",
+        "format-check": "php-cs-fixer check",
         "reformat": "php-cs-fixer fix",
         "test": "phpunit --configuration phpunit.xml"
     },
     "scripts-descriptions": {
-        "format-check": "Check coding style issues.",
         "lint": "Check PHP files for syntax errors.",
         "refactor": "Apply code refactoring.",
-        "check-refactor": "Check code refactoring rules.",
+        "refactor-check": "Check code refactoring rules.",
+        "format-check": "Check coding style issues.",
         "reformat": "Fix coding style issues.",
         "test": "Run all tests."
     }
