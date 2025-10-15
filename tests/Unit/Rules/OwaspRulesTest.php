@@ -11,10 +11,51 @@ final class OwaspRulesTest extends TestCase
 {
     private array $rules;
 
+    /**
+     * This method is called before the first test method in the test class is executed.
+     *
+     * @doesNotPerformAssertions
+     *
+     * @return void
+     */
+    public static function setUpBeforeClass(): void {}
+
+    /**
+     * This method is called after the last test method in the test class has been executed.
+     *
+     * @doesNotPerformAssertions
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass(): void
+    {
+        gc_collect_cycles();
+    }
+
+    /**
+     * This method is called BEFORE each test method.
+     *
+     * @doesNotPerformAssertions
+     *
+     * @return void
+     */
     protected function setUp(): void
     {
         parent::setUp();
         $this->rules = OwaspRules::getRules();
+    }
+
+    /**
+     * This method is called AFTER each test method.
+     *
+     * @doesNotPerformAssertions
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        // Methods finalization codes.
+        parent::tearDown();
     }
 
     public function ruleDataProvider(): array

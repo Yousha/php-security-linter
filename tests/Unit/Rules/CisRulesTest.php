@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yousha\PhpSecurityLinter\Unit\Rules;
+namespace Yousha\PhpSecurityLinter\Tests\Unit\Rules;
 
 use PHPUnit\Framework\TestCase;
 use Yousha\PhpSecurityLinter\Rules\CisRules;
@@ -11,9 +11,51 @@ final class CisRulesTest extends TestCase
 {
     private array $rules;
 
+    /**
+     * This method is called before the first test method in the test class is executed.
+     *
+     * @doesNotPerformAssertions
+     *
+     * @return void
+     */
+    public static function setUpBeforeClass(): void {}
+
+    /**
+     * This method is called after the last test method in the test class has been executed.
+     *
+     * @doesNotPerformAssertions
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass(): void
+    {
+        gc_collect_cycles();
+    }
+
+    /**
+     * This method is called BEFORE each test method.
+     *
+     * @doesNotPerformAssertions
+     *
+     * @return void
+     */
     protected function setUp(): void
     {
+        parent::setUp();
         $this->rules = CisRules::getRules();
+    }
+
+    /**
+     * This method is called AFTER each test method.
+     *
+     * @doesNotPerformAssertions
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        // Methods finalization codes.
+        parent::tearDown();
     }
 
     /**

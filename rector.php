@@ -7,7 +7,7 @@ use Rector\ValueObject\PhpVersion;
 
 return RectorConfig::configure()
     ->withPaths([
-        __DIR__ . '\.',
+        __DIR__ . '/.',
     ])
     ->withSkip([
         __DIR__ . '/.git',
