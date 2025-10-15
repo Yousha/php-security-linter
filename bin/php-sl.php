@@ -60,7 +60,7 @@ function outputResults(array $results): void
     echo str_repeat("=", 40) . "\n\n";
 
     foreach ($results as $file => $issues) {
-        echo "File: {$file}\n";
+        echo sprintf('File: %s%s', $file, PHP_EOL);
         foreach ($issues as $issue) {
             echo sprintf(
                 "  ✗ [%s] %s (Line %d)\n",
@@ -128,11 +128,11 @@ function runCli(array $argv): int
         outputResults($results);
         exit(0);
     } catch (LinterException $e) {
-        fwrite(STDERR, "SCAN ERROR [{$e->getCode()}]: {$e->getMessage()}\n");
+        fwrite(STDERR, sprintf('SCAN ERROR [%d]: %s%s', $e->getCode(), $e->getMessage(), PHP_EOL));
 
         exit(2);
     } catch (Exception $e) {
-        fwrite(STDERR, "FATAL ERROR: {$e->getMessage()}\n");
+        fwrite(STDERR, sprintf('FATAL ERROR: %s%s', $e->getMessage(), PHP_EOL));
         exit(3);
     }
 }

@@ -20,7 +20,7 @@ return RectorConfig::configure()
     ->withPhpVersion(PhpVersion::PHP_83)
     ->withComposerBased(phpunit: true)
     ->withPhpSets(php83: true)
-    ->withTypeCoverageLevel(1)
-    ->withDeadCodeLevel(1)
-    ->withCodeQualityLevel(1)
-    ->withCodingStyleLevel(1);
+    ->withTypeCoverageLevel(10)
+    ->withDeadCodeLevel(10)
+    ->withCodeQualityLevel(10)
+    ->withCodingStyleLevel(10);

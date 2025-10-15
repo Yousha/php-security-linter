@@ -104,10 +104,10 @@ final class LinterException extends \RuntimeException
      */
     public function __toString(): string
     {
-        $str = self::class . ": [{$this->code}]: {$this->message}\n";
+        $str = self::class . sprintf(': [%s]: %s%s', $this->code, $this->message, PHP_EOL);
 
         if ($this->context) {
-            $str .= "Context: {$this->context}\n";
+            $str .= sprintf('Context: %s%s', $this->context, PHP_EOL);
         }
 
         $str .= "Stack trace:\n" . $this->getTraceAsString();
