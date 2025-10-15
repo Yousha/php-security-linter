@@ -50,6 +50,7 @@ function showHelp(): void
           -p, --path=PATH      Path to scan (required).
           --exclude=LIST       Comma-separated paths to exclude.
           --exclude-rules=LIST Comma-separated rule IDs to ignore.
+          --list-rules         Show all available rule IDs.
           --help               Show this help message.
 
         Examples:
@@ -93,6 +94,37 @@ function outputResults(array $results): void
     echo "Summary: Scanned {$scannedCount} files, found {$issueCount} potential issues.\n";
 }
 
+/**
+ * Fetches and displays all available security rule IDs (CIS and OWASP).
+ *
+ * @return void Outputs directly to STDOUT
+ */
+function listRules(): void
+{
+    // The rules classes must be fully loaded via the autoloader by this point.
+    $cisRules = Yousha\PhpSecurityLinter\Rules\CisRules::getRules();
+    $owaspRules = Yousha\PhpSecurityLinter\Rules\OwaspRules::getRules();
+    $allRules = array_merge($cisRules, $owaspRules);
+    echo "Available Rule IDs\n";
+    echo str_repeat("=", 40) . "\n\n";
+    // Sort by ID for easier reading.
+    usort($allRules, fn($a, $b): int => strcmp((string) $a['id'], (string) $b['id']));
+
+    foreach ($allRules as $rule) {
+        $severity = strtoupper((string) $rule['severity']);
+        $id = $rule['id'];
+        $message = str_replace([$id . ': ', $id . ':'], ['', ''], $rule['message']);
+        echo sprintf(
+            "[%s] %s: %s\n",
+            $severity,
+            $id,
+            $message
+        );
+    }
+
+    echo "\nTotal rules: " . count($allRules) . "\n";
+}
+
 function runCli(array $argv): int
 {
     $shortOpts = 'p:';
@@ -101,11 +133,18 @@ function runCli(array $argv): int
         'exclude:',
         'exclude-rules:',
         'help',
+        'list-rules',
     ];
     $options = getopt($shortOpts, $longOpts);
 
     if (isset($options['help'])) {
         showHelp();
+        return 0;
+    }
+
+    // Check for --list-rules
+    if (isset($options['list-rules'])) {
+        listRules();
         return 0;
     }
 
