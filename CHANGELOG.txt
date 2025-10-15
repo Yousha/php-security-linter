@@ -3,6 +3,8 @@
 * Fix issue #17. (config and rule exclude bug)
 * Fix issue #16. (vendor path bug)
 * Add more security rules.
+* Add --exclude-rules option.
+* Add --list-rules option.
 * Add more unit tests.
 * Update documents.
 * Minor optimizations.
