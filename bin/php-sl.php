@@ -31,7 +31,7 @@ use Yousha\PhpSecurityLinter\Exceptions\LinterException;
  * Displays command line help information for PHP Security Linter.
  *
  * Outputs formatted usage instructions, available options, and examples
- * for runningsecurity linter fromcommand line.
+ * for running security linter from command line.
  *
  * @return void Outputs directly to STDOUT
  */
@@ -42,19 +42,21 @@ function showHelp(): void
         Usage: php bin/php-sl.php [options]
 
         Options:
-          -p, --path=PATH      Path to scan (required)
-          --exclude=LIST       Comma-separated exclusions (dirs/files)
-          --help               Show this help message
+          -p, --path=PATH      Path to scan (required).
+          --exclude=LIST       Comma-separated paths to exclude.
+          --exclude-rules=LIST Comma-separated rule IDs to ignore.
+          --help               Show this help message.
 
         Examples:
           php bin/php-sl.php --path ./src
-          php bin/php-sl.php -p ./app --exclude vendor,tests
+          php bin/php-sl.php -p ./app --exclude .git,storage,vendor,tests
+          php bin/php-sl.php -p ./src --exclude-rules CIS-003,OWASP-001
 
         HELP;
 }
 
 /**
- * Outputs security scan results inspecified format.
+ * Outputs security scan results in specified format.
  *
  * A human-readable summary is displayed with file-specific details.
  *
@@ -65,8 +67,7 @@ function outputResults(array $results): void
 {
     $scannedCount = $results['_meta']['scanned_count'] ?? 0;
     $issueCount = $results['_meta']['issue_count'] ?? 0;
-    unset($results['_meta']); // Don't show meta data in file list
-
+    unset($results['_meta']); // Don't show meta data in file list.
     echo "Scan results\n";
     echo str_repeat("=", 40) . "\n\n";
 
@@ -93,6 +94,7 @@ function runCli(array $argv): int
     $longOpts = [
         'path:',
         'exclude:',
+        'exclude-rules:',
         'help',
     ];
     $options = getopt($shortOpts, $longOpts);
@@ -100,20 +102,6 @@ function runCli(array $argv): int
     if (isset($options['help'])) {
         showHelp();
         return 0;
-    }
-
-
-    $shortOpts = 'p:';
-    $longOpts = [
-        'path:',
-        'exclude:',
-        'help',
-    ];
-    $options = getopt($shortOpts, $longOpts);
-
-    if (isset($options['help'])) {
-        showHelp();
-        exit(0);
     }
 
     // Validate path.
@@ -124,23 +112,47 @@ function runCli(array $argv): int
         exit(0);
     }
 
-    // Process exclusions.
-    $exclude = [];
+    // Process file/dir exclusions.
+    $excludePaths = [
+        // Default exclusions.
+        'vendor',
+        '.git',
+        '.github',
+        '.gitlab',
+        '.azure-pipelines',
+        '.husky',
+        '.circleci',
+        '.vscode',
+        '.idea',
+    ];
 
     if (isset($options['exclude'])) {
-        $exclude = is_array($options['exclude'])
+        $userExclusions = is_array($options['exclude'])
             ? $options['exclude']
             : explode(',', $options['exclude']);
+        // Merge user exclusions into the default list, and ensure unique values.
+        $excludePaths = array_unique(array_merge($excludePaths, $userExclusions));
+    }
+
+    // Process rule exclusions.
+    $excludeRules = [];
+
+    if (isset($options['exclude-rules'])) {
+        $excludeRules = is_array($options['exclude-rules'])
+            ? $options['exclude-rules']
+            : explode(',', $options['exclude-rules']);
+        // Normalize and trim each rule ID.
+        $excludeRules = array_map('trim', $excludeRules);
     }
 
     try {
-        $linter = new Linter();
-        $results = $linter->scan($path, $exclude);
+        // Pass rule exclusions to Linter constructor.
+        $linter = new Linter($excludeRules);
+        $results = $linter->scan($path, $excludePaths);
         outputResults($results);
         exit(0);
     } catch (LinterException $e) {
         fwrite(STDERR, sprintf('SCAN ERROR [%d]: %s%s', $e->getCode(), $e->getMessage(), PHP_EOL));
-
         exit(2);
     } catch (Exception $e) {
         fwrite(STDERR, sprintf('FATAL ERROR: %s%s', $e->getMessage(), PHP_EOL));

@@ -33,7 +33,7 @@ use RegexIterator;
  * Class Linter
  *
  * This class is responsible for scanning PHP files within a directory for security vulnerabilities.
- * It applies predefined security rules to detect unsafe patterns and reportsfindings.
+ * It applies predefined security rules to detect unsafe patterns and reports findings.
  */
 final class Linter
 {
@@ -43,23 +43,32 @@ final class Linter
     private $rules = [];
 
     /**
-     * Constructor initializes security rules based on CIS and OWASP guidelines.
+     * Constructor initializes security rules based on CIS and OWASP guidelines, applying exclusions.
+     * * @param array $excludeRuleIds List of rule IDs to exclude.
      */
-    public function __construct()
-    {
-        $this->rules = array_merge(
+    public function __construct(
+        /**
+         * @var array List of rule IDs to exclude.
+         */
+        private readonly array $excludedRuleIds = []
+    ) {
+        $allRules = array_merge(
             CisRules::getRules(),
             OwaspRules::getRules()
         );
+        // Filter the rules based on the provided IDs
+        $this->rules = array_filter($allRules, fn(array $rule): bool =>
+        // Only keep the rule if its ID is NOT in the excludedRuleIds list
+        !in_array($rule['id'], $this->excludedRuleIds, true));
     }
 
     /**
-     * Scans PHP files ingiven directory for security issues.
+     * Scans PHP files in given directory for security issues.
      *
-     * @param string $path Path todirectory to scan.
+     * @param string $path Path to directory to scan.
      * @param array $exclude List of file patterns or paths to exclude from scanning.
      * @return array An associative array of detected security issues by file.
-     * @throws LinterException Ifspecified path does not exist.
+     * @throws LinterException If specified path does not exist.
      */
     public function scan(string $path, array $exclude = []): array
     {
@@ -72,20 +81,17 @@ final class Linter
             new RecursiveDirectoryIterator($path)
         );
         $phpFiles = new RegexIterator($iterator, '/^.+\.php$/i', RegexIterator::GET_MATCH);
-
         $scannedCount = 0;
         $issueCount = 0;
 
         foreach ($phpFiles as $file) {
             $filePath = $file[0];
-
             if ($this->shouldExclude($filePath, $exclude)) {
                 continue;
             }
 
             $scannedCount++;
             $issues = $this->scanFile($filePath);
-
             if (!empty($issues)) {
                 $results[$filePath] = $issues;
                 $issueCount += count($issues);
@@ -130,9 +136,7 @@ final class Linter
                 continue;
             }
 
-            if (($this->isAbsolutePathMatch($filePath, $excludedPattern)) ||
-                ($this->isBasenameOrRelativePathMatch($filePath, $excludedPattern))
-            ) {
+            if (($this->isAbsolutePathMatch($filePath, $excludedPattern)) || ($this->isBasenameOrRelativePathMatch($filePath, $excludedPattern))) {
                 return true;
             }
         }
@@ -171,8 +175,8 @@ final class Linter
      */
     private function isAbsolutePath(string $path): bool
     {
-        return str_starts_with($path, '/') ||  // Unix
-            preg_match('/^[A-Za-z]:[\/\\\\]/', $path);  // Windows
+        return str_starts_with($path, '/') || // Unix
+            preg_match('/^[A-Za-z]:[\/\\\\]/', $path); // Windows
     }
 
     /**
@@ -191,8 +195,8 @@ final class Linter
     /**
      * Scans a PHP file for security vulnerabilities based on predefined rules.
      *
-     * @param string $filePath Path tofile to scan.
-     * @return array List of detected security issues withinfile.
+     * @param string $filePath Path to file to scan.
+     * @return array List of detected security issues within file.
      */
     private function scanFile(string $filePath): array
     {
@@ -208,7 +212,7 @@ final class Linter
         foreach ($this->rules as $rule) {
             // Check full content first for better pattern matching.
             if (preg_match($rule['pattern'], $content)) {
-                // Findline number where it occurs.
+                // Find line number where it occurs.
                 $lineNumber = 1;
                 foreach ($lines as $line) {
                     if (preg_match($rule['pattern'], $line)) {
