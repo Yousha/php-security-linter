@@ -5,24 +5,28 @@ A: The linter requires PHP 7.4 or 8.3.
 
 Q: How do I exclude files from scanning?
 A: Use the --exclude option with comma-separated paths:
---exclude=vendor,tests,config.php
+--exclude storage,tests,config.php
+
+Q: How do I exclude specific security rules?
+A: You can exclude specific rules by using the --exclude-rules option in the CLI, followed by a comma-separated list of rule IDs:
+--exclude-rules CIS-003,OWASP-002
+
+Q: Which directories are excluded by default?
+A: These: vendor,.git,.github,.gitlab,.azure-pipelines,.husky,.circleci,.vscode,.idea,
 
 Q: Can I use this in CI pipelines?
 A: Yes, the JSON output format (--format=json) works well for CI integration.
 
-Q: How do I add custom rules?
-A: Create a php-security-config.json file with your custom rules pattern.
-
-Q: Why isn't it detecting vulnerability X?
+Q: Why isn't it detecting vulnerability X? or how do I contribute new rules?
 A: Check if the rule exists in our documentation. You can submit new rule requests via Issues section.
 
 Q: How do I update the ruleset?
-A: Update to the latest version via Composer:
+A: Update to the latest version of package via Composer:
 composer update yousha/php-security-linter
 
 Q: Can I scan single files?
 A: Yes, provide the file path instead of directory:
---path=src/file.php
+--path src/file.php
 
 Q: How do I interpret the severity levels?
 * Critical: Immediate security risk
@@ -30,56 +34,19 @@ Q: How do I interpret the severity levels?
 * Medium: Security best practice violation
 * Low: Informational notice
 
-Q: Where can I see all available rules?
-A: Run with --verbose flag or check the RULES.md documentation.
-
-Q: How do I contribute new rules?
-A: Fork the repository and submit a PR with your rule additions to the appropriate ruleset file.
-
-Q: Why does it flag my vendor dependencies?
-A: Either exclude the vendor directory (--exclude=vendor) or update vulnerable dependencies.
-
-Q: Can I disable specific rules?
-A: Yes, via configuration file by listing rule IDs to exclude.
-
-Q: How can I create custom rule sets for my project's specific needs?
-A: Extend the built-in rules by adding a php-security-custom-rules.json file in your project root with patterns like:
-{
-    "CUSTOM-001": {
-        "pattern": "/\\bmy_unsafe_function\\s*\\(/i",
-        "message": "Custom unsafe function detected",
-        "severity": "high"
-    }
-}
-
 Q: Can I integrate this with PHPStan or Psalm for combined analysis?
 A: Yes, chain it in your CI pipeline after static analysis tools. For direct integration, use the JSON output as input for custom rules in those tools.
 
 Q: How do I handle false positives?
 A: Three approaches:
 * Exclude files via --exclude
-* Disable specific rules in config:
-{"disabledRules": ["OWASP-123", "CIS-456"]}
+* Disable specific rules via --exclude-rules
 
 Q: What's the performance impact for large codebases?
 A: Benchmarks show:
 ~50ms per 1,000 lines of code
 2-3x faster with OPcache enabled
-Use --exclude=vendor,node_modules for best performance
 
 Q: How can I export results to a security dashboard?
 A: Pipe JSON output to your monitoring system:
 php php-sl.php --format=json | jq '.results' > security-report.json
-
-Q: How does the linter handle obfuscated or dynamically generated code?
-A: The static analyzer:
-* Detects common obfuscation patterns
-* Flags eval()/create_function() usage
-* But cannot analyze runtime-generated strings executed as code
-
-Q: How are severity levels determined?
-A: Based on:
-* OWASP/CIS severity guidelines
-* Exploit probability
-* Impact scoring (CVSS-like)
-* Manual security team review
