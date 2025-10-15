@@ -1,22 +1,57 @@
+---
 name: Build and Test
+
+permissions:
+  contents: read
+  pull-requests: read
 
 on:
   push:
+    paths-ignore:
+      - "*.md"
     branches:
       - main
   pull_request:
+    paths-ignore:
+      - "*.md"
     branches:
       - main
   workflow_dispatch:
+
+env:
+  COMPOSER_NO_INTERACTION: 1
+  COMPOSER_PROCESS_TIMEOUT: 300   # Seconds.
 
 jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-latest
+    continue-on-error: false
 
     steps:
+      - name: Update platform's packages database
+        run: sudo apt-get update
+
+      - name: Install platform tools
+        run: sudo apt-get install -y libxml2-utils yamllint jq
+
       - name: Clone project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: Lint YAML files
+        run: |
+          find . -type f -name "*.yml" -not -path "./vendor/*" \
+            -not -path "./.git/*" -exec yamllint {} +
+
+      - name: Lint XML files
+        run: |
+          find . -type f -name "*.xml" -not -path "./vendor/*" \
+            -not -path "./.git/*" -exec xmllint --noout {} \;
+
+      - name: Lint JSON files
+        run: |
+          find . -type f -name "*.json" -not -path "./vendor/*" \
+            -not -path "./.git/*" -exec sh -c 'jq empty "$0"' {} \;
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -25,6 +60,17 @@ jobs:
           coverage: none
           extensions: pcre
           tools: composer:v2
+          ini-values: memory_limit=256M, zend.assertions=1, \
+            error_reporting=-1, display_errors=On
+
+     - name: Lint PHP files
+        run: |
+          set -e
+          set -o nounset
+          set -o errexit
+          set -o pipefail
+          find . -path ./vendor -prune -o -name "*.php" -print0 \
+            | xargs -0 -n 1 php -l
 
       - name: Validate manifest file
         run: composer validate --strict
@@ -37,21 +83,25 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --no-interaction --no-progress
+        run: composer install --no-interaction --no-progress --prefer-dist
 
       - name: Lint project files
         run: |
-          set -e  # Stop on error.
-          find . -path ./vendor -prune -o -name "*.php" -print0 | xargs -0 -n 1 php -l
+          set -e
+          set -o nounset
+          set -o errexit
+          set -o pipefail
+          find . -path ./vendor -prune -o -name "*.php" -print0 \
+            | xargs -0 -n 1 php -l
 
       - name: Lint codes
         run: composer lint
 
-      - name: Check coding convention
-        run: composer format-check
-
-      - name: Check code refactoring rules
+      - name: Check refactoring
         run: composer refactor-check
+
+      - name: Check coding style
+        run: composer format-check
 
       - name: Security check
         run: composer audit
