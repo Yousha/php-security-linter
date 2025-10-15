@@ -15,6 +15,7 @@ static $rules = [
 
 static $excludeFolders = [
     '.git/',
+    '.github/',
     'resources/',
     'vendor/'
 ];

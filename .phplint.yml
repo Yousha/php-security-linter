@@ -6,6 +6,7 @@ extensions:
   - php
 exclude:
   - .git/
+  - .github/
   - resources/
   - vendor/
 jobs: 1
