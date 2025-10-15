@@ -48,7 +48,10 @@ jobs:
         run: composer lint
 
       - name: Check coding convention
-        run: composer check
+        run: composer format-check
+
+      - name: Check code refactoring rules
+        run: composer refactor-check
 
       - name: Security check
         run: composer audit
