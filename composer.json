@@ -37,7 +37,7 @@
     },
     "require-dev": {
         "ergebnis/composer-normalize": "2.48.*",
-        "friendsofphp/php-cs-fixer": "3.91.*",
+        "friendsofphp/php-cs-fixer": "3.91.* || 3.92.*",
         "icanhazstring/composer-unused": "0.8.*",
         "maglnet/composer-require-checker": "3.8.*",
         "overtrue/phplint": "3.4.*",
