@@ -43,7 +43,7 @@ use Yousha\PhpSecurityLinter\Exceptions\LinterException;
 function showHelp(): void
 {
     echo <<<HELP
-        PHP Security Linter - 2.0.2.3
+        PHP Security Linter - 2.0.2.4
         Usage: php vendor/bin/php-sl [options]
 
         Options:

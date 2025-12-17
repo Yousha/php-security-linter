@@ -1,4 +1,14 @@
-2.0.1.2 - 2025-4-28
+2.0.2.4 - 2025-12-17
+-------------------------
+* Fix minor bugs.
+* Add Rector tool for development.
+* Add new Composer commands.
+* Reformat codes.
+* Cleanup codes.
+* Update libraries.
+* Update documents.
+
+2.0.1.3 - 2025-4-28
 -------------------------
 * Update documents.
 
