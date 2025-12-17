@@ -21,7 +21,7 @@ final class LinterExceptionTest extends TestCase
      *
      * @return void
      */
-    public function testBasicException()
+    public function testBasicException(): void
     {
         $exception = new LinterException('Test message', 123);
         $this->assertEquals('Test message', $exception->getMessage());
@@ -37,7 +37,7 @@ final class LinterExceptionTest extends TestCase
      *
      * @return void
      */
-    public function testExceptionWithContext()
+    public function testExceptionWithContext(): void
     {
         $exception = new LinterException('Test message', 0, null, 'Additional context');
         $this->assertEquals('Additional context', $exception->getContext());
@@ -52,7 +52,7 @@ final class LinterExceptionTest extends TestCase
      *
      * @return void
      */
-    public function testFileAccessErrorFactory()
+    public function testFileAccessErrorFactory(): void
     {
         $exception = LinterException::fileAccessError('/path/to/file.php');
         $this->assertEquals(
@@ -74,7 +74,7 @@ final class LinterExceptionTest extends TestCase
      *
      * @return void
      */
-    public function testParsingErrorFactory()
+    public function testParsingErrorFactory(): void
     {
         $exception = LinterException::parsingError('/path/to/file.php', 'Syntax error');
         $this->assertEquals(
@@ -96,7 +96,7 @@ final class LinterExceptionTest extends TestCase
      *
      * @return void
      */
-    public function testInvalidRuleFactory()
+    public function testInvalidRuleFactory(): void
     {
         $exception = LinterException::invalidRule('bad_rule_pattern');
         $this->assertEquals(
@@ -118,7 +118,7 @@ final class LinterExceptionTest extends TestCase
      *
      * @return void
      */
-    public function testExceptionChaining()
+    public function testExceptionChaining(): void
     {
         $previous = new \RuntimeException('Previous error');
         $exception = new LinterException('Wrapper error', 0, $previous);

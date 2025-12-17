@@ -129,6 +129,7 @@ final class Linter
             if (empty($excludedPattern)) {
                 continue;
             }
+
             if (($this->isAbsolutePathMatch($filePath, $excludedPattern)) ||
                 ($this->isBasenameOrRelativePathMatch($filePath, $excludedPattern))
             ) {
@@ -217,8 +218,10 @@ final class Linter
                             'line' => $lineNumber,
                         ];
                     }
+
                     $lineNumber++;
                 }
+
                 // If no specific line was found, default to line 1.
                 if (empty($issues) || $issues[count($issues) - 1]['message'] !== $rule['message']) {
                     $issues[] = [
