@@ -56,7 +56,7 @@
         }
     },
     "bin": [
-        "bin/php-sl.php"
+        "bin/php-sl"
     ],
     "archive": {
         "exclude": [
