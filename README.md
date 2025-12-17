@@ -46,20 +46,20 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
 * **Configurable ruleset** with severity levels
 * **DevSecOps ready** CI/CD pipeline integration
 * **Exclusion support** for ignoring specific paths
-* **Supported PHP:** 7.4, 8.3
+* **Supported PHP:** 7.4, 8.*
 * **Supported platforms:** Windows, GNU/Linux, MacOS
 
 ## Requirements
 
-1. PHP 7.4 or PHP 8.3
+1. PHP 7.4 or PHP 8.*
 2. Composer >= 2
 
 ### Versions
 
 | Package version | Branch        | PHP version | Status         |
 |-----------------|---------------|-------------|----------------|
-| dev-main        | `main`        | 8.3         | Active         |
-| 3.*             | `main`        | 8.3         | Active         |
+| dev-main        | `main`        | 8.*         | Active         |
+| 3.*             | `main`        | 8.*         | Active         |
 | 2.*             | `main-php7.4` | 7.4         | Maintenance    |
 | 1.*             |               | 5.6         | EOL            |
 
@@ -118,19 +118,19 @@ Customize rules by creating a `php-security-config.json`:
 Lint a directory:
 
 ```shell
-php vendor/bin/php-security-linter --path ./src
+php vendor/bin/php-sl --path=./src
 ```
 
 Lint with exclusions:
 
 ```shell
-php vendor/bin/php-security-linter --path ./app --exclude vendor,tests
+php vendor/bin/php-sl --path=./app --exclude=vendor,tests
 ```
 
 JSON output:
 
 ```shell
-php vendor/bin/php-security-linter --path ./public --format json
+php vendor/bin/php-sl --path=./public --format=json
 ```
 
 ### Command options

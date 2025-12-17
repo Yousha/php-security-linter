@@ -69,7 +69,7 @@ Use --exclude=vendor,node_modules for best performance
 
 Q: How can I export results to a security dashboard?
 A: Pipe JSON output to your monitoring system:
-php php-sl.php --format=json | jq '.results' > security-report.json
+php php-sl --format=json | jq '.results' > security-report.json
 
 Q: How does the linter handle obfuscated or dynamically generated code?
 A: The static analyzer:
