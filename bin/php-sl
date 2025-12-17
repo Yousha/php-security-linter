@@ -137,6 +137,6 @@ function runCli(array $argv): int
     }
 }
 
-if (realpath($_SERVER['SCRIPT_FILENAME']) === __FILE__) {
+if (basename(realpath($_SERVER['SCRIPT_FILENAME'])) === basename(__FILE__)) {
     exit(runCli($argv));
 }
