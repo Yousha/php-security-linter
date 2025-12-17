@@ -1,3 +1,9 @@
+3.1.7.5 - 2025-12-17
+-------------------------
+* Rename CLI bin file.
+* Update/Fix readme file.
+* Cleanup codes.
+
 3.1.6.4 - 2025-10-15
 -------------------------
 * Fix issue #17. (config and rule exclude bug)
