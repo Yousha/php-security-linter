@@ -43,7 +43,7 @@ use Yousha\PhpSecurityLinter\Exceptions\LinterException;
 function showHelp(): void
 {
     echo <<<HELP
-        PHP Security Linter
+        PHP Security Linter - 3.1.7.5
         Usage: php bin/php-sl.php [options]
 
         Options:
@@ -153,7 +153,7 @@ function runCli(array $argv): int
 
     if (!$path || !is_dir($path)) {
         showHelp();
-        exit(0);
+        return 0;
     }
 
     // Process file/dir exclusions.
@@ -186,7 +186,7 @@ function runCli(array $argv): int
             ? $options['exclude-rules']
             : explode(',', $options['exclude-rules']);
         // Normalize and trim each rule ID.
-        $excludeRules = array_map('trim', $excludeRules);
+        $excludeRules = array_map(trim(...), $excludeRules);
     }
 
     try {
@@ -194,14 +194,14 @@ function runCli(array $argv): int
         $linter = new Linter($excludeRules);
         $results = $linter->scan($path, $excludePaths);
         outputResults($results);
-        exit(0);
+        return 0;
     } catch (LinterException $e) {
         fwrite(STDERR, sprintf('SCAN ERROR [%d]: %s%s', $e->getCode(), $e->getMessage(), PHP_EOL));
-        exit(2);
+        return 2;
     } catch (Exception $e) {
         fwrite(STDERR, sprintf('FATAL ERROR: %s%s', $e->getMessage(), PHP_EOL));
-        exit(3);
+        return 3;
     }
 }
 
-runCli($argv);
+exit(runCli($argv));

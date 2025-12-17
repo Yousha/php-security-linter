@@ -3,11 +3,11 @@
 /*
  * Name: PHP Security Linter
  * Description: A PHP tool to lint PHP files for security issues based on CIS and OWASP best practices.
- * Version: 3.0.0.3
+ * Version: 3.1.7.5
  * Locale: en_International
  * Last update: 2025
  * Architecture: no-arch
- * API: 7.4
+ * API: 8.3
  * Executor: Apache module, FPM, CGI
  * Builder:
  * License: GPL-3.0

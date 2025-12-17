@@ -88,16 +88,16 @@
         "lint": "phplint",
         "refactor": "rector process",
         "refactor-check": "rector --dry-run",
-        "format-check": "php-cs-fixer check",
         "reformat": "php-cs-fixer fix",
+        "format-check": "php-cs-fixer check",
         "test": "phpunit --configuration phpunit.xml"
     },
     "scripts-descriptions": {
         "lint": "Check PHP files for syntax errors.",
         "refactor": "Apply code refactoring.",
         "refactor-check": "Check code refactoring rules.",
-        "format-check": "Check coding style issues.",
         "reformat": "Fix coding style issues.",
+        "format-check": "Check coding style issues.",
         "test": "Run all tests."
     }
 }
