@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 /**
@@ -6,12 +7,27 @@
  * @package PhpSecurityLinter
  */
 
-if (php_sapi_name() !== 'cli') {
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+
+if (PHP_SAPI !== 'cli') {
     fwrite(STDERR, "Error: This script can only be run from terminal.\n");
     exit(1);
 }
 
-require_once __DIR__ . '/../vendor/autoload.php';
+$autoloadPath = __DIR__ . '/../../../../vendor/autoload.php'; // Path for Composer-installed package as user.
+
+if (!file_exists($autoloadPath)) {
+    $autoloadPath = __DIR__ . '/../vendor/autoload.php'; // Path for local development.
+}
+
+if (!file_exists($autoloadPath)) {
+    fwrite(STDERR, "Error: Vendor autoload file not found. Run 'composer install'.\n");
+    exit(1);
+}
+
+require_once $autoloadPath;
 
 use Yousha\PhpSecurityLinter\Linter;
 use Yousha\PhpSecurityLinter\Exceptions\LinterException;
@@ -27,8 +43,8 @@ use Yousha\PhpSecurityLinter\Exceptions\LinterException;
 function showHelp(): void
 {
     echo <<<HELP
-        PHP Security Linter 2.0.0.2
-        Usage: php bin/php-sl.php [options]
+        PHP Security Linter - 2.0.1.3
+        Usage: php vendor/bin/php-sl [options]
 
         Options:
           -p, --path=PATH      Path to scan (required)
@@ -36,8 +52,8 @@ function showHelp(): void
           --help               Show this help message
 
         Examples:
-          php bin/php-sl.php --path ./src
-          php bin/php-sl.php -p ./app --exclude vendor,tests
+          php /vendor/bin/php-sl --path=./src
+          php /vendor/bin/php-sl -p=./app --exclude=vendor,tests
 
         HELP;
 }
@@ -54,7 +70,7 @@ function outputResults(array $results): void
 {
     $scannedCount = $results['_meta']['scanned_count'] ?? 0;
     $issueCount = $results['_meta']['issue_count'] ?? 0;
-    unset($results['_meta']); // Don't show meta data in file list
+    unset($results['_meta']); // Don't show meta data in file list.
 
     echo "Scan results\n";
     echo str_repeat("=", 40) . "\n\n";
@@ -69,7 +85,7 @@ function outputResults(array $results): void
                 $issue['line']
             );
         }
-        echo "\n";
+        echo PHP_EOL;
     }
 
     echo "Summary: Scanned {$scannedCount} files, found {$issueCount} potential issues.\n";
@@ -90,26 +106,12 @@ function runCli(array $argv): int
         return 0;
     }
 
-
-    $shortOpts = 'p:';
-    $longOpts = [
-        'path:',
-        'exclude:',
-        'help',
-    ];
-    $options = getopt($shortOpts, $longOpts);
-
-    if (isset($options['help'])) {
-        showHelp();
-        exit(0);
-    }
-
     // Validate path.
     $path = $options['p'] ?? $options['path'] ?? null;
 
     if (!$path || !is_dir($path)) {
         showHelp();
-        exit(0);
+        return 0;
     }
 
     // Process exclusions.
@@ -125,18 +127,16 @@ function runCli(array $argv): int
         $linter = new Linter();
         $results = $linter->scan($path, $exclude);
         outputResults($results);
-        exit(0);
+        return 0;
     } catch (LinterException $e) {
         fwrite(STDERR, "SCAN ERROR [{$e->getCode()}]: {$e->getMessage()}\n");
-
-        exit(2);
+        return 2;
     } catch (Exception $e) {
         fwrite(STDERR, "FATAL ERROR: {$e->getMessage()}\n");
-        exit(3);
+        return 3;
     }
 }
 
-// Only execute if run directly (not when included).
-if (realpath($argv[0]) === realpath(__FILE__)) {
-    runCli($argv);
+if (realpath($_SERVER['SCRIPT_FILENAME']) === __FILE__) {
+    exit(runCli($argv));
 }
