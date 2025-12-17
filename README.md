@@ -67,6 +67,8 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
 * **Maintenance**: Critical/Security fixes only
 * **EOL**: Unsupported
 
+_The version of package that gets installed is automatically selected by Composer based on current installed PHP version._
+
 ## Screenshots
 
 ![Screenshot](resources/images/screenshots/1.png)
@@ -100,31 +102,37 @@ composer global require yousha/php-security-linter
 Lint current directory:
 
 ```shell
-php vendor/bin/php-security-linter --path .
+php vendor/bin/php-sl --path=.
+```
+
+Or (Windows):
+
+```shell
+vendor\bin\php-sl.bat --path=.
 ```
 
 Lint a directory:
 
 ```shell
-php vendor/bin/php-security-linter --path ./src
+php vendor/bin/php-sl --path=./src
 ```
 
 Lint with path exclusion:
 
 ```shell
-php vendor/bin/php-security-linter --path ./app --exclude storage,tests
+php vendor/bin/php-sl --path=./app --exclude=storage,tests
 ```
 
 Excluding a specific directory, path exclusion, and rule exclusion:
 
 ```bash
-php bin/php-sl.php --path ./src --exclude storage --exclude-rules CIS-003,OWASP-001
+php bin/php-sl.php --path=./src --exclude=storage --exclude-rules=CIS-003,OWASP-001
 ```
 
 JSON output:
 
 ```shell
-php vendor/bin/php-security-linter --path ./public --format json
+php vendor/bin/php-sl --path=./public --format=json
 ```
 
 ### Command options
