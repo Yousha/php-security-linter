@@ -9,8 +9,8 @@ static $rules = [
     '@PSR1'  => true,
     '@PSR2'  => true,
     '@PSR12' => true,
-    '@PER-CS2.0' => true,
-    '@PHP83Migration' => true
+    '@PER-CS' => true,
+    '@PHP8x5Migration' => true
 ];
 
 static $excludeFolders = [
@@ -27,6 +27,6 @@ $finder = Finder::create()
     ->ignoreVCS(true);
 
 
-return (new Config())
+return new Config()
     ->setRules($rules)
     ->setFinder($finder);

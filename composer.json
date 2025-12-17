@@ -32,7 +32,7 @@
         "source": "https://github.com/yousha/php-security-linter"
     },
     "require": {
-        "php": "8.3.*",
+        "php": "8.*",
         "ext-pcre": "*"
     },
     "require-dev": {

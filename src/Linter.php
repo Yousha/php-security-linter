@@ -7,7 +7,7 @@
  * Locale: en_International
  * Last update: 2025
  * Architecture: no-arch
- * API: 8.3
+ * API: 8.5
  * Executor: Apache module, FPM, CGI
  * Builder:
  * License: GPL-3.0
@@ -57,9 +57,9 @@ final class Linter
             OwaspRules::getRules()
         );
         // Filter the rules based on the provided IDs
-        $this->rules = array_filter($allRules, fn(array $rule): bool =>
+        $this->rules = array_filter($allRules, fn(array $rule): bool
         // Only keep the rule if its ID is NOT in the excludedRuleIds list
-        !in_array($rule['id'], $this->excludedRuleIds, true));
+        => !in_array($rule['id'], $this->excludedRuleIds, true));
     }
 
     /**
@@ -175,8 +175,8 @@ final class Linter
      */
     private function isAbsolutePath(string $path): bool
     {
-        return str_starts_with($path, '/') || // Unix
-            preg_match('/^[A-Za-z]:[\/\\\\]/', $path); // Windows
+        return str_starts_with($path, '/') // Unix
+            || preg_match('/^[A-Za-z]:[\/\\\\]/', $path); // Windows
     }
 
     /**
@@ -188,8 +188,8 @@ final class Linter
      */
     private function isBasenameOrRelativePathMatch(string $filePath, string $excludedPattern): bool
     {
-        return basename($filePath) === $excludedPattern ||
-            str_contains($filePath, $excludedPattern);
+        return basename($filePath) === $excludedPattern
+            || str_contains($filePath, $excludedPattern);
     }
 
     /**
