@@ -1,5 +1,5 @@
-version: 3
-
+---
+version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -9,7 +9,6 @@ updates:
     target-branch: "develop"
     assignees:
       - "Yousha"
-    versioning-strategy: "increase"
 
   - package-ecosystem: "composer"
     directory: "/"
@@ -19,4 +18,3 @@ updates:
     target-branch: "main"
     assignees:
       - "Yousha"
-    versioning-strategy: "increase"
