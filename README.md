@@ -50,15 +50,15 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
 
 ## Requirements
 
-1. PHP 7.4 or PHP 8.*
+1. PHP 7.4 or PHP +8.2
 2. Composer >= 2
 
 ### Versions
 
 | Package version | Branch name       | PHP version | Status         |
 |-----------------|-------------------|-------------|----------------|
-| dev-main        | `main`            | 8.*         | Active         |
-| 3.*             | `main`            | 8.*         | Active         |
+| dev-main        | `main`            | +8.2         | Active         |
+| 3.*             | `main`            | +8.2         | Active         |
 | dev-main-php7.4 | `main-php7.4`     | 7.4         | Maintenance    |
 | 2.*             | `main-php7.4`     | 7.4         | Maintenance    |
 | 1.*             |                   | 5.6         | EOL            |
@@ -85,13 +85,13 @@ _The version of package that gets installed is automatically selected by Compose
 
 ## Installation
 
-Via [Composer](https://getcomposer.org/):
+Via [Composer](https://getcomposer.org/) per project:
 
 ```shell
 composer require --dev yousha/php-security-linter
 ```
 
-Or Composer global installation:
+Or via [Composer](https://getcomposer.org/) globally:
 
 ```shell
 composer global require yousha/php-security-linter
@@ -135,7 +135,7 @@ JSON output:
 php vendor/bin/php-sl --path=./public --format=json
 ```
 
-### Command options
+### Commands
 
 | Option       | Description                      |
 | ------------ | -------------------------------- |
@@ -144,7 +144,7 @@ php vendor/bin/php-sl --path=./public --format=json
 | `--exclude-rules` | Comma-separated rule IDs to ignore |
 | `--help`     | Show help message                |
 
-### Example console output
+### Example output
 
 ```shell
 Scan Results
@@ -160,7 +160,7 @@ File: /src/utils.php
 Summary: Scanned 24 files, found 3 potential issues.
 ```
 
-### QA test
+### QA/QC test
 
 Run tests to ensure everything works as expected:
 
