@@ -3,18 +3,18 @@
 /*
  * Name: PHP Security Linter
  * Description: A PHP tool to lint PHP files for security issues based on CIS and OWASP best practices.
- * Version: 3.1.7.5
+ * Version: 3.1.8.6
  * Locale: en_International
- * Last update: 2025
+ * Last update: 2026
  * Architecture: no-arch
- * API: 8.5
+ * API: 8.2
  * Executor: Apache module, FPM, CGI
  * Builder:
  * License: GPL-3.0
- * Copyright: Copyright (c) 2025 Yousha Aleayoub.
+ * Copyright: Copyright (c) 2026 Yousha Aleayoub.
  * Producer: Yousha Aleayoub
  * Maintainer: Yousha Aleayoub
- * Contact: yousha.a@hotmail.com
+ * Contact: y.aleayoub@gmail.com
  * Link: http://yousha.blog.ir
  */
 
