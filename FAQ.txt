@@ -1,7 +1,7 @@
 Frequently Asked Questions (FAQs)
 
 Q: What PHP versions are supported?
-A: The linter requires PHP 7.4 or 8.*.
+A: The current version requires PHP 8.2 or newer.
 
 Q: How do I exclude files from scanning?
 A: Use the --exclude option with comma-separated paths:
@@ -15,7 +15,7 @@ Q: Which directories are excluded by default?
 A: These: vendor,.git,.github,.gitlab,.azure-pipelines,.husky,.circleci,.vscode,.idea,
 
 Q: Can I use this in CI pipelines?
-A: Yes, the JSON output format (--format=json) works well for CI integration.
+A: Yes. Run the CLI in your pipeline and use its exit code: 0 means the scan completed, 2 indicates invalid CLI input, 3 indicates a fatal error, and 4 indicates one or more files or directories could not be scanned. Findings are printed to the console.
 
 Q: Why isn't it detecting vulnerability X? or how do I contribute new rules?
 A: Check if the rule exists in our documentation. You can submit new rule requests via Issues section.
@@ -24,9 +24,8 @@ Q: How do I update the ruleset?
 A: Update to the latest version of package via Composer:
 composer update yousha/php-security-linter
 
-Q: Can I scan single files?
-A: Yes, provide the file path instead of directory:
---path src/file.php
+Q: Can I scan a single PHP file?
+A: Not currently. The --path option must point to an existing directory. To scan one file, place it in a directory and scan that directory.
 
 Q: How do I interpret the severity levels?
 * Critical: Immediate security risk
@@ -35,7 +34,7 @@ Q: How do I interpret the severity levels?
 * Low: Informational notice
 
 Q: Can I integrate this with PHPStan or Psalm for combined analysis?
-A: Yes, chain it in your CI pipeline after static analysis tools. For direct integration, use the JSON output as input for custom rules in those tools.
+A: Yes, chain it in your CI pipeline after static analysis tools. The CLI currently reports findings in human-readable console output; it does not provide JSON output.
 
 Q: How do I handle false positives?
 A: Three approaches:
@@ -48,5 +47,4 @@ A: Benchmarks show:
 2-3x faster with OPcache enabled
 
 Q: How can I export results to a security dashboard?
-A: Pipe JSON output to your monitoring system:
-php php-sl.php --format=json | jq '.results' > security-report.json
+A: A machine-readable output format is not currently available. Use the console output and process exit code, or integrate the PHP library directly.
