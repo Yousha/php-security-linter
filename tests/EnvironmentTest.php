@@ -10,6 +10,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
     use PHPUnit\Framework\TestCase;
 
     #[\PHPUnit\Framework\Attributes\Group('Environment')]
+    #[\PHPUnit\Framework\Attributes\Medium]
     final class EnvironmentTest extends TestCase
     {
         /**
@@ -65,7 +66,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          * @return void
          */
         #[\PHPUnit\Framework\Attributes\Test]
-        #[\PHPUnit\Framework\Attributes\Medium]
         final public function testPhp_1(): void
         {
             // AAA
