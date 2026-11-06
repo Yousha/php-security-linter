@@ -166,7 +166,8 @@ final class LinterTest extends TestCase
 
         try {
             $results = $this->linter->scan($tempDir);
-            $this->assertEmpty($results);
+            $this->assertSame(0, $results['_meta']['scanned_count']);
+            $this->assertSame(0, $results['_meta']['warning_count']);
         } finally {
             unlink($tempDir . '/test.txt');
             rmdir($tempDir);
@@ -271,7 +272,48 @@ final class LinterTest extends TestCase
     public function testInvalidDirectory(): void
     {
         $this->expectException(LinterException::class);
+        $this->expectExceptionMessage('Path does not exist: /nonexistent/path');
         $linter = new Linter();
         $linter->scan('/nonexistent/path');
+    }
+
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function testScanMetadataIncludesWarningDetails(): void
+    {
+        $tempDir = sys_get_temp_dir() . '/scan_warning_' . uniqid();
+        mkdir($tempDir);
+        mkdir($tempDir . '/unreadable.php');
+
+        try {
+            $results = $this->linter->scan($tempDir);
+
+            $this->assertSame(0, $results['_meta']['scanned_count']);
+            $this->assertSame(1, $results['_meta']['warning_count']);
+            $this->assertStringContainsString(
+                'Could not read file:',
+                $results['_meta']['warnings'][0]
+            );
+        } finally {
+            rmdir($tempDir . '/unreadable.php');
+            rmdir($tempDir);
+        }
+    }
+
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function testScanMetadataIsPresentForEmptyDirectory(): void
+    {
+        $tempDir = sys_get_temp_dir() . '/scan_empty_' . uniqid();
+        mkdir($tempDir);
+
+        try {
+            $results = $this->linter->scan($tempDir);
+
+            $this->assertSame(0, $results['_meta']['scanned_count']);
+            $this->assertSame(0, $results['_meta']['issue_count']);
+            $this->assertSame(0, $results['_meta']['warning_count']);
+            $this->assertSame([], $results['_meta']['warnings']);
+        } finally {
+            rmdir($tempDir);
+        }
     }
 }

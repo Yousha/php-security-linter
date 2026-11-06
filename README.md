@@ -28,7 +28,7 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
 
 ## Features
 
-* **200+ vuilt-in security rules**:
+* **35 built-in security rules** (16 CIS and 19 OWASP):
   * Injection flaws (SQLi, Command, LDAP)
   * Cryptographic weaknesses
   * XSS and SSRF vulnerabilities
@@ -41,7 +41,7 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
   * OWASP Top 10 2021
   * Custom rule sets
 * **Fast static analysis** without executing code
-* **Multiple output formats** (Console, JSON)
+* **Console output** with file-level findings and scan summary
 * **Configurable ruleset**
 * **DevSecOps ready** CI/CD pipeline integration
 * **Exclusion support** for ignoring specific paths
@@ -131,12 +131,6 @@ Excluding a specific directory, path exclusion, and rule exclusion:
 php bin/php-sl.php --path=./src --exclude=storage --exclude-rules=CIS-003,OWASP-001
 ```
 
-JSON output:
-
-```shell
-php vendor/bin/php-sl --path=./public --format=json
-```
-
 ### Commands
 
 | Option       | Description                      |
@@ -144,6 +138,7 @@ php vendor/bin/php-sl --path=./public --format=json
 | `-p, --path` | Path to scan (required)          |
 | `--exclude`  | Comma-separated paths to exclude |
 | `--exclude-rules` | Comma-separated rule IDs to ignore |
+| `--list-rules` | List available rule IDs |
 | `--help`     | Show help message                |
 
 ### Example output
