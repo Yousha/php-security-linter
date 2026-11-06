@@ -14,19 +14,19 @@ namespace Yousha\PhpSecurityLinter\Tests {
         /**
          * This method is called before the first test method in the test class is executed.
          *
-         * @doesNotPerformAssertions
          *
          * @return void
          */
+        #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         public static function setUpBeforeClass(): void {}
 
         /**
          * This method is called after the last test method in the test class has been executed.
          *
-         * @doesNotPerformAssertions
          *
          * @return void
          */
+        #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         public static function tearDownAfterClass(): void
         {
             gc_collect_cycles();
@@ -35,10 +35,10 @@ namespace Yousha\PhpSecurityLinter\Tests {
         /**
          * This method is called BEFORE each test method.
          *
-         * @doesNotPerformAssertions
          *
          * @return void
          */
+        #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         protected function setUp(): void
         {
             parent::setUp();
@@ -48,10 +48,10 @@ namespace Yousha\PhpSecurityLinter\Tests {
         /**
          * This method is called AFTER each test method.
          *
-         * @doesNotPerformAssertions
          *
          * @return void
          */
+        #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         protected function tearDown(): void
         {
             // Methods finalization codes.
@@ -59,12 +59,12 @@ namespace Yousha\PhpSecurityLinter\Tests {
         }
 
         /**
-         * @test
          *
-         * @small
          *
          * @return void
          */
+        #[\PHPUnit\Framework\Attributes\Test]
+        #[\PHPUnit\Framework\Attributes\Small]
         final public function testProjectRequiredPhpVersion(): void
         {
             $_result = (PHP_MAJOR_VERSION == 8) && (PHP_MINOR_VERSION >= 3);
@@ -72,12 +72,12 @@ namespace Yousha\PhpSecurityLinter\Tests {
         }
 
         /**
-         * @test
          *
-         * @small
          *
          * @return void
          */
+        #[\PHPUnit\Framework\Attributes\Test]
+        #[\PHPUnit\Framework\Attributes\Small]
         final public function testProjectRequiredPhpExtensions(): void
         {
             $extensions = [
@@ -90,12 +90,12 @@ namespace Yousha\PhpSecurityLinter\Tests {
         }
 
         /**
-         * @test
          *
-         * @small
          *
          * @return void
          */
+        #[\PHPUnit\Framework\Attributes\Test]
+        #[\PHPUnit\Framework\Attributes\Small]
         final public function testProjectDirectoriesExist(): void
         {
             $directories = [
@@ -112,12 +112,12 @@ namespace Yousha\PhpSecurityLinter\Tests {
         }
 
         /**
-         * @test
          *
-         * @small
          *
          * @return void
          */
+        #[\PHPUnit\Framework\Attributes\Test]
+        #[\PHPUnit\Framework\Attributes\Small]
         final public function testProjectFilesExist(): void
         {
             $files = [
