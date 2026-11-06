@@ -166,7 +166,8 @@ final class LinterTest extends TestCase
 
         try {
             $results = $this->linter->scan($tempDir);
-            $this->assertEmpty($results);
+            $this->assertSame(0, $results['_meta']['scanned_count']);
+            $this->assertSame(0, $results['_meta']['warning_count']);
         } finally {
             unlink($tempDir . '/test.txt');
             rmdir($tempDir);
