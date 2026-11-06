@@ -45,29 +45,31 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
 * **Configurable ruleset**
 * **DevSecOps ready** CI/CD pipeline integration
 * **Exclusion support** for ignoring specific paths
-* **Supported PHP:** 7.4, 8.*
+* **Supported PHP:** 8.2 and newer
 * **Supported platforms:** Windows, GNU/Linux, MacOS
 
 ## Requirements
 
-1. PHP 7.4 or PHP +8.2
-2. Composer >= 2
+1. PHP 8.2 or newer
+2. Composer 2 or newer
 
-### Versions
+### PHP Compatibility
 
-| Package version | Branch name       | PHP version | Status         |
-|-----------------|-------------------|-------------|----------------|
-| dev-main        | `main`            | +8.2         | Active         |
-| 3.*             | `main`            | +8.2         | Active         |
-| dev-main-php7.4 | `main-php7.4`     | 7.4         | Maintenance    |
-| 2.*             | `main-php7.4`     | 7.4         | Maintenance    |
-| 1.*             |                   | 5.6         | EOL            |
+The current `main` branch (`dev-main`) and 3.x releases require PHP 8.2 or newer.
+
+| Package version | Branch name       | PHP version | Status      |
+|-----------------|-------------------|-------------|-------------|
+| dev-main        | `main`            | 8.2+        | Active      |
+| 3.*             | `main`            | 8.2+        | Active      |
+| dev-main-php7.4 | `main-php7.4`     | 7.4         | Maintenance |
+| 2.*             | `main-php7.4`     | 7.4         | Maintenance |
+| 1.*             |                   | 5.6         | EOL         |
 
 * **Active**: Full support
-* **Maintenance**: Critical/Security fixes only
+* **Maintenance**: Critical and security fixes only
 * **EOL**: Unsupported
 
-_The version of package that gets installed is automatically selected by Composer based on current installed PHP version._
+The PHP 7.4 and PHP 5.6 entries refer only to older release lines; they are not supported by the current `main` branch or 3.x releases.
 
 ## Screenshots
 
