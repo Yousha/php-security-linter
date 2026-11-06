@@ -128,7 +128,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          * @return void
          */
         #[\PHPUnit\Framework\Attributes\Test]
-        #[\PHPUnit\Framework\Attributes\Medium]
         final public function testPhp_2(): void
         {
             $this->assertNotEmpty(getmypid());
