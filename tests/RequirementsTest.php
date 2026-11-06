@@ -7,6 +7,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
     use PHPUnit\Framework\TestCase;
 
     #[\PHPUnit\Framework\Attributes\Group('Requirements')]
+    #[\PHPUnit\Framework\Attributes\Small]
     final class RequirementsTest extends TestCase
     {
         /**
@@ -62,7 +63,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          * @return void
          */
         #[\PHPUnit\Framework\Attributes\Test]
-        #[\PHPUnit\Framework\Attributes\Small]
         final public function testProjectRequiredPhpVersion(): void
         {
             $_result = (PHP_MAJOR_VERSION == 8) && (PHP_MINOR_VERSION >= 2);
@@ -75,7 +75,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          * @return void
          */
         #[\PHPUnit\Framework\Attributes\Test]
-        #[\PHPUnit\Framework\Attributes\Small]
         final public function testProjectRequiredPhpExtensions(): void
         {
             $extensions = [
@@ -93,7 +92,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          * @return void
          */
         #[\PHPUnit\Framework\Attributes\Test]
-        #[\PHPUnit\Framework\Attributes\Small]
         final public function testProjectDirectoriesExist(): void
         {
             $directories = [
@@ -115,7 +113,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          * @return void
          */
         #[\PHPUnit\Framework\Attributes\Test]
-        #[\PHPUnit\Framework\Attributes\Small]
         final public function testProjectFilesExist(): void
         {
             $files = [
