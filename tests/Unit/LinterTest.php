@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
  * it correctly detects security vulnerabilities, handles exclusions,
  * and raises exceptions for invalid paths.
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class LinterTest extends TestCase
 {
     private Linter $linter;
@@ -20,19 +21,19 @@ final class LinterTest extends TestCase
     /**
      * This method is called before the first test method in the test class is executed.
      *
-     * @doesNotPerformAssertions
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public static function setUpBeforeClass(): void {}
 
     /**
      * This method is called after the last test method in the test class has been executed.
      *
-     * @doesNotPerformAssertions
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public static function tearDownAfterClass(): void
     {
         gc_collect_cycles();
@@ -41,10 +42,10 @@ final class LinterTest extends TestCase
     /**
      * This method is called BEFORE each test method.
      *
-     * @doesNotPerformAssertions
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     protected function setUp(): void
     {
         parent::setUp();
@@ -54,10 +55,10 @@ final class LinterTest extends TestCase
     /**
      * This method is called AFTER each test method.
      *
-     * @doesNotPerformAssertions
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     protected function tearDown(): void
     {
         // Methods finalization codes.
@@ -65,12 +66,11 @@ final class LinterTest extends TestCase
     }
 
     /**
-     * @test
      *
-     * @small
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testClassIsFinal(): void
     {
         $reflection = new \ReflectionClass(Linter::class);
@@ -78,12 +78,11 @@ final class LinterTest extends TestCase
     }
 
     /**
-     * @test
      *
-     * @small
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testClassHasCorrectNamespace(): void
     {
         $this->assertStringStartsWith(
@@ -94,12 +93,11 @@ final class LinterTest extends TestCase
     }
 
     /**
-     * @test
      *
-     * @small
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testLinterInitializesWithRules(): void
     {
         $reflection = new \ReflectionClass(Linter::class);
@@ -115,12 +113,11 @@ final class LinterTest extends TestCase
     }
 
     /**
-     * @test
      *
-     * @small
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testScanMethodExists(): void
     {
         $this->assertTrue(
@@ -129,12 +126,11 @@ final class LinterTest extends TestCase
     }
 
     /**
-     * @test
      *
-     * @small
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testScanMethodSignature(): void
     {
         $method = new \ReflectionMethod(Linter::class, 'scan');
@@ -157,12 +153,11 @@ final class LinterTest extends TestCase
     }
 
     /**
-     * @test
      *
-     * @small
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testScanDirectoryWithNonPhpFiles(): void
     {
         $tempDir = sys_get_temp_dir() . '/test_dir_' . uniqid();
@@ -179,12 +174,11 @@ final class LinterTest extends TestCase
     }
 
     /**
-     * @test
      *
-     * @small
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testScanReturnsMetadataWithFiles(): void
     {
         // Create temp dir with sample PHP file
@@ -203,12 +197,11 @@ final class LinterTest extends TestCase
     }
 
     /**
-     * @test
      *
-     * @small
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testScanThrowsExceptionForInvalidPath(): void
     {
         $this->expectException(LinterException::class);
@@ -218,12 +211,11 @@ final class LinterTest extends TestCase
     }
 
     /**
-     * @test
      *
-     * @small
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testCanScanEmptyDirectory(): void
     {
         $tempDir = sys_get_temp_dir() . '/empty_test_dir_' . uniqid();
@@ -247,12 +239,11 @@ final class LinterTest extends TestCase
     }
 
     /**
-     * @test
      *
-     * @small
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testShouldExcludeMethodIsPrivate(): void
     {
         $method = new \ReflectionMethod(Linter::class, 'shouldExclude');
@@ -260,12 +251,11 @@ final class LinterTest extends TestCase
     }
 
     /**
-     * @test
      *
-     * @small
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testScanFileMethodIsPrivate(): void
     {
         $method = new \ReflectionMethod(Linter::class, 'scanFile');
@@ -273,12 +263,11 @@ final class LinterTest extends TestCase
     }
 
     /**
-     * @test
      *
-     * @small
      *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testInvalidDirectory(): void
     {
         $this->expectException(LinterException::class);
