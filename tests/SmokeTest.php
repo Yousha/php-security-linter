@@ -9,6 +9,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
     use Yousha\PhpSecurityLinter\Linter;
 
     #[\PHPUnit\Framework\Attributes\Group('Smoke')]
+    #[\PHPUnit\Framework\Attributes\Small]
     final class SmokeTest extends TestCase
     {
         private Linter $linter;
@@ -66,7 +67,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          * @return void
          */
         #[\PHPUnit\Framework\Attributes\Test]
-        #[\PHPUnit\Framework\Attributes\Small]
         public function testComposerCanLoadLibraryClass(): void
         {
             // AAA
@@ -79,7 +79,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          * @return void
          */
         #[\PHPUnit\Framework\Attributes\Test]
-        #[\PHPUnit\Framework\Attributes\Small]
         public function testLinterInstanceIsObject(): void
         {
             // AAA
