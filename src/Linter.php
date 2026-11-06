@@ -34,16 +34,16 @@ use UnexpectedValueException;
 /**
  * Scans PHP files in a directory and reports security-rule matches.
  */
-final class Linter
+final readonly class Linter
 {
     /** @var array Security rules to check against. */
-    private array $rules = [];
+    private array $rules;
 
     /**
      * @param array $excludeRuleIds List of rule IDs to exclude.
      */
     public function __construct(
-        private readonly array $excludedRuleIds = []
+        private array $excludedRuleIds = []
     ) {
         $allRules = array_merge(CisRules::getRules(), OwaspRules::getRules());
         $this->rules = array_filter(
@@ -101,8 +101,8 @@ final class Linter
                     $issueCount += count($issues);
                 }
             }
-        } catch (UnexpectedValueException $exception) {
-            $warnings[] = sprintf('Could not traverse directory: %s', $exception->getMessage());
+        } catch (UnexpectedValueException $unexpectedValueException) {
+            $warnings[] = sprintf('Could not traverse directory: %s', $unexpectedValueException->getMessage());
         }
 
         $results['_meta'] = [
