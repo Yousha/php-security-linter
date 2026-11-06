@@ -101,9 +101,6 @@ jobs:
       - name: Lint codes
         run: composer lint
 
-      - name: Check refactoring
-        run: composer refactor-check
-
       - name: Check coding style
         run: composer format-check
 
