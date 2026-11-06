@@ -65,8 +65,12 @@ final class Linter
      */
     public function scan(string $path, array $exclude = []): array
     {
+        if (!file_exists($path)) {
+            throw new LinterException('Path does not exist: ' . $path);
+        }
+
         if (!is_dir($path)) {
-            throw new LinterException('Path is not an existing directory: ' . $path);
+            throw new LinterException('Path is not a directory: ' . $path);
         }
 
         $results = [];
