@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
  * it correctly detects security vulnerabilities, handles exclusions,
  * and raises exceptions for invalid paths.
  */
+#[\PHPUnit\Framework\Attributes\Small]
 final class LinterTest extends TestCase
 {
     private Linter $linter;
