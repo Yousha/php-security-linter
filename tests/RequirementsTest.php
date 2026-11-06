@@ -6,9 +6,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
 
     use PHPUnit\Framework\TestCase;
 
-    /**
-     * @group Requirements
-     */
+        #[\PHPUnit\Framework\Attributes\Group('Requirements')]
     final class RequirementsTest extends TestCase
     {
         /**
