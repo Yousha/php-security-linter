@@ -8,9 +8,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
     use PHPUnit\Framework\TestCase;
     use Yousha\PhpSecurityLinter\Linter;
 
-    /**
-     * @group Smoke
-     */
+        #[\PHPUnit\Framework\Attributes\Group('Smoke')]
     final class SmokeTest extends TestCase
     {
         private Linter $linter;
