@@ -277,7 +277,7 @@ final class LinterTest extends TestCase
         $linter->scan('/nonexistent/path');
     }
 
-    #[\PHPUnit\\Framework\\Attributes\\Test]
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testScanMetadataIncludesWarningDetails(): void
     {
         $tempDir = sys_get_temp_dir() . '/scan_warning_' . uniqid();
@@ -299,7 +299,7 @@ final class LinterTest extends TestCase
         }
     }
 
-    #[\PHPUnit\\Framework\\Attributes\\Test]
+    #[\PHPUnit\Framework\Attributes\Test]
     public function testScanMetadataIsPresentForEmptyDirectory(): void
     {
         $tempDir = sys_get_temp_dir() . '/scan_empty_' . uniqid();
