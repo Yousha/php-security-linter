@@ -9,9 +9,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
     use stdClass;
     use PHPUnit\Framework\TestCase;
 
-    /**
-     * @group Environment
-     */
+        #[\PHPUnit\Framework\Attributes\Group('Environment')]
     final class EnvironmentTest extends TestCase
     {
         /**
