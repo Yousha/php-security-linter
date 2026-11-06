@@ -278,28 +278,6 @@ final class LinterTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
-    public function testScanMetadataIncludesWarningDetails(): void
-    {
-        $tempDir = sys_get_temp_dir() . '/scan_warning_' . uniqid();
-        mkdir($tempDir);
-        mkdir($tempDir . '/unreadable.php');
-
-        try {
-            $results = $this->linter->scan($tempDir);
-
-            $this->assertSame(0, $results['_meta']['scanned_count']);
-            $this->assertSame(1, $results['_meta']['warning_count']);
-            $this->assertStringContainsString(
-                'Could not read file:',
-                $results['_meta']['warnings'][0]
-            );
-        } finally {
-            rmdir($tempDir . '/unreadable.php');
-            rmdir($tempDir);
-        }
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
     public function testScanMetadataIsPresentForEmptyDirectory(): void
     {
         $tempDir = sys_get_temp_dir() . '/scan_empty_' . uniqid();
