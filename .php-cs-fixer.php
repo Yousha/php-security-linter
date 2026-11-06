@@ -27,6 +27,8 @@ $finder = Finder::create()
     ->ignoreVCS(true);
 
 
-return new Config()
-    ->setRules($rules)
-    ->setFinder($finder);
+$config = new Config();
+$config->setRules($rules);
+$config->setFinder($finder);
+
+return $config;
