@@ -62,9 +62,7 @@ function showHelp(): void
 }
 
 /**
- * Outputs security scan results in specified format.
- *
- * A human-readable summary is displayed with file-specific details.
+ * Outputs a human-readable security scan summary with file-specific details.
  *
  * @param array $results The security scan results, indexed by file path.
  * @return void
