@@ -55,7 +55,7 @@ final class OwaspRulesTest extends TestCase
 
     public function testOwaspA07WeakPasswordHashPattern(): void
     {
-                // Arrange
+        // Arrange
 $pattern = null;
         foreach ($this->rules as $rule) {
             if (str_starts_with((string) $rule['message'], 'OWASP-A07:')) {
@@ -107,7 +107,7 @@ $pattern = null;
 
     public function testOwaspA08InsecureDeserializationUnserializePattern(): void
     {
-                // Arrange
+        // Arrange
 $pattern = null;
         foreach ($this->rules as $rule) {
             if (str_starts_with((string) $rule['message'], 'OWASP-A08:')) {
@@ -154,7 +154,7 @@ $pattern = null;
 
     public function testOwaspA10SsrFPattern(): void
     {
-                // Arrange
+        // Arrange
 $pattern = null;
         foreach ($this->rules as $rule) {
             if (str_starts_with((string) $rule['message'], 'OWASP-A10:')) {
@@ -203,7 +203,7 @@ $pattern = null;
 
     public function testOwaspA07ReflectedXssPattern(): void
     {
-                // Arrange
+        // Arrange
 $pattern = null;
         foreach ($this->rules as $rule) {
             if (str_starts_with((string) $rule['message'], 'OWASP-A07:')) {

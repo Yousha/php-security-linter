@@ -45,10 +45,11 @@ namespace Yousha\PhpSecurityLinter\Tests {
         #[\PHPUnit\Framework\Attributes\Test]
         public function testComposerCanLoadLibraryClass(): void
         {
-                    // Arrange
-// Assert
+        // Arrange
+
+        // Act
+
         // Assert
-        
             $this->assertTrue(class_exists(Linter::class));
         }
 
@@ -56,14 +57,12 @@ namespace Yousha\PhpSecurityLinter\Tests {
         #[\PHPUnit\Framework\Attributes\Test]
         public function testLinterInstanceIsObject(): void
         {
-                    // Arrange
-// Assert
+        // Arrange
+
+        // Act
+
         // Assert
-        
             $this->assertNotNull($this->linter);
-            // Assert
-        // Assert
-        
             $this->assertIsObject($this->linter);
         }
     }

@@ -18,9 +18,7 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
         mkdir($root);
         $file = $root . '/unsafe.php';
         file_put_contents($file, "<?php\nexec(\$_GET['cmd']);\n");
-
         try {
-            // Act
             $json = $formatter->format([
                 $file => [[
                     'severity' => 'critical',
@@ -35,8 +33,6 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
                 ],
             ], $root);
             $document = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-
-            // Assert
             self::assertSame('2.1.0', $document['version']);
             self::assertCount(1, $document['runs']);
             self::assertSame('PHP Security Linter', $document['runs'][0]['tool']['driver']['name']);
@@ -67,8 +63,6 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
     {
         // Arrange
         $formatter = new SarifFormatter();
-
-        // Act
         $document = json_decode($formatter->format([
             '_meta' => [
                 'scanned_count' => 0,
@@ -77,8 +71,6 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
                 'warnings' => [],
             ],
         ], sys_get_temp_dir()), true, 512, JSON_THROW_ON_ERROR);
-
-        // Assert
         self::assertSame([], $document['runs'][0]['results']);
         self::assertTrue($document['runs'][0]['invocations'][0]['executionSuccessful']);
     }
@@ -88,8 +80,6 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
     {
         // Arrange
         $formatter = new SarifFormatter();
-
-        // Act
         $document = json_decode($formatter->format([
             '_meta' => [
                 'scanned_count' => 0,
@@ -98,8 +88,6 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
                 'warnings' => ['Could not read file: unreadable.php'],
             ],
         ], sys_get_temp_dir()), true, 512, JSON_THROW_ON_ERROR);
-
-        // Assert
         self::assertSame([], $document['runs'][0]['results']);
         self::assertFalse($document['runs'][0]['invocations'][0]['executionSuccessful']);
         self::assertSame(
@@ -114,18 +102,13 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
         // Arrange
         $registeredRules = array_merge(CisRules::getRules(), OwaspRules::getRules());
         $formatter = new SarifFormatter();
-
-        // Act
         $document = json_decode($formatter->format([
             '_meta' => ['warnings' => []],
         ], sys_get_temp_dir()), true, 512, JSON_THROW_ON_ERROR);
         $descriptors = $document['runs'][0]['tool']['driver']['rules'];
         $descriptorIds = array_column($descriptors, 'id');
-
-        // Assert
         self::assertCount(count($registeredRules), $descriptors);
         self::assertCount(count(array_unique($descriptorIds)), $descriptorIds);
-
         foreach ($registeredRules as $index => $rule) {
             self::assertSame($rule['id'], $descriptors[$index]['id']);
         }
@@ -137,8 +120,6 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
         // Arrange
         $formatter = new SarifFormatter();
         $rule = $this->getRuleById('OWASP-013');
-
-        // Act
         $document = json_decode($formatter->format([
             __FILE__ => [[
                 'severity' => $rule['severity'],
@@ -147,8 +128,6 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
             ]],
             '_meta' => ['warnings' => []],
         ], dirname(__DIR__, 3)), true, 512, JSON_THROW_ON_ERROR);
-
-        // Assert
         self::assertCount(1, $document['runs'][0]['results']);
         self::assertSame('OWASP-013', $document['runs'][0]['results'][0]['ruleId']);
         self::assertSame('error', $document['runs'][0]['results'][0]['level']);
@@ -167,7 +146,6 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
             ['OWASP-010', 'note'],
         ];
         $findings = [];
-
         foreach ($cases as [$ruleId, $expectedLevel]) {
             $rule = $this->getRuleById($ruleId);
             $findings[] = [
@@ -205,11 +183,8 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
         mkdir($root);
         $file = $root . '/source file #1.php';
         file_put_contents($file, "<?php echo \$_GET['value'];");
-
         try {
             $rule = $this->getRuleById('OWASP-007');
-
-            // Act
             $document = json_decode($formatter->format([
                 $file => [[
                     'severity' => $rule['severity'],
@@ -219,8 +194,6 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
                 '_meta' => ['warnings' => []],
             ], $root), true, 512, JSON_THROW_ON_ERROR);
             $result = $document['runs'][0]['results'][0];
-
-            // Assert
             self::assertSame(
                 'source%20file%20%231.php',
                 $result['locations'][0]['physicalLocation']['artifactLocation']['uri']
@@ -237,8 +210,6 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
     {
         // Arrange
         $formatter = new SarifFormatter();
-
-        // Act
         $document = json_decode($formatter->format([
             __FILE__ => [[
                 'severity' => 'high',
@@ -247,8 +218,6 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
             ]],
             '_meta' => ['warnings' => []],
         ], dirname(__DIR__, 3)), true, 512, JSON_THROW_ON_ERROR);
-
-        // Assert
         self::assertSame([], $document['runs'][0]['results']);
     }
 

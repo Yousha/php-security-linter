@@ -41,44 +41,22 @@ final class CisRulesTest extends TestCase
     /** Test that the rules array is correctly structured and not empty. */
     public function testRulesArrayStructure(): void
     {
-                // Arrange
+        // Arrange
+
+        // Act
+
         // Assert
-        
 $this->assertIsArray($this->rules);
-        // Assert
-        
         $this->assertNotEmpty($this->rules);
-
         foreach ($this->rules as $rule) {
-        // Assert
-        
             $this->assertArrayHasKey('id', $rule);
-        // Assert
-        
             $this->assertIsString($rule['id']);
-        // Assert
-        
             $this->assertStringStartsWith('CIS-', $rule['id']);
-        // Assert
-        
-
             $this->assertArrayHasKey('severity', $rule);
-        // Assert
-        
             $this->assertIsString($rule['severity']);
-        // Assert
-        
-
             $this->assertArrayHasKey('message', $rule);
-        // Assert
-        
             $this->assertIsString($rule['message']);
-        // Assert
-        
-
             $this->assertArrayHasKey('pattern', $rule);
-        // Assert
-        
             $this->assertIsString($rule['pattern']);
         }
     }

@@ -40,151 +40,58 @@ namespace Yousha\PhpSecurityLinter\Tests {
             parent::tearDown();
         }
 
-        /** Verify  php_1 behavior. */
+        /** Verify basic PHP runtime functions and values. */
         #[\PHPUnit\Framework\Attributes\Test]
         final public function testPhp_1(): void
         {
-                    // Arrange
-// Assert
+        // Arrange
+
+        // Act
+
         // Assert
-        
             $this->assertTrue(true);
-
-            // Assert
-        // Assert
-        
             $this->assertFalse(false);
-
-            // Assert
-        // Assert
-        
             $this->assertNull(null);
-
-            // Assert
-        // Assert
-        
             $this->assertIsObject(new stdClass());
-
-            // Assert
-        // Assert
-        
             $this->assertSame(1, 1);
-
-            // Assert
-        // Assert
-        
             $this->assertSame('A', 'A');
-
-            // Assert
-        // Assert
-        
             $this->assertNotSame(1, '1');
-
-            // Assert
-        // Assert
-        
             $this->assertEquals(1, '1');
-
-            // Assert
-        // Assert
-        
             $this->assertNotEquals(1, -1);
-
-            // Assert
-        // Assert
-        
             $this->assertNotEquals('A', '');
-
-            // Arrange
             $testString = '1234567890';
-            // Action
             $result = stristr($testString, 'abc');
-            // Assert
-        // Assert
-        
             $this->assertFalse($result);
-            // Action
             $result = stristr($testString, '567');
-            // Assert
-        // Assert
-        
             $this->assertSame('567890', $result);
-
-            // Assert
-        // Assert
-        
             $this->assertNotEmpty(php_uname());
-
-            // Assert
-        // Assert
-        
             $this->assertSame(min(3, 4, 2, 8, 10), 2);
-
-            // Arrange
             $testVar = 'Test.';
-            // Act
-        // Assert
-        
             $this->assertIsString($testVar);
         }
 
 
-        /** Verify  php_1 behavior. */
+        /** Verify basic PHP runtime functions and values. */
         #[\PHPUnit\Framework\Attributes\Test]
         final public function testPhp_2(): void
         {
-                    // Arrange
+        // Arrange
+
+        // Act
+
         // Assert
-        
 $this->assertNotEmpty(getmypid());
-
-            // Assert
-        // Assert
-        
             $this->assertTrue(extension_loaded('standard'));
-
-            // Assert
-        // Assert
-        
             $this->assertTrue(extension_loaded('Core'));
-
-            // Assert
-        // Assert
-        
             $this->assertNotEmpty(PHP_OS);
-
-            // Assert
-        // Assert
-        
             $this->assertNotEmpty(PHP_MAJOR_VERSION);
-
-            // Assert
-        // Assert
-        
             $this->assertNotEmpty(PHP_MINOR_VERSION);
-
-            // Act
             $result = hash('sha256', '1234567890Abcdefg');
-            // Assert
-        // Assert
-        
             $this->assertSame('acb7c749f0da6d3b87c1265856a590067c268a1843976f38f4223c5ccfe92d25', $result);
-
-            // Assert
-        // Assert
-        
             $this->assertNotEmpty(get_loaded_extensions());
-
-            // Act
             if (PHP_MAJOR_VERSION == 5) {
-                // Assert
-        // Assert
-        
                 $this->assertSame(PHP_INT_MAX, 2147483647);
             } else {
-                // Assert
-        // Assert
-        
                 $this->assertSame(PHP_INT_MAX, 9223372036854775807);
             }
 

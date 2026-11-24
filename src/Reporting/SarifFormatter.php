@@ -126,7 +126,7 @@ final class SarifFormatter
                 'index' => $index,
                 'message' => $message,
                 'shortDescription' => preg_replace(
-                    '/^' . preg_quote($id, '/') . ':\\s*/',
+                    '/^' . preg_quote($id, '/') . ':\s*/',
                     '',
                     $message
                 ) ?? $message,
@@ -167,8 +167,8 @@ final class SarifFormatter
     {
         $root = realpath($scanRoot);
         $file = realpath($filePath);
-        $normalizedRoot = rtrim(str_replace('\\\\', '/', $root !== false ? $root : $scanRoot), '/');
-        $normalizedFile = str_replace('\\\\', '/', $file !== false ? $file : $filePath);
+        $normalizedRoot = rtrim(str_replace('\\', '/', $root !== false ? $root : $scanRoot), '/');
+        $normalizedFile = str_replace('\\', '/', $file !== false ? $file : $filePath);
 
         if (str_starts_with($normalizedFile, $normalizedRoot . '/')) {
             $relative = substr($normalizedFile, strlen($normalizedRoot) + 1);

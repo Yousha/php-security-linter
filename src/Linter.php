@@ -119,7 +119,7 @@ final class Linter
             return false;
         }
 
-        $normalizedFilePath = str_replace('\\\\', '/', $resolvedFilePath);
+        $normalizedFilePath = str_replace('\\', '/', $resolvedFilePath);
 
         foreach ($exclude as $excludedPattern) {
             $excludedPattern = trim((string) $excludedPattern);
@@ -148,7 +148,7 @@ final class Linter
             return false;
         }
 
-        $excludedPath = rtrim(str_replace('\\\\', '/', $excludedPath), '/');
+        $excludedPath = rtrim(str_replace('\\', '/', $excludedPath), '/');
         return $filePath === $excludedPath || str_starts_with($filePath, $excludedPath . '/');
     }
 
@@ -156,13 +156,13 @@ final class Linter
     private function isAbsolutePath(string $path): bool
     {
         return str_starts_with($path, '/')
-            || preg_match('/^[A-Za-z]:[\\/\\\\]/', $path) === 1;
+            || preg_match('/^[A-Za-z]:[\/\\\\]/', $path) === 1;
     }
 
     /** Match a file by basename or relative path. */
     private function isBasenameOrRelativePathMatch(string $filePath, string $excludedPattern): bool
     {
-        $normalizedPattern = str_replace('\\\\', '/', $excludedPattern);
+        $normalizedPattern = str_replace('\\', '/', $excludedPattern);
         if (basename($filePath) === $normalizedPattern) {
             return true;
         }
@@ -189,7 +189,7 @@ final class Linter
         }
 
         $issues = [];
-        $lines = explode("\\n", $content);
+        $lines = explode("\n", $content);
 
         foreach ($this->rules as $rule) {
             if (preg_match($rule['pattern'], $content) !== 1) {

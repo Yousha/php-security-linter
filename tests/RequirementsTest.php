@@ -41,10 +41,12 @@ namespace Yousha\PhpSecurityLinter\Tests {
         #[\PHPUnit\Framework\Attributes\Test]
         final public function testProjectRequiredPhpVersion(): void
         {
-                    // Arrange
+        // Arrange
 $_result = (PHP_MAJOR_VERSION == 8) && (PHP_MINOR_VERSION >= 2);
+
+        // Act
+
         // Assert
-        
             $this->assertTrue($_result);
         }
 
@@ -52,14 +54,15 @@ $_result = (PHP_MAJOR_VERSION == 8) && (PHP_MINOR_VERSION >= 2);
         #[\PHPUnit\Framework\Attributes\Test]
         final public function testProjectRequiredPhpExtensions(): void
         {
-                    // Arrange
+        // Arrange
 $extensions = [
                 'pcre',
             ];
-
             foreach ($extensions as $extension) {
+
+        // Act
+
         // Assert
-        
                 $this->assertTrue(extension_loaded($extension));
             }
         }
@@ -68,7 +71,7 @@ $extensions = [
         #[\PHPUnit\Framework\Attributes\Test]
         final public function testProjectDirectoriesExist(): void
         {
-                    // Arrange
+        // Arrange
 $directories = [
                 'bin',
                 'resources',
@@ -76,10 +79,11 @@ $directories = [
                 'tests',
                 'vendor',
             ];
-
             foreach ($directories as $directory) {
+
+        // Act
+
         // Assert
-        
                 $this->assertDirectoryExists($directory);
             }
         }
@@ -88,7 +92,7 @@ $directories = [
         #[\PHPUnit\Framework\Attributes\Test]
         final public function testProjectFilesExist(): void
         {
-                    // Arrange
+        // Arrange
 $files = [
                 '.editorconfig',
                 '.gitattributes',
@@ -111,10 +115,11 @@ $files = [
                 'TODO.txt',
                 'VERSION.txt',
             ];
-
             foreach ($files as $file) {
+
+        // Act
+
         // Assert
-        
                 $this->assertFileExists($file);
             }
         }
