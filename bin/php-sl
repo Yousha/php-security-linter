@@ -30,6 +30,7 @@ if (!file_exists($autoloadPath)) {
 require_once $autoloadPath;
 
 use Yousha\PhpSecurityLinter\Linter;
+use Yousha\PhpSecurityLinter\Reporting\SarifFormatter;
 use Yousha\PhpSecurityLinter\Exceptions\LinterException;
 
 /**
@@ -51,6 +52,8 @@ function showHelp(): void
           --exclude=LIST       Comma-separated paths to exclude.
           --exclude-rules=LIST Comma-separated rule IDs to ignore.
           --list-rules         Show all available rule IDs.
+          --format=FORMAT      Output format: text (default) or sarif.
+          --output=FILE        Write SARIF output to a file.
           --help               Show this help message.
 
         Examples:
@@ -132,6 +135,8 @@ function runCli(array $argv): int
         'exclude-rules:',
         'help',
         'list-rules',
+        'format:',
+        'output:',
     ];
     $options = getopt($shortOpts, $longOpts);
 
@@ -192,7 +197,31 @@ function runCli(array $argv): int
         // Pass rule exclusions to Linter constructor.
         $linter = new Linter($excludeRules);
         $results = $linter->scan($path, $excludePaths);
-        outputResults($results);
+        $format = strtolower((string) ($options['format'] ?? 'text'));
+        if (!in_array($format, ['text', 'sarif'], true)) {
+            fwrite(STDERR, sprintf("Error: Unsupported output format '%s'. Use text or sarif.\n", $format));
+            return 2;
+        }
+
+        if ($format === 'sarif') {
+            $report = (new SarifFormatter())->format($results, $path);
+            $outputPath = $options['output'] ?? null;
+            if (is_string($outputPath) && $outputPath !== '') {
+                if (@file_put_contents($outputPath, $report) === false) {
+                    fwrite(STDERR, sprintf("Error: Could not write SARIF report to '%s'.\n", $outputPath));
+                    return 3;
+                }
+            } else {
+                fwrite(STDOUT, $report);
+            }
+        } else {
+            if (isset($options['output'])) {
+                fwrite(STDERR, "Error: --output requires --format=sarif.\n");
+                return 2;
+            }
+            outputResults($results);
+        }
+
         $warnings = $results['_meta']['warnings'] ?? [];
         foreach ($warnings as $warning) {
             fwrite(STDERR, sprintf("WARNING: %s\n", $warning));

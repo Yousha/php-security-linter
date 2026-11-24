@@ -42,6 +42,7 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
   * Custom rule sets
 * **Fast static analysis** without executing code
 * **Console output** with file-level findings and scan summary
+* **SARIF 2.1.0 output** for interoperable security findings and CI/CD integrations
 * **Configurable ruleset**
 * **DevSecOps ready** CI/CD pipeline integration
 * **Exclusion support** for ignoring specific paths
@@ -131,6 +132,21 @@ Excluding a specific directory, path exclusion, and rule exclusion:
 php bin/php-sl.php --path=./src --exclude=storage --exclude-rules=CIS-003,OWASP-001
 ```
 
+
+Generate a SARIF 2.1.0 report and write it to a file:
+
+```shell
+php vendor/bin/php-sl --path=./src --format=sarif --output=results.sarif
+```
+
+Write SARIF to standard output:
+
+```shell
+php vendor/bin/php-sl --path=./src --format=sarif > results.sarif
+```
+
+The default `text` format remains unchanged. SARIF output includes rule descriptors, severity levels, source file URIs, line locations, and scan warnings as invocation notifications.
+
 ### Commands
 
 | Option       | Description                      |
@@ -139,6 +155,8 @@ php bin/php-sl.php --path=./src --exclude=storage --exclude-rules=CIS-003,OWASP-
 | `--exclude`  | Comma-separated paths to exclude |
 | `--exclude-rules` | Comma-separated rule IDs to ignore |
 | `--list-rules` | List available rule IDs |
+| `--format` | Output format: `text` (default) or `sarif` |
+| `--output` | Write SARIF output to a file (requires `--format=sarif`) |
 | `--help`     | Show help message                |
 
 ### Example output
