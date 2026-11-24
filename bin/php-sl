@@ -207,7 +207,7 @@ function runCli(array $argv): int
             $report = (new SarifFormatter())->format($results, $path);
             $outputPath = $options['output'] ?? null;
             if (is_string($outputPath) && $outputPath !== '') {
-                if (file_put_contents($outputPath, $report) === false) {
+                if (@file_put_contents($outputPath, $report) === false) {
                     fwrite(STDERR, sprintf("Error: Could not write SARIF report to '%s'.\n", $outputPath));
                     return 3;
                 }
