@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Yousha\\PhpSecurityLinter\\Tests\\Unit\\Reporting;
+namespace Yousha\PhpSecurityLinter\Tests\Unit\Reporting;
 
-use PHPUnit\\Framework\\TestCase;
-use Yousha\\PhpSecurityLinter\\Reporting\\SarifFormatter;
+use PHPUnit\Framework\TestCase;
+use Yousha\PhpSecurityLinter\Reporting\SarifFormatter;
 
 /**
  * Tests SARIF 2.1.0 report serialization.
  */
-#[\\PHPUnit\\Framework\\Attributes\\Small]
+#[\PHPUnit\Framework\Attributes\Small]
 final class SarifFormatterTest extends TestCase
 {
     /**
-     * Verify a finding is serialized with SARIF rule metadata and location.
+     * Verify finding metadata and its physical source location.
      */
     public function testFormatsFindingsAsSarif21(): void
     {
@@ -23,7 +23,7 @@ final class SarifFormatterTest extends TestCase
         $root = sys_get_temp_dir() . '/php-sl-sarif-' . bin2hex(random_bytes(5));
         mkdir($root);
         $file = $root . '/unsafe.php';
-        file_put_contents($file, "<?php\\nexec(\\$_GET['cmd']);\\n");
+        file_put_contents($file, "<?php\nexec(\$_GET['cmd']);\n");
 
         try {
             // Act
@@ -50,7 +50,7 @@ final class SarifFormatterTest extends TestCase
             self::assertSame('error', $document['runs'][0]['results'][0]['level']);
             self::assertSame('unsafe.php', $document['runs'][0]['results'][0]['locations'][0]['physicalLocation']['artifactLocation']['uri']);
             self::assertSame(2, $document['runs'][0]['results'][0]['locations'][0]['physicalLocation']['region']['startLine']);
-            self::assertArrayHasKey('defaultConfiguration', $document['runs'][0]['tool']['driver']['rules'][1]);
+            self::assertSame('A03:2021', $document['runs'][0]['results'][0]['properties']['standardReference']);
             self::assertTrue($document['runs'][0]['invocations'][0]['executionSuccessful']);
         } finally {
             unlink($file);
@@ -59,7 +59,7 @@ final class SarifFormatterTest extends TestCase
     }
 
     /**
-     * Verify a clean scan is represented by an empty results array.
+     * Verify a scan with no findings produces an empty result set.
      */
     public function testFormatsCleanScanWithoutFindings(): void
     {
@@ -82,7 +82,7 @@ final class SarifFormatterTest extends TestCase
     }
 
     /**
-     * Verify scan warnings become execution notifications, not findings.
+     * Verify scan warnings are execution notifications, not vulnerability results.
      */
     public function testFormatsScanWarningsAsExecutionNotifications(): void
     {
