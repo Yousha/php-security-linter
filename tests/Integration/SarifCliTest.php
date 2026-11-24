@@ -124,6 +124,33 @@ final class SarifCliTest extends TestCase
         }
     }
 
+
+    /**
+     * Verify a failed report write returns an error without corrupting standard output.
+     */
+    public function testReportsSarifOutputFileWriteFailure(): void
+    {
+        // Arrange
+        $directory = $this->createFixtureDirectory();
+        $outputFile = $directory . '/missing/report.sarif';
+
+        try {
+            // Act
+            $process = $this->runCli([
+                '--path=' . $directory,
+                '--format=sarif',
+                '--output=' . $outputFile,
+            ]);
+
+            // Assert
+            self::assertSame(3, $process['exitCode']);
+            self::assertSame('', $process['stdout']);
+            self::assertStringContainsString('Could not write SARIF report', $process['stderr']);
+        } finally {
+            $this->removeFixtureDirectory($directory);
+        }
+    }
+
     /**
      * Execute the real CLI process with the supplied arguments.
      *
