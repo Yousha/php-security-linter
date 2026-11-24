@@ -102,8 +102,8 @@ final class OwaspRules
             [
                 'id' => 'OWASP-010',
                 'severity' => 'low',
-                'message' => 'OWASP-010: Accessing raw superglobals directly (security best practice)',
-                'pattern' => '/(\$_GET|\$_POST|\$_REQUEST|\$_COOKIE|eval)/i',
+                'message' => 'OWASP-010: Direct use of eval or raw superglobals in sensitive context',
+                'pattern' => '/\beval\s*\(|\$_(GET|POST|REQUEST|COOKIE)\s*\[/i',
                 'reference' => 'A05:2021',
             ],
             // A08:2021 - Software and Data Integrity Failures (CSRF is a related issue)
@@ -128,55 +128,56 @@ final class OwaspRules
             [
                 'id' => 'OWASP-013',
                 'severity' => 'critical',
-                'message' => 'OWASP-A01: Path Traversal (Local File Inclusion)',
-                'pattern' => '/(include|require|file_get_contents|fopen|readfile)\s*\([^)]*["\']?\s*\.\s*\$_(GET|POST|REQUEST)\s*\.\s*["\']?\)/i', // Looks for direct user input concatenated into file operations.
+                'message' => 'OWASP-013: Path Traversal (Local File Inclusion)',
+                'pattern' => '/(include|require|file_get_contents|fopen|readfile)\s*\([^)]*["\']?\s*\.\s*\$_(GET|POST|REQUEST)\s*\.\s*["\']?\)/i',
             ],
 
             // A06:2021 - Improper Asset Management - Debug files
             [
                 'id' => 'OWASP-014',
                 'severity' => 'medium',
-                'message' => 'OWASP-A06: Potential debug file exposed',
-                'pattern' => '/\.(log|sql|bak|backup|old|tmp)$/i', // Checks for common debug file extensions.
+                'message' => 'OWASP-014: Potential debug or backup file referenced',
+                'pattern' => '/["\'][^"\']*\.(log|sql|bak|backup|old|tmp)["\']/i',
+                'reference' => 'A06:2021',
             ],
             // A07:2021 - Identification and Authentication Failures - Weak Password Hashing
             [
                 'id' => 'OWASP-015',
                 'severity' => 'critical',
-                'message' => 'OWASP-A07: Weak password hashing algorithm used',
-                'pattern' => '/hash\s*\(\s*[\'"](?i)(md2|md4|md5|sha1|sha224)[\'"]/i', // Checks for weak hash functions in hash().
+                'message' => 'OWASP-015: Weak password hashing algorithm used',
+                'pattern' => '/hash\s*\(\s*[\'"](?i)(md2|md4|md5|sha1|sha224)[\'"]/i',
             ],
 
             // A08:2021 - Software and Data Integrity Failures - Unserialize
             [
                 'id' => 'OWASP-016',
                 'severity' => 'critical',
-                'message' => 'OWASP-A08: Insecure deserialization (unserialize)',
-                'pattern' => '/unserialize\s*\(\s*\$_(GET|POST|COOKIE|REQUEST)/i', // Checks for user input in unserialize (same as CIS-017).
+                'message' => 'OWASP-016: Insecure deserialization (unserialize)',
+                'pattern' => '/unserialize\s*\(\s*\$_(GET|POST|COOKIE|REQUEST)/i',
             ],
 
             // A10:2021 - Server-Side Request Forgery
             [
                 'id' => 'OWASP-017',
                 'severity' => 'critical',
-                'message' => 'OWASP-A10: Potential Server-Side Request Forgery (SSRF)',
-                'pattern' => '/(file_get_contents|fopen|curl_init|fsockopen|stream_socket_client)\s*\([^)]*\$_(GET|POST|REQUEST)/i', // Checks for user input in various HTTP/file functions.
+                'message' => 'OWASP-017: Potential Server-Side Request Forgery (SSRF)',
+                'pattern' => '/(file_get_contents|fopen|curl_init|fsockopen|stream_socket_client)\s*\([^)]*\$_(GET|POST|REQUEST)/i',
             ],
 
             // Cross-Site Scripting (XSS) - Reflected
             [
                 'id' => 'OWASP-018',
                 'severity' => 'high',
-                'message' => 'OWASP-A07: Potential Reflected XSS (outputting user input)',
-                'pattern' => '/echo\s+\$_(GET|POST|REQUEST|COOKIE)/i', // Checks for direct output of user input.
+                'message' => 'OWASP-018: Potential Reflected XSS (outputting user input)',
+                'pattern' => '/echo\s+\$_(GET|POST|REQUEST|COOKIE)/i',
             ],
 
             // A08:2021 - Insecure Deserialization - Alternative pattern
             [
                 'id' => 'OWASP-019',
                 'severity' => 'critical',
-                'message' => 'OWASP-A08: Potential Insecure Deserialization (serialize/unserialize mismatch)',
-                'pattern' => '/serialize\s*\(\s*\$_(GET|POST|REQUEST)/i', // Checks for serializing user input (less common than unserialize).
+                'message' => 'OWASP-019: Potential Insecure Deserialization (serialize on user input)',
+                'pattern' => '/serialize\s*\(\s*\$_(GET|POST|REQUEST)/i',
             ],
         ];
     }

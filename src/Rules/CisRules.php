@@ -30,7 +30,7 @@ final class CisRules
                 'id' => 'CIS-001',
                 'severity' => 'critical',
                 'message' => 'CIS-001: Dangerous functions not disabled',
-                'pattern' => '/disable_functions\s*=\s*[^\n]*(?!(exec|system|passthru|shell_exec|proc_open|popen|eval))/i',
+                'pattern' => '/disable_functions\s*=\s*(?![^\n]*(?:exec|system|passthru|shell_exec|proc_open|popen|eval))/i',
             ],
             [
                 'id' => 'CIS-002',
@@ -133,7 +133,7 @@ final class CisRules
                 'id' => 'CIS-015',
                 'severity' => 'medium',
                 'message' => 'CIS-015: Session cookie might lack HttpOnly flag',
-                'pattern' => '/session_set_cookie_params\s*\([^)]*(?<!HttpOnly)[,)]/i', // Checks if HttpOnly isn't set as an argument (simplistic)
+                'pattern' => '/session_set_cookie_params\s*\((?![^)]*(?:httponly|HttpOnly))[^)]*\)/i',
             ],
 
             // Insecure deserialization

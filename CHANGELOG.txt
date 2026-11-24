@@ -3,6 +3,12 @@ Unreleased
 * Add SARIF 2.1.0 report output.
 * Add CLI format and output options while preserving text output by default.
 * Add SARIF formatter tests for findings, clean scans, and scan warnings.
+* Normalize line endings (CRLF → LF) for cross-platform rule matching.
+* Make path exclusion case-insensitive.
+* Fix CIS-001 and CIS-015 false-positive patterns.
+* Align OWASP rule messages with their IDs.
+* Exit code 1 when findings are present.
+* Update README and FAQ for current CLI and SARIF support.
 
 3.1.8.6 - 2026-08-17
 -------------------------
