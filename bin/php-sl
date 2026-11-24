@@ -54,8 +54,6 @@ function showHelp(): void
           --list-rules         Show all available rule IDs.
           --format=FORMAT      Output format: text (default) or sarif.
           --output=FILE        Write SARIF output to a file.
-          --format=FORMAT      Output format: text (default) or sarif.
-          --output=FILE        Write SARIF output to a file.
           --help               Show this help message.
 
         Examples:
@@ -137,8 +135,6 @@ function runCli(array $argv): int
         'exclude-rules:',
         'help',
         'list-rules',
-        'format:',
-        'output:',
         'format:',
         'output:',
     ];
