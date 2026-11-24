@@ -5,7 +5,7 @@ permissions:
   contents: read
   pull-requests: read
 
-on:
+on:  # yamllint disable-line rule:truthy
   push:
     paths-ignore:
       - "*.md"
@@ -20,7 +20,7 @@ on:
 
 env:
   COMPOSER_NO_INTERACTION: 1
-  COMPOSER_PROCESS_TIMEOUT: 300 # Seconds.
+  COMPOSER_PROCESS_TIMEOUT: 300  # Seconds.
 
 jobs:
   build:
@@ -116,4 +116,9 @@ jobs:
       - name: Validate SARIF output
         run: |
           php bin/php-sl --path=src --format=sarif --output=results.sarif
-          jq -e '.version == "2.1.0" and (.runs | length == 1) and (.runs[0].tool.driver.name == "PHP Security Linter") and (.runs[0].results | type == "array")' results.sarif
+          jq -e '
+            .version == "2.1.0"
+            and (.runs | length == 1)
+            and (.runs[0].tool.driver.name == "PHP Security Linter")
+            and (.runs[0].results | type == "array")
+          ' results.sarif
