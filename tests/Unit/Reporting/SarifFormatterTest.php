@@ -6,8 +6,7 @@ namespace Yousha\PhpSecurityLinter\Tests\Unit\Reporting;
 
 use PHPUnit\Framework\TestCase;
 use Yousha\PhpSecurityLinter\Reporting\SarifFormatter;
-use Yousha\PhpSecurityLinter\Rules\CisRules;
-use Yousha\PhpSecurityLinter\Rules\OwaspRules;
+use Yousha\PhpSecurityLinter\Rules\RuleCatalog;
 
 /**
  * Tests SARIF 2.1.0 report serialization.
@@ -126,7 +125,7 @@ final class SarifFormatterTest extends TestCase
     public function testIncludesAllRegisteredRulesWithStableIndexes(): void
     {
         // Arrange
-        $registeredRules = array_merge(CisRules::getRules(), OwaspRules::getRules());
+        $registeredRules = RuleCatalog::all();
         $formatter = new SarifFormatter();
 
         // Act
@@ -137,6 +136,7 @@ final class SarifFormatterTest extends TestCase
         $descriptorIds = array_column($descriptors, 'id');
 
         // Assert
+        self::assertCount(48, $descriptors);
         self::assertCount(count($registeredRules), $descriptors);
         self::assertCount(count(array_unique($descriptorIds)), $descriptorIds);
 
@@ -281,7 +281,7 @@ final class SarifFormatterTest extends TestCase
      */
     private function getRuleById(string $ruleId): array
     {
-        foreach (array_merge(CisRules::getRules(), OwaspRules::getRules()) as $rule) {
+        foreach (RuleCatalog::all() as $rule) {
             if ($rule['id'] === $ruleId) {
                 return $rule;
             }

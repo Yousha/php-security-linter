@@ -59,6 +59,31 @@ final class SarifCliTest extends TestCase
         }
     }
 
+    public function testListsAndEnablesAttackRulesFromTheCli(): void
+    {
+        // Arrange
+        $directory = $this->createFixtureDirectory();
+        try {
+            file_put_contents($directory . '/unsafe.php', "<?php\ncopy('https://example.invalid/data', 'sample.php');");
+
+            // Act
+            $list = $this->runCli(['--list-rules']);
+            $enabled = $this->runCli(['--path=' . $directory, '--include-attack', '--format=sarif']);
+            $excluded = $this->runCli(['--path=' . $directory, '--include-attack', '--exclude-rules=ATTACK-002']);
+            $report = json_decode($enabled['stdout'], true, 512, JSON_THROW_ON_ERROR);
+
+            // Assert
+            self::assertSame(0, $list['exitCode']);
+            self::assertStringContainsString('Total rules: 48', $list['stdout']);
+            self::assertSame(1, $enabled['exitCode']);
+            self::assertSame('ATTACK-002', $report['runs'][0]['results'][0]['ruleId']);
+            self::assertSame('T1105', $report['runs'][0]['results'][0]['properties']['standardReference']);
+            self::assertSame(0, $excluded['exitCode']);
+        } finally {
+            $this->removeFixtureDirectory($directory);
+        }
+    }
+
     /**
      * Verify SARIF can be written to a file without polluting standard output.
      */

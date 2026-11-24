@@ -62,7 +62,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           coverage: none
-          extensions: pcre
+          extensions: pcre, tokenizer
           tools: composer:v2
           ini-values: >-
             memory_limit=256M, zend.assertions=1,

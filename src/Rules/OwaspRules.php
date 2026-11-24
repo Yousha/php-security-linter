@@ -3,7 +3,7 @@
 namespace Yousha\PhpSecurityLinter\Rules;
 
 /**
- * OWASP Top 10 Security Rules Implementation
+ * OWASP Top 10 and Cheat Sheet rules
  *
  * Provides security rules based on the OWASP Top 10 (2021) list,
  * focusing on common, high-impact web application vulnerabilities in PHP.
@@ -13,13 +13,13 @@ namespace Yousha\PhpSecurityLinter\Rules;
 final class OwaspRules
 {
     /**
-     * Get all OWASP Top 10 security rules
+     * Get all OWASP security rules
      *
      * @return array[] Array of rule definitions with:
      * - id: string Unique identifier for the rule (e.g., OWASP-001)
      * - severity: string (critical/high/medium/low)
      * - message: string Description of the vulnerability
-     * - pattern: string Regex pattern to detect the issue
+     * - pattern: optional regex; other rules are evaluated by CallInspector
      * - reference: string OWASP A-Code reference (optional)
      */
     public static function getRules(): array
@@ -178,6 +178,76 @@ final class OwaspRules
                 'severity' => 'critical',
                 'message' => 'OWASP-019: Potential Insecure Deserialization (serialize on user input)',
                 'pattern' => '/serialize\s*\(\s*\$_(GET|POST|REQUEST)/i',
+            ],
+            [
+                'id' => 'OWASP-020',
+                'severity' => 'medium',
+                'message' => 'OWASP-020: Session strict mode explicitly disabled',
+                'reference' => 'PHP_Configuration',
+                'helpUri' => 'https://cheatsheetseries.owasp.org/cheatsheets/PHP_Configuration_Cheat_Sheet.html',
+            ],
+            [
+                'id' => 'OWASP-021',
+                'severity' => 'medium',
+                'message' => 'OWASP-021: URL-based session IDs explicitly enabled',
+                'reference' => 'PHP_Configuration',
+                'helpUri' => 'https://cheatsheetseries.owasp.org/cheatsheets/PHP_Configuration_Cheat_Sheet.html',
+            ],
+            [
+                'id' => 'OWASP-022',
+                'severity' => 'medium',
+                'message' => 'OWASP-022: Cookie-only session IDs explicitly disabled',
+                'reference' => 'PHP_Configuration',
+                'helpUri' => 'https://cheatsheetseries.owasp.org/cheatsheets/PHP_Configuration_Cheat_Sheet.html',
+            ],
+            [
+                'id' => 'OWASP-023',
+                'severity' => 'medium',
+                'message' => 'OWASP-023: SameSite=None cookie explicitly disables Secure',
+                'reference' => 'Session_Management',
+                'helpUri' => 'https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html',
+            ],
+            [
+                'id' => 'OWASP-024',
+                'severity' => 'medium',
+                'message' => 'OWASP-024: __Host- cookie sets a Domain attribute',
+                'reference' => 'Session_Management',
+                'helpUri' => 'https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html',
+            ],
+            [
+                'id' => 'OWASP-025',
+                'severity' => 'medium',
+                'message' => 'OWASP-025: __Host- cookie specifies a path other than /',
+                'reference' => 'Session_Management',
+                'helpUri' => 'https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html',
+            ],
+            [
+                'id' => 'OWASP-026',
+                'severity' => 'low',
+                'message' => 'OWASP-026: Startup error display enabled; review production configuration',
+                'reference' => 'PHP_Configuration',
+                'helpUri' => 'https://cheatsheetseries.owasp.org/cheatsheets/PHP_Configuration_Cheat_Sheet.html',
+            ],
+            [
+                'id' => 'OWASP-027',
+                'severity' => 'low',
+                'message' => 'OWASP-027: HTML error display enabled; review production configuration',
+                'reference' => 'PHP_Configuration',
+                'helpUri' => 'https://cheatsheetseries.owasp.org/cheatsheets/PHP_Configuration_Cheat_Sheet.html',
+            ],
+            [
+                'id' => 'OWASP-028',
+                'severity' => 'medium',
+                'message' => 'OWASP-028: Exception traces include arguments; review production configuration',
+                'reference' => 'PHP_Configuration',
+                'helpUri' => 'https://cheatsheetseries.owasp.org/cheatsheets/PHP_Configuration_Cheat_Sheet.html',
+            ],
+            [
+                'id' => 'OWASP-029',
+                'severity' => 'medium',
+                'message' => 'OWASP-029: Explicit bcrypt cost below the OWASP minimum of 10',
+                'reference' => 'Password_Storage',
+                'helpUri' => 'https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html',
             ],
         ];
     }

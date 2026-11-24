@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace Yousha\PhpSecurityLinter;
 
-use Yousha\PhpSecurityLinter\Rules\CisRules;
-use Yousha\PhpSecurityLinter\Rules\OwaspRules;
+use Yousha\PhpSecurityLinter\Rules\RuleCatalog;
+use Yousha\PhpSecurityLinter\Rules\CallInspector;
 use Yousha\PhpSecurityLinter\Exceptions\LinterException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -38,17 +38,23 @@ final class Linter
 {
     /** @var array Security rules to check against. */
     private array $rules = [];
+    private array $callRules = [];
 
     /**
      * @param array $excludedRuleIds List of rule IDs to exclude.
      */
-    public function __construct(array $excludedRuleIds = [])
+    public function __construct(array $excludedRuleIds = [], bool $includeAttack = false)
     {
-        $allRules = array_merge(CisRules::getRules(), OwaspRules::getRules());
-        $this->rules = array_filter(
-            $allRules,
-            fn(array $rule): bool => !in_array($rule['id'], $excludedRuleIds, true)
-        );
+        foreach (RuleCatalog::all($includeAttack) as $rule) {
+            if (in_array($rule['id'], $excludedRuleIds, true)) {
+                continue;
+            }
+            if (isset($rule['pattern'])) {
+                $this->rules[] = $rule;
+            } else {
+                $this->callRules[$rule['id']] = $rule;
+            }
+        }
     }
 
     /**
@@ -254,6 +260,6 @@ final class Linter
             }
         }
 
-        return $issues;
+        return $this->callRules === [] ? $issues : array_merge($issues, CallInspector::findings($content, $this->callRules));
     }
 }

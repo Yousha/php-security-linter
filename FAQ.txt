@@ -29,6 +29,9 @@ A: Use --format=sarif --output=results.sarif for SARIF 2.1.0 (CI/CD, GitHub Code
 Q: Why isn't it detecting vulnerability X? or how do I contribute new rules?
 A: Check if the rule exists in our documentation. You can submit new rule requests via Issues section.
 
+Q: Which rules are enabled?
+A: A default scan runs 16 CIS and 29 OWASP rules. Add --include-attack to enable the three MITRE ATT&CK review rules. Use --list-rules to see all 48 IDs.
+
 Q: How do I update the ruleset?
 A: Update to the latest version of package via Composer:
 composer update yousha/php-security-linter
@@ -43,7 +46,7 @@ Q: How do I interpret the severity levels?
 * Low: Informational notice
 
 Q: Can I integrate this with PHPStan or Psalm for combined analysis?
-A: Yes, chain it in your CI pipeline after static analysis tools. The CLI currently reports findings in human-readable console output; it does not provide JSON output.
+A: Yes, chain it in your CI pipeline after static analysis tools. Use the default text output or export a SARIF JSON report with --format=sarif.
 
 Q: How do I handle false positives?
 A: Three approaches:

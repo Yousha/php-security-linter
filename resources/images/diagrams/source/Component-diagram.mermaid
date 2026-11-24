@@ -1,9 +1,12 @@
 flowchart TD
-    Runtime["PHP 8.0+ with PCRE"] --> Cli["bin/php-sl"]
+    Runtime["PHP 8.0+, PCRE, tokenizer"] --> Cli["bin/php-sl"]
     Cli --> Linter["Linter"]
     Cli --> Sarif["SarifFormatter"]
-    Linter --> CIS["CisRules"]
-    Linter --> OWASP["OwaspRules"]
-    Sarif --> CIS
-    Sarif --> OWASP
+    Cli --> Catalog["RuleCatalog"]
+    Linter --> Catalog
+    Sarif --> Catalog
+    Catalog --> CIS["CisRules"]
+    Catalog --> OWASP["OwaspRules"]
+    Catalog --> ATTACK["AttackRules"]
+    Linter --> Calls["CallInspector"]
     Linter --> Exception["LinterException"]

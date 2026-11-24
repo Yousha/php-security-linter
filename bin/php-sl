@@ -52,6 +52,7 @@ function showHelp(): void
           --exclude=LIST       Comma-separated paths to exclude.
           --exclude-rules=LIST Comma-separated rule IDs to ignore.
           --list-rules         Show all available rule IDs.
+          --include-attack     Enable three MITRE ATT&CK review rules.
           --format=FORMAT      Output format: text (default) or sarif.
           --output=FILE        Write SARIF output to a file.
           --help               Show this help message.
@@ -96,16 +97,13 @@ function outputResults(array $results): void
 }
 
 /**
- * Fetches and displays all available security rule IDs (CIS and OWASP).
+ * Fetches and displays all available security rule IDs (CIS, OWASP, and opt-in ATT&CK).
  *
  * @return void Outputs directly to STDOUT
  */
 function listRules(): void
 {
-    // The rules classes must be fully loaded via the autoloader by this point.
-    $cisRules = Yousha\PhpSecurityLinter\Rules\CisRules::getRules();
-    $owaspRules = Yousha\PhpSecurityLinter\Rules\OwaspRules::getRules();
-    $allRules = array_merge($cisRules, $owaspRules);
+    $allRules = \Yousha\PhpSecurityLinter\Rules\RuleCatalog::all();
     echo "Available Rule IDs\n";
     echo str_repeat("=", 40) . "\n\n";
     // Sort by ID for easier reading.
@@ -119,7 +117,7 @@ function listRules(): void
             "[%s] %s: %s\n",
             $severity,
             $id,
-            $message
+            $message . (str_starts_with($id, 'ATTACK-') ? ' (opt-in)' : '')
         );
     }
 
@@ -135,6 +133,7 @@ function runCli(array $argv): int
         'exclude-rules:',
         'help',
         'list-rules',
+        'include-attack',
         'format:',
         'output:',
     ];
@@ -195,7 +194,7 @@ function runCli(array $argv): int
 
     try {
         // Pass rule exclusions to Linter constructor.
-        $linter = new Linter($excludeRules);
+        $linter = new Linter($excludeRules, isset($options['include-attack']));
         $results = $linter->scan($path, $excludePaths);
         $format = strtolower((string) ($options['format'] ?? 'text'));
         if (!in_array($format, ['text', 'sarif'], true)) {

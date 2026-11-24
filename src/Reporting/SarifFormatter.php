@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Yousha\PhpSecurityLinter\Reporting;
 
-use Yousha\PhpSecurityLinter\Rules\CisRules;
-use Yousha\PhpSecurityLinter\Rules\OwaspRules;
+use Yousha\PhpSecurityLinter\Rules\RuleCatalog;
 
 /**
  * Serializes PHP Security Linter results as SARIF 2.1.0.
@@ -124,7 +123,7 @@ final class SarifFormatter
      */
     private function getRules(): array
     {
-        $allRules = array_merge(CisRules::getRules(), OwaspRules::getRules());
+        $allRules = RuleCatalog::all();
         $rules = [];
 
         foreach ($allRules as $index => $rule) {
@@ -143,7 +142,7 @@ final class SarifFormatter
                 ) ?? $message,
                 'level' => $this->mapSeverity((string) ($rule['severity'] ?? 'note')),
                 'reference' => $reference,
-                'helpUri' => $this->referenceUri($reference),
+                'helpUri' => $rule['helpUri'] ?? $this->referenceUri($reference),
             ];
         }
 
