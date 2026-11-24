@@ -1,3 +1,9 @@
+Unreleased
+----------
+* Add SARIF 2.1.0 report output.
+* Add CLI format and output options while preserving text output by default.
+* Add SARIF formatter tests for findings, clean scans, and scan warnings.
+
 3.1.8.6 - 2026-08-17
 -------------------------
 * Cleanup.
