@@ -6,6 +6,8 @@ namespace Yousha\PhpSecurityLinter\Tests\Unit\Reporting;
 
 use PHPUnit\Framework\TestCase;
 use Yousha\PhpSecurityLinter\Reporting\SarifFormatter;
+use Yousha\PhpSecurityLinter\Rules\CisRules;
+use Yousha\PhpSecurityLinter\Rules\OwaspRules;
 
 /**
  * Tests SARIF 2.1.0 report serialization.
@@ -57,6 +59,10 @@ final class SarifFormatterTest extends TestCase
                 $document['runs'][0]['results'][0]['locations'][0]['physicalLocation']['region']['startLine']
             );
             self::assertSame('A03:2021', $document['runs'][0]['results'][0]['properties']['standardReference']);
+            self::assertSame(
+                'https://owasp.org/Top10/A03_2021/',
+                array_column($document['runs'][0]['tool']['driver']['rules'], null, 'id')['OWASP-002']['helpUri']
+            );
             self::assertTrue($document['runs'][0]['invocations'][0]['executionSuccessful']);
         } finally {
             unlink($file);
