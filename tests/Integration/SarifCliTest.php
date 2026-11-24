@@ -29,7 +29,7 @@ final class SarifCliTest extends TestCase
             $document = json_decode($process['stdout'], true, 512, JSON_THROW_ON_ERROR);
 
             // Assert
-            self::assertSame(0, $process['exitCode']);
+            self::assertSame(1, $process['exitCode']);
             self::assertSame('2.1.0', $document['version']);
             self::assertSame(
                 'OWASP-002',
@@ -65,7 +65,7 @@ final class SarifCliTest extends TestCase
             );
 
             // Assert
-            self::assertSame(0, $process['exitCode']);
+            self::assertSame(1, $process['exitCode']);
             self::assertSame([], $document['runs'][0]['invocations'][0]['toolExecutionNotifications'] ?? []);
             self::assertSame('', $process['stdout']);
             self::assertSame('2.1.0', $document['version']);
@@ -116,7 +116,7 @@ final class SarifCliTest extends TestCase
             $process = $this->runCli(['--path=' . $directory]);
 
             // Assert
-            self::assertSame(0, $process['exitCode']);
+            self::assertSame(1, $process['exitCode']);
             self::assertStringStartsWith('Scan results', $process['stdout']);
             self::assertStringNotContainsString('"version": "2.1.0"', $process['stdout']);
         } finally {

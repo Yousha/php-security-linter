@@ -15,7 +15,16 @@ Q: Which directories are excluded by default?
 A: These: vendor,.git,.github,.gitlab,.azure-pipelines,.husky,.circleci,.vscode,.idea,
 
 Q: Can I use this in CI pipelines?
-A: Yes. Run the CLI in your pipeline and use its exit code: 0 means the scan completed, 2 indicates invalid CLI input, 3 indicates a fatal error, and 4 indicates one or more files or directories could not be scanned. Findings are printed to the console.
+A: Yes. Exit codes:
+  0 = clean scan
+  1 = one or more findings
+  2 = invalid CLI input or scan error
+  3 = fatal error
+  4 = one or more files or directories could not be scanned
+
+Q: How can I export results?
+A: Use --format=sarif --output=results.sarif for SARIF 2.1.0 (CI/CD, GitHub Code Scanning, etc.).
+   Default text output is also available.
 
 Q: Why isn't it detecting vulnerability X? or how do I contribute new rules?
 A: Check if the rule exists in our documentation. You can submit new rule requests via Issues section.
@@ -47,4 +56,4 @@ A: Benchmarks show:
 2-3x faster with OPcache enabled
 
 Q: How can I export results to a security dashboard?
-A: A machine-readable output format is not currently available. Use the console output and process exit code, or integrate the PHP library directly.
+A: Use --format=sarif --output=results.sarif. The SARIF 2.1.0 report is compatible with GitHub Code Scanning and other SARIF consumers.

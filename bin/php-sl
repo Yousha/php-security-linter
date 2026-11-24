@@ -45,7 +45,7 @@ function showHelp(): void
 {
     echo <<<HELP
         PHP Security Linter - 3.1.8.6
-        Usage: php bin/php-sl.php [options]
+        Usage: php bin/php-sl [options]
 
         Options:
           -p, --path=PATH      Path to scan (required).
@@ -57,9 +57,9 @@ function showHelp(): void
           --help               Show this help message.
 
         Examples:
-          php bin/php-sl.php --path ./src
-          php bin/php-sl.php -p ./app --exclude .git,storage,vendor,tests
-          php bin/php-sl.php -p ./src --exclude-rules CIS-003,OWASP-001
+          php bin/php-sl --path ./src
+          php bin/php-sl -p ./app --exclude .git,storage,vendor,tests
+          php bin/php-sl -p ./src --exclude-rules CIS-003,OWASP-001
 
         HELP;
 }
@@ -227,7 +227,14 @@ function runCli(array $argv): int
             fwrite(STDERR, sprintf("WARNING: %s\n", $warning));
         }
 
-        return $warnings === [] ? 0 : 4;
+        $issueCount = $results['_meta']['issue_count'] ?? 0;
+        if ($warnings !== []) {
+            return 4;
+        }
+        if ($issueCount > 0) {
+            return 1;
+        }
+        return 0;
     } catch (LinterException $e) {
         fwrite(STDERR, sprintf('SCAN ERROR [%d]: %s%s', $e->getCode(), $e->getMessage(), PHP_EOL));
         return 2;
