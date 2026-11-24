@@ -129,7 +129,7 @@ php vendor/bin/php-sl --path=./app --exclude=storage,tests
 Excluding a specific directory, path exclusion, and rule exclusion:
 
 ```bash
-php bin/php-sl.php --path=./src --exclude=storage --exclude-rules=CIS-003,OWASP-001
+php bin/php-sl --path=./src --exclude=storage --exclude-rules=CIS-003,OWASP-001
 ```
 
 
@@ -146,6 +146,23 @@ php vendor/bin/php-sl --path=./src --format=sarif > results.sarif
 ```
 
 The default `text` format remains unchanged. SARIF output includes rule descriptors, severity levels, source file URIs, line locations, and scan warnings as invocation notifications.
+
+### Exit codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Clean scan |
+| 1 | One or more findings |
+| 2 | Invalid CLI input or scan error |
+| 3 | Fatal error |
+| 4 | One or more files/directories could not be scanned |
+
+### Cross-platform notes
+
+- Line endings are normalized (CRLF → LF) before rule matching.
+- Path exclusion is case-insensitive.
+- Absolute paths (`/…` and `X:\…`) and mixed separators are handled.
+- On Windows use `vendor\bin\php-sl.bat` (Composer wrapper).
 
 ### Commands
 

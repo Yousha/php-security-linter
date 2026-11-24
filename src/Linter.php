@@ -116,7 +116,11 @@ final class Linter
     }
 
     /**
-     * Determine whether a file should be excluded.
+     * Determine whether a file should be excluded from the scan.
+     *
+     * @param string $filePath Absolute or relative file path
+     * @param array $exclude List of exclusion patterns
+     * @return bool
      */
     private function shouldExclude(string $filePath, array $exclude): bool
     {
@@ -146,6 +150,13 @@ final class Linter
         return false;
     }
 
+    /**
+     * Check if a file matches an absolute exclusion path.
+     *
+     * @param string $filePath Normalized file path
+     * @param string $excludedPattern Exclusion pattern
+     * @return bool
+     */
     private function isAbsolutePathMatch(string $filePath, string $excludedPattern): bool
     {
         if (!$this->isAbsolutePath($excludedPattern)) {
@@ -161,25 +172,45 @@ final class Linter
         return $filePath === $excludedPath || str_starts_with($filePath, $excludedPath . '/');
     }
 
+    /**
+     * Determine whether a path is absolute (Unix or Windows).
+     *
+     * @param string $path Path to check
+     * @return bool
+     */
     private function isAbsolutePath(string $path): bool
     {
         return str_starts_with($path, '/')
             || preg_match('/^[A-Za-z]:[\/\\\\]/', $path) === 1;
     }
 
+    /**
+     * Check if a file matches by basename or relative path segment (case-insensitive).
+     *
+     * @param string $filePath Normalized file path
+     * @param string $excludedPattern Exclusion pattern
+     * @return bool
+     */
     private function isBasenameOrRelativePathMatch(string $filePath, string $excludedPattern): bool
     {
         $normalizedPattern = str_replace('\\', '/', $excludedPattern);
-        if (basename($filePath) === $normalizedPattern) {
+        // Case-insensitive so Windows (case-insensitive FS) and mixed-case dirs are handled.
+        $fileBase = basename($filePath);
+        if (strcasecmp($fileBase, $normalizedPattern) === 0) {
             return true;
         }
 
-        return str_contains('/' . ltrim($filePath, '/') . '/', '/' . trim($normalizedPattern, '/') . '/');
+        $haystack = '/' . ltrim($filePath, '/') . '/';
+        $needle = '/' . trim($normalizedPattern, '/') . '/';
+        return stripos($haystack, $needle) !== false;
     }
 
     /**
-     * @param string[] $warnings Warnings collected during the scan.
-     * @return array|null Null means the file could not be read.
+     * Scan a single PHP file for security issues.
+     *
+     * @param string $filePath Path to the PHP file
+     * @param string[] $warnings Warnings collected during the scan
+     * @return array|null Null if the file could not be read
      */
     private function scanFile(string $filePath, array &$warnings): ?array
     {
@@ -193,6 +224,8 @@ final class Linter
             return [];
         }
 
+        // Normalize line endings so Windows CRLF does not break $ anchors or line matching.
+        $content = str_replace(["\r\n", "\r"], "\n", $content);
         $issues = [];
         $lines = explode("\n", $content);
 
