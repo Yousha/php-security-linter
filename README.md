@@ -40,7 +40,7 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
 
 ## Requirements
 
-1. PHP 8.0 or newer with PCRE and tokenizer
+1. PHP 8.0 or newer
 2. Composer 2 or newer
 
 ### PHP Compatibility
@@ -137,28 +137,6 @@ php vendor/bin/php-sl --path=./src --format=sarif > results.sarif
 ```
 
 The default `text` format remains unchanged. SARIF output includes rule descriptors, severity levels, source file URIs, line locations, and scan warnings as invocation notifications.
-
-### OWASP and MITRE ATT&CK checks
-
-A default scan runs 45 rules. Use `--include-attack` to enable all 48. Library callers can pass `new Linter(includeAttack: true)`. Exclude individual rule IDs with `--exclude-rules`.
-
-| Rule | Finding | Guidance |
-|---|---|---|
-| OWASP-020 | Session strict mode explicitly disabled | [PHP Configuration](https://cheatsheetseries.owasp.org/cheatsheets/PHP_Configuration_Cheat_Sheet.html) |
-| OWASP-021 | URL-based session IDs explicitly enabled | [PHP Configuration](https://cheatsheetseries.owasp.org/cheatsheets/PHP_Configuration_Cheat_Sheet.html) |
-| OWASP-022 | Cookie-only session IDs explicitly disabled | [PHP Configuration](https://cheatsheetseries.owasp.org/cheatsheets/PHP_Configuration_Cheat_Sheet.html) |
-| OWASP-023 | SameSite=None cookie explicitly disables Secure | [Session Management](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html) |
-| OWASP-024 | __Host- cookie sets a Domain attribute | [Session Management](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html) |
-| OWASP-025 | __Host- cookie specifies a path other than / | [Session Management](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html) |
-| OWASP-026 | Startup error display enabled; review production configuration | [PHP Configuration](https://cheatsheetseries.owasp.org/cheatsheets/PHP_Configuration_Cheat_Sheet.html) |
-| OWASP-027 | HTML error display enabled; review production configuration | [PHP Configuration](https://cheatsheetseries.owasp.org/cheatsheets/PHP_Configuration_Cheat_Sheet.html) |
-| OWASP-028 | Exception traces include arguments; review production configuration | [PHP Configuration](https://cheatsheetseries.owasp.org/cheatsheets/PHP_Configuration_Cheat_Sheet.html) |
-| OWASP-029 | Explicit bcrypt cost below the OWASP minimum of 10 | [Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) |
-| ATTACK-001 | Review execution of directly Base64-decoded literal content | [T1140](https://attack.mitre.org/techniques/T1140/) |
-| ATTACK-002 | Review remote content copied directly to a script file | [T1105](https://attack.mitre.org/techniques/T1105/) |
-| ATTACK-003 | Review literal schedule written to a cron configuration file | [T1053.003](https://attack.mitre.org/techniques/T1053/003/) |
-
-These checks inspect direct PHP calls and literal positional arguments. Cookie and hashing options use literal arrays. The diagnostics checks target production settings. ATT&CK matches identify code for review, including legitimate installers and scheduled maintenance. The scanner does not execute the code or trace values across assignments.
 
 ### Exit codes
 
