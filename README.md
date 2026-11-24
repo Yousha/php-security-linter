@@ -65,7 +65,7 @@ To install the PHP 8.0-compatible branch before a tagged release, run `composer 
 
 ## Screenshots
 
-![Screenshot](resources/images/screenshots/1.png)
+![CLI scan of two PHP files showing OWASP findings and an opt-in ATT&CK finding](resources/images/screenshots/1.png)
 
 ## Diagrams
 
@@ -75,7 +75,7 @@ To install the PHP 8.0-compatible branch before a tagged release, run `composer 
 
 * Dataflow diagram:
 
-![Dataflow diagram](resources/images/diagrams/artifacts/Dataflow-diagram.png)
+![Scan dataflow from rule selection and PHP file traversal to regex and token checks, findings, warnings, and text or SARIF output](resources/images/diagrams/artifacts/Dataflow-diagram.png)
 
 ## Installation
 

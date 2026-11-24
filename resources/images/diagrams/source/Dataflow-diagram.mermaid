@@ -1,8 +1,18 @@
 flowchart TD
-    A[CLI Input] --> B[Directory Traversal]
-    B --> C[File Content Analysis]
-    C --> D[Rule Matching]
-    D --> E[Issue Aggregation]
-    E --> F[Results Output]
-    C -->|Error| G[Exception Handling]
-    G --> F
+    Options["CLI options"] --> Select["Select rules and apply rule exclusions"]
+    Catalog["45 default rules + 3 opt-in ATT&CK rules"] --> Select
+    Options --> Walk["Traverse scan directory"]
+    Walk --> Read["Filter PHP files and excluded paths"]
+    Read --> Source["Read file and normalize line endings"]
+    Source --> Regex["Match regex rules"]
+    Source --> Calls["Tokenize PHP and inspect direct calls"]
+    Select --> Regex
+    Select --> Calls
+    Regex --> Results["Collect findings and scan counts"]
+    Calls --> Results
+    Walk -->|Traversal warning| Warnings["Record scan warnings"]
+    Source -->|Read warning| Warnings
+    Warnings --> Results
+    Results --> Text["Text report to stdout"]
+    Results --> Sarif["SARIF to stdout or file"]
+    Results --> Status["Warnings to stderr and CLI exit code"]
