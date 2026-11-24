@@ -35,6 +35,7 @@ final class SarifFormatter
             foreach ($findings as $finding) {
                 $message = (string) ($finding['message'] ?? '');
                 $ruleId = $this->extractRuleId($message);
+
                 if ($ruleId === null || !isset($rules[$ruleId])) {
                     continue;
                 }
@@ -47,8 +48,12 @@ final class SarifFormatter
                     'message' => ['text' => $message !== '' ? $message : $rule['message']],
                     'locations' => [[
                         'physicalLocation' => [
-                            'artifactLocation' => ['uri' => $this->toArtifactUri((string) $file, $scanRoot)],
-                            'region' => ['startLine' => max(1, (int) ($finding['line'] ?? 1))],
+                            'artifactLocation' => [
+                                'uri' => $this->toArtifactUri((string) $file, $scanRoot),
+                            ],
+                            'region' => [
+                                'startLine' => max(1, (int) ($finding['line'] ?? 1)),
+                            ],
                         ],
                     ]],
                 ];
@@ -89,7 +94,7 @@ final class SarifFormatter
             );
         }
 
-        return json_encode([
+        $document = [
             '$schema' => self::SCHEMA,
             'version' => '2.1.0',
             'runs' => [[
@@ -104,7 +109,12 @@ final class SarifFormatter
                 'invocations' => [$invocation],
                 'results' => $results,
             ]],
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR) . PHP_EOL;
+        ];
+
+        return json_encode(
+            $document,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+        ) . PHP_EOL;
     }
 
     /**
@@ -126,7 +136,11 @@ final class SarifFormatter
                 'id' => $id,
                 'index' => $index,
                 'message' => $message,
-                'shortDescription' => preg_replace('/^' . preg_quote($id, '/') . ':\s*/', '', $message) ?? $message,
+                'shortDescription' => preg_replace(
+                    '/^' . preg_quote($id, '/') . ':\s*/',
+                    '',
+                    $message
+                ) ?? $message,
                 'level' => $this->mapSeverity((string) ($rule['severity'] ?? 'note')),
                 'reference' => $reference,
                 'helpUri' => $this->referenceUri($reference),
@@ -137,7 +151,7 @@ final class SarifFormatter
     }
 
     /**
-     * Extract the registered rule identifier embedded in finding messages.
+     * Extract the registered rule identifier embedded in a finding message.
      */
     private function extractRuleId(string $message): ?string
     {
