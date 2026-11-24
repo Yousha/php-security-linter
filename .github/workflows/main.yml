@@ -115,7 +115,17 @@ jobs:
 
       - name: Validate SARIF output
         run: |
+          # Linter exits 1 when issues are found; that is expected on its own source.
+          # Only fail the step on unexpected errors (exit > 1) or invalid SARIF.
+          set +e
           php bin/php-sl --path=src --format=sarif --output=results.sarif
+          linter_status=$?
+          set -e
+          if [ "$linter_status" -gt 1 ]; then
+            echo "Unexpected linter exit code: $linter_status"
+            exit "$linter_status"
+          fi
+          test -s results.sarif
           jq -e '
             .version == "2.1.0"
             and (.runs | length == 1)
