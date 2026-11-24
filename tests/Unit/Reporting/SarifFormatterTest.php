@@ -48,8 +48,14 @@ final class SarifFormatterTest extends TestCase
             self::assertSame('PHP Security Linter', $document['runs'][0]['tool']['driver']['name']);
             self::assertSame('OWASP-002', $document['runs'][0]['results'][0]['ruleId']);
             self::assertSame('error', $document['runs'][0]['results'][0]['level']);
-            self::assertSame('unsafe.php', $document['runs'][0]['results'][0]['locations'][0]['physicalLocation']['artifactLocation']['uri']);
-            self::assertSame(2, $document['runs'][0]['results'][0]['locations'][0]['physicalLocation']['region']['startLine']);
+            self::assertSame(
+                'unsafe.php',
+                $document['runs'][0]['results'][0]['locations'][0]['physicalLocation']['artifactLocation']['uri']
+            );
+            self::assertSame(
+                2,
+                $document['runs'][0]['results'][0]['locations'][0]['physicalLocation']['region']['startLine']
+            );
             self::assertSame('A03:2021', $document['runs'][0]['results'][0]['properties']['standardReference']);
             self::assertTrue($document['runs'][0]['invocations'][0]['executionSuccessful']);
         } finally {
