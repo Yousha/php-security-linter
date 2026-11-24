@@ -112,3 +112,8 @@ jobs:
 
       - name: Run tests
         run: composer test
+
+      - name: Validate SARIF output
+        run: |
+          php bin/php-sl --path=src --format=sarif --output=results.sarif
+          jq -e '.version == "2.1.0" and (.runs | length == 1) and (.runs[0].tool.driver.name == "PHP Security Linter") and (.runs[0].results | type == "array")' results.sarif
