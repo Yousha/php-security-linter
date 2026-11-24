@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Yousha\\PhpSecurityLinter\\Reporting;
+namespace Yousha\PhpSecurityLinter\Reporting;
 
-use Yousha\\PhpSecurityLinter\\Rules\\CisRules;
-use Yousha\\PhpSecurityLinter\\Rules\\OwaspRules;
+use Yousha\PhpSecurityLinter\Rules\CisRules;
+use Yousha\PhpSecurityLinter\Rules\OwaspRules;
 
 /**
  * Serializes PHP Security Linter results as SARIF 2.1.0.
@@ -13,8 +13,6 @@ use Yousha\\PhpSecurityLinter\\Rules\\OwaspRules;
 final class SarifFormatter
 {
     private const SCHEMA = 'https://json.schemastore.org/sarif-2.1.0.json';
-    private const VERSION = '2.1.0';
-    private const TOOL_NAME = 'PHP Security Linter';
     private const TOOL_URI = 'https://github.com/Yousha/php-security-linter';
 
     /**
@@ -35,28 +33,27 @@ final class SarifFormatter
             }
 
             foreach ($findings as $finding) {
-                $ruleId = $this->extractRuleId((string) ($finding['message'] ?? ''));
-                $rule = $rules[$ruleId] ?? null;
-                if ($ruleId === null || $rule === null) {
+                $message = (string) ($finding['message'] ?? '');
+                $ruleId = $this->extractRuleId($message);
+                if ($ruleId === null || !isset($rules[$ruleId])) {
                     continue;
                 }
 
-                $artifactUri = $this->toArtifactUri((string) $file, $scanRoot);
-                $line = max(1, (int) ($finding['line'] ?? 1));
+                $rule = $rules[$ruleId];
                 $result = [
                     'ruleId' => $ruleId,
                     'ruleIndex' => $rule['index'],
                     'level' => $this->mapSeverity((string) ($finding['severity'] ?? 'note')),
-                    'message' => ['text' => (string) ($finding['message'] ?? $rule['message'])],
+                    'message' => ['text' => $message !== '' ? $message : $rule['message']],
                     'locations' => [[
                         'physicalLocation' => [
-                            'artifactLocation' => ['uri' => $artifactUri],
-                            'region' => ['startLine' => $line],
+                            'artifactLocation' => ['uri' => $this->toArtifactUri((string) $file, $scanRoot)],
+                            'region' => ['startLine' => max(1, (int) ($finding['line'] ?? 1))],
                         ],
                     ]],
                 ];
 
-                if (isset($rule['reference'])) {
+                if ($rule['reference'] !== null) {
                     $result['properties'] = ['standardReference' => $rule['reference']];
                 }
 
@@ -64,57 +61,54 @@ final class SarifFormatter
             }
         }
 
-        $run = [
-            'tool' => [
-                'driver' => [
-                    'name' => self::TOOL_NAME,
-                    'informationUri' => self::TOOL_URI,
-                    'version' => $this->getVersion(),
-                    'rules' => array_values(array_map(
-                        static function (array $rule): array {
-                            $descriptor = [
-                                'id' => $rule['id'],
-                                'shortDescription' => ['text' => $rule['shortDescription']],
-                                'defaultConfiguration' => ['level' => $rule['level']],
-                                'properties' => ['tags' => ['security']],
-                            ];
-                            if (isset($rule['reference'])) {
-                                $descriptor['helpUri'] = $rule['helpUri'];
-                                $descriptor['properties']['standardReference'] = $rule['reference'];
-                            }
-                            return $descriptor;
-                        },
-                        $rules
-                    )),
-                ],
-            ],
-            'results' => $results,
-        ];
+        $descriptors = [];
+        foreach ($rules as $rule) {
+            $descriptor = [
+                'id' => $rule['id'],
+                'shortDescription' => ['text' => $rule['shortDescription']],
+                'defaultConfiguration' => ['level' => $rule['level']],
+                'properties' => ['tags' => ['security']],
+            ];
 
+            if ($rule['reference'] !== null && $rule['helpUri'] !== null) {
+                $descriptor['helpUri'] = $rule['helpUri'];
+                $descriptor['properties']['standardReference'] = $rule['reference'];
+            }
+
+            $descriptors[] = $descriptor;
+        }
+
+        $invocation = ['executionSuccessful' => $warnings === []];
         if ($warnings !== []) {
-            $run['invocations'] = [[
-                'executionSuccessful' => false,
-                'toolExecutionNotifications' => array_map(
-                    static fn(string $warning): array => [
-                        'level' => 'warning',
-                        'message' => ['text' => $warning],
-                    ],
-                    array_map('strval', $warnings)
-                ),
-            ]];
-        } else {
-            $run['invocations'] = [['executionSuccessful' => true]];
+            $invocation['toolExecutionNotifications'] = array_map(
+                static fn(string $warning): array => [
+                    'level' => 'warning',
+                    'message' => ['text' => $warning],
+                ],
+                array_map('strval', $warnings)
+            );
         }
 
         return json_encode([
             '$schema' => self::SCHEMA,
-            'version' => self::VERSION,
-            'runs' => [$run],
+            'version' => '2.1.0',
+            'runs' => [[
+                'tool' => [
+                    'driver' => [
+                        'name' => 'PHP Security Linter',
+                        'informationUri' => self::TOOL_URI,
+                        'version' => $this->getVersion(),
+                        'rules' => $descriptors,
+                    ],
+                ],
+                'invocations' => [$invocation],
+                'results' => $results,
+            ]],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR) . PHP_EOL;
     }
 
     /**
-     * Return registered rules keyed by stable rule identifier.
+     * Return registered rules keyed by stable identifier.
      *
      * @return array<string, array<string, mixed>>
      */
@@ -126,13 +120,13 @@ final class SarifFormatter
         foreach ($allRules as $index => $rule) {
             $id = (string) $rule['id'];
             $message = (string) $rule['message'];
-            $shortDescription = preg_replace('/^' . preg_quote($id, '/') . ':\\s*/', '', $message) ?? $message;
             $reference = $rule['reference'] ?? null;
+
             $rules[$id] = [
                 'id' => $id,
                 'index' => $index,
                 'message' => $message,
-                'shortDescription' => $shortDescription,
+                'shortDescription' => preg_replace('/^' . preg_quote($id, '/') . ':\s*/', '', $message) ?? $message,
                 'level' => $this->mapSeverity((string) ($rule['severity'] ?? 'note')),
                 'reference' => $reference,
                 'helpUri' => $this->referenceUri($reference),
@@ -143,17 +137,17 @@ final class SarifFormatter
     }
 
     /**
-     * Extract a rule identifier from the current finding message format.
+     * Extract the registered rule identifier embedded in finding messages.
      */
     private function extractRuleId(string $message): ?string
     {
-        return preg_match('/^(CIS-\\d{3}|OWASP-\\d{3}):/', $message, $matches) === 1
+        return preg_match('/^(CIS-\d{3}|OWASP-\d{3}):/', $message, $matches) === 1
             ? $matches[1]
             : null;
     }
 
     /**
-     * Map linter severities to SARIF levels.
+     * Map scanner severities to SARIF levels.
      */
     private function mapSeverity(string $severity): string
     {
@@ -166,19 +160,16 @@ final class SarifFormatter
     }
 
     /**
-     * Convert a filesystem path to a normalized, scan-root-relative URI.
+     * Convert a filesystem path into a scan-root-relative artifact URI.
      */
     private function toArtifactUri(string $filePath, string $scanRoot): string
     {
         $root = realpath($scanRoot);
         $file = realpath($filePath);
-        $normalizedRoot = str_replace('\\', '/', $root !== false ? $root : $scanRoot);
+        $normalizedRoot = rtrim(str_replace('\\', '/', $root !== false ? $root : $scanRoot), '/');
         $normalizedFile = str_replace('\\', '/', $file !== false ? $file : $filePath);
-        $normalizedRoot = rtrim($normalizedRoot, '/');
 
-        if ($normalizedFile === $normalizedRoot) {
-            $relative = basename($normalizedFile);
-        } elseif (str_starts_with($normalizedFile, $normalizedRoot . '/')) {
+        if (str_starts_with($normalizedFile, $normalizedRoot . '/')) {
             $relative = substr($normalizedFile, strlen($normalizedRoot) + 1);
         } else {
             $relative = $normalizedFile;
@@ -188,7 +179,7 @@ final class SarifFormatter
     }
 
     /**
-     * Return a documentation URI for a known standard reference.
+     * Resolve known standard references to documentation pages.
      */
     private function referenceUri(?string $reference): ?string
     {
@@ -196,15 +187,13 @@ final class SarifFormatter
             return null;
         }
 
-        if (str_starts_with($reference, 'A')) {
-            return 'https://owasp.org/Top10/' . rawurlencode($reference) . '/';
-        }
-
-        return null;
+        return str_starts_with($reference, 'A')
+            ? 'https://owasp.org/Top10/' . rawurlencode($reference) . '/'
+            : null;
     }
 
     /**
-     * Read the package version without requiring a generated build file.
+     * Read the package version from VERSION.txt.
      */
     private function getVersion(): string
     {
