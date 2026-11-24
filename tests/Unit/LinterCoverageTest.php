@@ -20,7 +20,7 @@ final class LinterCoverageTest extends TestCase
     {
         parent::setUp();
         $this->tempDir = sys_get_temp_dir() . '/php-sl-coverage-' . uniqid('', true);
-        mkdir($this->tempDir, 0777, true);
+        mkdir($this->tempDir, 0o777, true);
     }
 
     protected function tearDown(): void
@@ -37,7 +37,7 @@ final class LinterCoverageTest extends TestCase
     {
         // Arrange
         $subDir = $this->tempDir . '/src/lib';
-        mkdir($subDir, 0777, true);
+        mkdir($subDir, 0o777, true);
 
         $vulnerableFile = $subDir . '/auth.php';
         file_put_contents($vulnerableFile, "<?php\necho \$_GET['xss'];\n");
@@ -106,7 +106,7 @@ final class LinterCoverageTest extends TestCase
     {
         // Arrange
         $emptySub = $this->tempDir . '/empty-sub';
-        mkdir($emptySub, 0777, true);
+        mkdir($emptySub, 0o777, true);
         $linter = new Linter();
 
         // Act
@@ -135,7 +135,7 @@ final class LinterCoverageTest extends TestCase
         $shouldExclude->setAccessible(true);
 
         $filePath = $this->tempDir . '/src/app.php';
-        mkdir(dirname($filePath), 0777, true);
+        mkdir(dirname($filePath), 0o777, true);
         file_put_contents($filePath, '<?php');
 
         // Act & Assert – isAbsolutePath
@@ -164,7 +164,7 @@ final class LinterCoverageTest extends TestCase
         $baseMatch->setAccessible(true);
 
         $dir = $this->tempDir . '/src';
-        mkdir($dir, 0777, true);
+        mkdir($dir, 0o777, true);
         $file = $dir . '/app.php';
         file_put_contents($file, '<?php');
         $normalized = str_replace('\\', '/', realpath($file));
@@ -212,7 +212,7 @@ final class LinterCoverageTest extends TestCase
     {
         // Arrange
         $vendorDir = $this->tempDir . '/Vendor';
-        mkdir($vendorDir, 0777, true);
+        mkdir($vendorDir, 0o777, true);
         file_put_contents($vendorDir . '/lib.php', "<?php echo \$_GET['x'];");
         $linter = new Linter();
 
