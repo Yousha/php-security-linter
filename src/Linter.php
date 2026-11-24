@@ -7,7 +7,7 @@
  * Locale: en_International
  * Last update: 2026
  * Architecture: no-arch
- * API: 8.2
+ * API: 8.0
  * Executor: Apache module, FPM, CGI
  * Builder:
  * License: GPL-3.0
@@ -40,15 +40,14 @@ final class Linter
     private array $rules = [];
 
     /**
-     * @param array $excludeRuleIds List of rule IDs to exclude.
+     * @param array $excludedRuleIds List of rule IDs to exclude.
      */
-    public function __construct(
-        private readonly array $excludedRuleIds = []
-    ) {
+    public function __construct(array $excludedRuleIds = [])
+    {
         $allRules = array_merge(CisRules::getRules(), OwaspRules::getRules());
         $this->rules = array_filter(
             $allRules,
-            fn(array $rule): bool => !in_array($rule['id'], $this->excludedRuleIds, true)
+            fn(array $rule): bool => !in_array($rule['id'], $excludedRuleIds, true)
         );
     }
 

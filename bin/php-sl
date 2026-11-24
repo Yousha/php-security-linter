@@ -190,7 +190,7 @@ function runCli(array $argv): int
             ? $options['exclude-rules']
             : explode(',', $options['exclude-rules']);
         // Normalize and trim each rule ID.
-        $excludeRules = array_map(trim(...), $excludeRules);
+        $excludeRules = array_map('trim', $excludeRules);
     }
 
     try {

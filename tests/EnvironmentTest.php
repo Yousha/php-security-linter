@@ -9,8 +9,10 @@ namespace Yousha\PhpSecurityLinter\Tests {
     use stdClass;
     use PHPUnit\Framework\TestCase;
 
-    #[\PHPUnit\Framework\Attributes\Group('Environment')]
-    #[\PHPUnit\Framework\Attributes\Medium]
+    /**
+     * @group Environment
+     * @medium
+     */
     final class EnvironmentTest extends TestCase
     {
         /**
@@ -19,7 +21,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          *
          * @return void
          */
-        #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         public static function setUpBeforeClass(): void {}
 
         /**
@@ -28,7 +29,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          *
          * @return void
          */
-        #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         public static function tearDownAfterClass(): void
         {
             gc_collect_cycles();
@@ -40,7 +40,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          *
          * @return void
          */
-        #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         protected function setUp(): void
         {
             parent::setUp();
@@ -53,7 +52,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          *
          * @return void
          */
-        #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         protected function tearDown(): void
         {
             // Methods finalization codes.
@@ -65,7 +63,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          *
          * @return void
          */
-        #[\PHPUnit\Framework\Attributes\Test]
         final public function testPhp_1(): void
         {
             // AAA
@@ -127,7 +124,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
          *
          * @return void
          */
-        #[\PHPUnit\Framework\Attributes\Test]
         final public function testPhp_2(): void
         {
             $this->assertNotEmpty(getmypid());
@@ -145,7 +141,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
             $this->assertNotEmpty(PHP_MAJOR_VERSION);
 
             // AAA
-            $this->assertNotEmpty(PHP_MINOR_VERSION);
+            $this->assertGreaterThanOrEqual(0, PHP_MINOR_VERSION);
 
             // Arrange/Action
             $result = hash('sha256', '1234567890Abcdefg');

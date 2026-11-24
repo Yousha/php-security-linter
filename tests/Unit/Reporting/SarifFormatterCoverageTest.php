@@ -23,7 +23,9 @@ final class SarifFormatterCoverageTest extends TestCase
         $formatter = new SarifFormatter();
         $reflection = new ReflectionClass($formatter);
         $method = $reflection->getMethod('getVersion');
-        $method->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $method->setAccessible(true);
+        }
 
         $originalVersionFile = dirname(__DIR__, 3) . '/VERSION.txt';
         $backup = $originalVersionFile . '.bak';
@@ -56,7 +58,9 @@ final class SarifFormatterCoverageTest extends TestCase
         $formatter = new SarifFormatter();
         $reflection = new ReflectionClass($formatter);
         $method = $reflection->getMethod('referenceUri');
-        $method->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $method->setAccessible(true);
+        }
 
         // Act & Assert
         $this->assertNull($method->invoke($formatter, null));
@@ -76,9 +80,11 @@ final class SarifFormatterCoverageTest extends TestCase
         $formatter = new SarifFormatter();
         $reflection = new ReflectionClass($formatter);
         $getRules = $reflection->getMethod('getRules');
-        $getRules->setAccessible(true);
         $findRuleId = $reflection->getMethod('findRuleId');
-        $findRuleId->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $getRules->setAccessible(true);
+            $findRuleId->setAccessible(true);
+        }
 
         $rules = $getRules->invoke($formatter);
 
@@ -98,7 +104,9 @@ final class SarifFormatterCoverageTest extends TestCase
         $formatter = new SarifFormatter();
         $reflection = new ReflectionClass($formatter);
         $method = $reflection->getMethod('toArtifactUri');
-        $method->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $method->setAccessible(true);
+        }
 
         $outside = '/tmp/outside-' . uniqid() . '.php';
         file_put_contents($outside, '<?php');

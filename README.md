@@ -2,7 +2,7 @@
 
 A PHP tool to lint PHP files for security issues based on CIS and OWASP best practices.
 
-[![current version](https://img.shields.io/packagist/v/yousha/php-security-linter.svg)](https://packagist.org/packages/yousha/php-security-linter) [![Build and Test](https://github.com/Yousha/php-security-linter/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/Yousha/php-security-linter/actions/workflows/main.yml) [![CodeQL](https://github.com/Yousha/php-security-linter/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/Yousha/php-security-linter/actions/workflows/github-code-scanning/codeql) [![Dependabot Updates](https://github.com/Yousha/php-security-linter/actions/workflows/dependabot/dependabot-updates/badge.svg?branch=main)](https://github.com/Yousha/php-security-linter/actions/workflows/dependabot/dependabot-updates) [![PHP](https://img.shields.io/badge/PHP-8.5-617CBE)](https://php.net/) [![issues](https://img.shields.io/github/issues/yousha/php-security-linter)](https://github.com/yousha/php-security-linter/issues) ![repo size](https://img.shields.io/github/repo-size/yousha/php-security-linter) [![GitHub license](https://img.shields.io/github/license/yousha/php-security-linter)](LICENSE) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.txt)
+[![current version](https://img.shields.io/packagist/v/yousha/php-security-linter.svg)](https://packagist.org/packages/yousha/php-security-linter) [![Build and Test](https://github.com/Yousha/php-security-linter/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/Yousha/php-security-linter/actions/workflows/main.yml) [![CodeQL](https://github.com/Yousha/php-security-linter/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/Yousha/php-security-linter/actions/workflows/github-code-scanning/codeql) [![Dependabot Updates](https://github.com/Yousha/php-security-linter/actions/workflows/dependabot/dependabot-updates/badge.svg?branch=main)](https://github.com/Yousha/php-security-linter/actions/workflows/dependabot/dependabot-updates) [![PHP](https://img.shields.io/badge/PHP-8.0%2B-617CBE)](https://php.net/) [![issues](https://img.shields.io/github/issues/yousha/php-security-linter)](https://github.com/yousha/php-security-linter/issues) ![repo size](https://img.shields.io/github/repo-size/yousha/php-security-linter) [![GitHub license](https://img.shields.io/github/license/yousha/php-security-linter)](LICENSE) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.txt)
 
 ## Contents
 
@@ -46,22 +46,22 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
 * **Configurable ruleset**
 * **DevSecOps ready** CI/CD pipeline integration
 * **Exclusion support** for ignoring specific paths
-* **Supported PHP:** 8.2 and newer
+* **Supported PHP:** 8.0 and newer
 * **Supported platforms:** Windows, GNU/Linux, MacOS
 
 ## Requirements
 
-1. PHP 8.2 or newer
+1. PHP 8.0 or newer
 2. Composer 2 or newer
 
 ### PHP Compatibility
 
-The current `main` branch (`dev-main`) and 3.x releases require PHP 8.2 or newer.
+The current `main` branch (`dev-main`) requires PHP 8.0 or newer. Published 3.x tags retain their original Composer requirements.
 
 | Package version | Branch name       | PHP version | Status      |
 |-----------------|-------------------|-------------|-------------|
-| dev-main        | `main`            | 8.2+        | Active      |
-| 3.*             | `main`            | 8.2+        | Active      |
+| dev-main        | `main`            | 8.0+        | Active      |
+| 3.* (released)  | `main`            | Per tag     | Active      |
 | dev-main-php7.4 | `main-php7.4`     | 7.4         | Maintenance |
 | 2.*             | `main-php7.4`     | 7.4         | Maintenance |
 | 1.*             |                   | 5.6         | EOL         |
@@ -71,6 +71,8 @@ The current `main` branch (`dev-main`) and 3.x releases require PHP 8.2 or newer
 * **EOL**: Unsupported
 
 The PHP 7.4 and PHP 5.6 entries refer only to older release lines; they are not supported by the current `main` branch or 3.x releases.
+
+To install the PHP 8.0-compatible branch before a tagged release, run `composer require --dev yousha/php-security-linter:dev-main`.
 
 ## Screenshots
 

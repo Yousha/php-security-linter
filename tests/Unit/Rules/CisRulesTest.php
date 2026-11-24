@@ -17,7 +17,6 @@ final class CisRulesTest extends TestCase
      *
      * @return void
      */
-    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public static function setUpBeforeClass(): void {}
 
     /**
@@ -26,7 +25,6 @@ final class CisRulesTest extends TestCase
      *
      * @return void
      */
-    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public static function tearDownAfterClass(): void
     {
         gc_collect_cycles();
@@ -38,7 +36,6 @@ final class CisRulesTest extends TestCase
      *
      * @return void
      */
-    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     protected function setUp(): void
     {
         parent::setUp();
@@ -51,7 +48,6 @@ final class CisRulesTest extends TestCase
      *
      * @return void
      */
-    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     protected function tearDown(): void
     {
         // Methods finalization codes.

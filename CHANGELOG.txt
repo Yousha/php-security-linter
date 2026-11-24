@@ -1,5 +1,6 @@
 Unreleased
 ----------
+* Lower the minimum PHP version on main to 8.0 and test PHP 8.0 through 8.5 in CI.
 * Add SARIF 2.1.0 report output.
 * Add CLI format and output options while preserving text output by default.
 * Add SARIF formatter tests for findings, clean scans, and scan warnings.

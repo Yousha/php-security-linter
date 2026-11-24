@@ -11,8 +11,8 @@ use Yousha\PhpSecurityLinter\Rules\OwaspRules;
 
 /**
  * Tests SARIF 2.1.0 report serialization.
+ * @small
  */
-#[\PHPUnit\Framework\Attributes\Small]
 final class SarifFormatterTest extends TestCase
 {
     /**

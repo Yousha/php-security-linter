@@ -8,8 +8,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Exercises the SARIF CLI using real PHP processes and filesystem fixtures.
+ * @small
  */
-#[\PHPUnit\Framework\Attributes\Small]
 final class SarifCliTest extends TestCase
 {
     /**
@@ -35,6 +35,24 @@ final class SarifCliTest extends TestCase
                 'OWASP-002',
                 $document['runs'][0]['results'][0]['ruleId']
             );
+            self::assertSame('', $process['stderr']);
+        } finally {
+            $this->removeFixtureDirectory($directory);
+        }
+    }
+
+    public function testTrimsCommaSeparatedRuleExclusions(): void
+    {
+        $directory = $this->createFixtureDirectory();
+
+        try {
+            $process = $this->runCli([
+                '--path=' . $directory,
+                '--exclude-rules=OWASP-010, OWASP-002 ',
+            ]);
+
+            self::assertSame(0, $process['exitCode']);
+            self::assertStringContainsString('found 0 potential issues', $process['stdout']);
             self::assertSame('', $process['stderr']);
         } finally {
             $this->removeFixtureDirectory($directory);
