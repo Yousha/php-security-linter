@@ -151,9 +151,7 @@ final class SarifCliTest extends TestCase
         }
     }
 
-    /**
-     * Execute the real CLI process with the supplied arguments.
-     *
+    /** Execute the CLI with real arguments and return its process output.
      * @param string[] $arguments
      * @return array{exitCode: int, stdout: string, stderr: string}
      */
@@ -183,9 +181,7 @@ final class SarifCliTest extends TestCase
         ];
     }
 
-    /**
-     * Create a temporary directory containing a detectable PHP vulnerability.
-     */
+    /** Create a temporary fixture containing a detectable vulnerability. */
     private function createFixtureDirectory(): string
     {
         $directory = sys_get_temp_dir() . '/php-sl-cli-' . bin2hex(random_bytes(5));
@@ -197,9 +193,7 @@ final class SarifCliTest extends TestCase
         return $directory;
     }
 
-    /**
-     * Remove the temporary fixture directory and its files.
-     */
+    /** Remove the temporary fixture directory and its contents. */
     private function removeFixtureDirectory(string $directory): void
     {
         foreach (new \DirectoryIterator($directory) as $entry) {

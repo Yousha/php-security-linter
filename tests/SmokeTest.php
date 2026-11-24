@@ -14,33 +14,18 @@ namespace Yousha\PhpSecurityLinter\Tests {
     {
         private Linter $linter;
 
-        /**
-         * This method is called before the first test method in the test class is executed.
-         *
-         *
-         * @return void
-         */
+        /** Initialize shared test fixtures before the test class runs. */
         #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         public static function setUpBeforeClass(): void {}
 
-        /**
-         * This method is called after the last test method in the test class has been executed.
-         *
-         *
-         * @return void
-         */
+        /** Release shared resources after the test class finishes. */
         #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         public static function tearDownAfterClass(): void
         {
             gc_collect_cycles();
         }
 
-        /**
-         * This method is called BEFORE each test method.
-         *
-         *
-         * @return void
-         */
+        /** Initialize resources required by each test. */
         #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         protected function setUp(): void
         {
@@ -48,12 +33,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
             $this->linter = new Linter();
         }
 
-        /**
-         * This method is called AFTER each test method.
-         *
-         *
-         * @return void
-         */
+        /** Release resources created by each test. */
         #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         protected function tearDown(): void
         {
@@ -61,29 +41,29 @@ namespace Yousha\PhpSecurityLinter\Tests {
             parent::tearDown();
         }
 
-        /**
-         *
-         *
-         * @return void
-         */
+        /** Verify  composer can load library class behavior. */
         #[\PHPUnit\Framework\Attributes\Test]
         public function testComposerCanLoadLibraryClass(): void
         {
-            // AAA
+                    // Arrange
+// Assert
+        // Assert
+        
             $this->assertTrue(class_exists(Linter::class));
         }
 
-        /**
-         *
-         *
-         * @return void
-         */
+        /** Verify  composer can load library class behavior. */
         #[\PHPUnit\Framework\Attributes\Test]
         public function testLinterInstanceIsObject(): void
         {
-            // AAA
+                    // Arrange
+// Assert
+        // Assert
+        
             $this->assertNotNull($this->linter);
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertIsObject($this->linter);
         }
     }

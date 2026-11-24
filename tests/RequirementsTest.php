@@ -10,33 +10,18 @@ namespace Yousha\PhpSecurityLinter\Tests {
     #[\PHPUnit\Framework\Attributes\Small]
     final class RequirementsTest extends TestCase
     {
-        /**
-         * This method is called before the first test method in the test class is executed.
-         *
-         *
-         * @return void
-         */
+        /** Initialize shared test fixtures before the test class runs. */
         #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         public static function setUpBeforeClass(): void {}
 
-        /**
-         * This method is called after the last test method in the test class has been executed.
-         *
-         *
-         * @return void
-         */
+        /** Release shared resources after the test class finishes. */
         #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         public static function tearDownAfterClass(): void
         {
             gc_collect_cycles();
         }
 
-        /**
-         * This method is called BEFORE each test method.
-         *
-         *
-         * @return void
-         */
+        /** Initialize resources required by each test. */
         #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         protected function setUp(): void
         {
@@ -44,12 +29,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
             // Methods initialization codes.
         }
 
-        /**
-         * This method is called AFTER each test method.
-         *
-         *
-         * @return void
-         */
+        /** Release resources created by each test. */
         #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         protected function tearDown(): void
         {
@@ -57,44 +37,39 @@ namespace Yousha\PhpSecurityLinter\Tests {
             parent::tearDown();
         }
 
-        /**
-         *
-         *
-         * @return void
-         */
+        /** Verify  project required php version behavior. */
         #[\PHPUnit\Framework\Attributes\Test]
         final public function testProjectRequiredPhpVersion(): void
         {
-            $_result = (PHP_MAJOR_VERSION == 8) && (PHP_MINOR_VERSION >= 2);
+                    // Arrange
+$_result = (PHP_MAJOR_VERSION == 8) && (PHP_MINOR_VERSION >= 2);
+        // Assert
+        
             $this->assertTrue($_result);
         }
 
-        /**
-         *
-         *
-         * @return void
-         */
+        /** Verify  project required php version behavior. */
         #[\PHPUnit\Framework\Attributes\Test]
         final public function testProjectRequiredPhpExtensions(): void
         {
-            $extensions = [
+                    // Arrange
+$extensions = [
                 'pcre',
             ];
 
             foreach ($extensions as $extension) {
+        // Assert
+        
                 $this->assertTrue(extension_loaded($extension));
             }
         }
 
-        /**
-         *
-         *
-         * @return void
-         */
+        /** Verify  project required php version behavior. */
         #[\PHPUnit\Framework\Attributes\Test]
         final public function testProjectDirectoriesExist(): void
         {
-            $directories = [
+                    // Arrange
+$directories = [
                 'bin',
                 'resources',
                 'src',
@@ -103,19 +78,18 @@ namespace Yousha\PhpSecurityLinter\Tests {
             ];
 
             foreach ($directories as $directory) {
+        // Assert
+        
                 $this->assertDirectoryExists($directory);
             }
         }
 
-        /**
-         *
-         *
-         * @return void
-         */
+        /** Verify  project required php version behavior. */
         #[\PHPUnit\Framework\Attributes\Test]
         final public function testProjectFilesExist(): void
         {
-            $files = [
+                    // Arrange
+$files = [
                 '.editorconfig',
                 '.gitattributes',
                 '.gitignore',
@@ -139,6 +113,8 @@ namespace Yousha\PhpSecurityLinter\Tests {
             ];
 
             foreach ($files as $file) {
+        // Assert
+        
                 $this->assertFileExists($file);
             }
         }

@@ -13,33 +13,18 @@ namespace Yousha\PhpSecurityLinter\Tests {
     #[\PHPUnit\Framework\Attributes\Medium]
     final class EnvironmentTest extends TestCase
     {
-        /**
-         * This method is called before the first test method in the test class is executed.
-         *
-         *
-         * @return void
-         */
+        /** Initialize shared test fixtures before the test class runs. */
         #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         public static function setUpBeforeClass(): void {}
 
-        /**
-         * This method is called after the last test method in the test class has been executed.
-         *
-         *
-         * @return void
-         */
+        /** Release shared resources after the test class finishes. */
         #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         public static function tearDownAfterClass(): void
         {
             gc_collect_cycles();
         }
 
-        /**
-         * This method is called BEFORE each test method.
-         *
-         *
-         * @return void
-         */
+        /** Initialize resources required by each test. */
         #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         protected function setUp(): void
         {
@@ -47,12 +32,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
             // Methods initialization codes.
         }
 
-        /**
-         * This method is called AFTER each test method.
-         *
-         *
-         * @return void
-         */
+        /** Release resources created by each test. */
         #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
         protected function tearDown(): void
         {
@@ -60,42 +40,59 @@ namespace Yousha\PhpSecurityLinter\Tests {
             parent::tearDown();
         }
 
-        /**
-         *
-         *
-         * @return void
-         */
+        /** Verify  php_1 behavior. */
         #[\PHPUnit\Framework\Attributes\Test]
         final public function testPhp_1(): void
         {
-            // AAA
+                    // Arrange
+// Assert
+        // Assert
+        
             $this->assertTrue(true);
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertFalse(false);
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertNull(null);
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertIsObject(new stdClass());
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertSame(1, 1);
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertSame('A', 'A');
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertNotSame(1, '1');
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertEquals(1, '1');
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertNotEquals(1, -1);
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertNotEquals('A', '');
 
             // Arrange
@@ -103,99 +100,144 @@ namespace Yousha\PhpSecurityLinter\Tests {
             // Action
             $result = stristr($testString, 'abc');
             // Assert
+        // Assert
+        
             $this->assertFalse($result);
             // Action
             $result = stristr($testString, '567');
             // Assert
+        // Assert
+        
             $this->assertSame('567890', $result);
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertNotEmpty(php_uname());
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertSame(min(3, 4, 2, 8, 10), 2);
 
             // Arrange
             $testVar = 'Test.';
-            // Action/Assert
+            // Act
+        // Assert
+        
             $this->assertIsString($testVar);
         }
 
 
-        /**
-         *
-         *
-         * @return void
-         */
+        /** Verify  php_1 behavior. */
         #[\PHPUnit\Framework\Attributes\Test]
         final public function testPhp_2(): void
         {
-            $this->assertNotEmpty(getmypid());
+                    // Arrange
+        // Assert
+        
+$this->assertNotEmpty(getmypid());
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertTrue(extension_loaded('standard'));
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertTrue(extension_loaded('Core'));
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertNotEmpty(PHP_OS);
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertNotEmpty(PHP_MAJOR_VERSION);
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertNotEmpty(PHP_MINOR_VERSION);
 
-            // Arrange/Action
+            // Act
             $result = hash('sha256', '1234567890Abcdefg');
             // Assert
+        // Assert
+        
             $this->assertSame('acb7c749f0da6d3b87c1265856a590067c268a1843976f38f4223c5ccfe92d25', $result);
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertNotEmpty(get_loaded_extensions());
 
-            // Arrange/Action
+            // Act
             if (PHP_MAJOR_VERSION == 5) {
                 // Assert
+        // Assert
+        
                 $this->assertSame(PHP_INT_MAX, 2147483647);
             } else {
                 // Assert
+        // Assert
+        
                 $this->assertSame(PHP_INT_MAX, 9223372036854775807);
             }
 
             // Arrange
             $testArray = [];
-            // Action/Assert
+            // Act
+        // Assert
+        
             $this->assertSame([], $testArray);
             unset($testArray);
+        // Assert
+        
             $this->assertFalse(isset($testArray));
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertTrue(isset($_SERVER['SCRIPT_NAME']));
 
             // Arrange
             $_SERVER['SCRIPT_NAME'] = 'a/b/c/test.php';
-            // Arrange/Action
+            // Act
+        // Assert
+        
             $this->assertSame('a/b/c/test.php', $_SERVER['SCRIPT_NAME']);
 
             // Arrange
             $_SERVER['HTTPS'] = '1';
-            // Arrange/Action
+            // Act
+        // Assert
+        
             $this->assertSame('1', $_SERVER['HTTPS']);
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertTrue(putenv('NAME=Test'));
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertSame('Test', getenv('NAME'));
 
             // Arrange
             $_SERVER['TEST'] = 'a';
-            // Action/Assert
+            // Act
+        // Assert
+        
             $this->assertSame('a', $_SERVER['TEST']);
 
-            // AAA
+            // Assert
+        // Assert
+        
             $this->assertGreaterThan(0, time());
 
             // Arrange
@@ -203,6 +245,8 @@ namespace Yousha\PhpSecurityLinter\Tests {
             // Action
             $result = ob_get_clean();
             // Arrange
+        // Assert
+        
             $this->assertEmpty($result);
 
             // Arrange
@@ -211,6 +255,8 @@ namespace Yousha\PhpSecurityLinter\Tests {
             // Action
             $result = ob_get_clean();
             // Assert
+        // Assert
+        
             $this->assertSame('Test data.', $result);
 
             // Arrange
@@ -219,6 +265,8 @@ namespace Yousha\PhpSecurityLinter\Tests {
             // Action
             $result = ob_get_clean();
             // Assert
+        // Assert
+        
             $this->assertSame('<div class="test" style="direction: ltr;">Test data.</div>', $result);
 
             // Arrange
@@ -226,11 +274,19 @@ namespace Yousha\PhpSecurityLinter\Tests {
             // Assert
             $exceptionObject = new RuntimeException($message);
             // Action
+        // Assert
+        
             $this->assertInstanceOf(Exception::class, $exceptionObject);
+        // Assert
+        
             $this->assertInstanceOf(RuntimeException::class, $exceptionObject);
+        // Assert
+        
             $this->assertSame($message, $exceptionObject->getMessage());
 
-            // AAA
+            // Assert
+        // Act
+        
             $this->expectException(RuntimeException::class);
             throw new RuntimeException(''); //NOSONAR
             $this->fail('Failed asserting that `RuntimeException` thrown.'); //NOSONAR

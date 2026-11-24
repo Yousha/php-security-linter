@@ -2,33 +2,14 @@
 
 declare(strict_types=1);
 
-/**
- * LinterException - Custom exception class for PHP Security Linter.
- *
- * @package PhpSecurityLinter
- * @subpackage Exceptions
- */
-
 namespace Yousha\PhpSecurityLinter\Exceptions;
 
 use Throwable;
 
-/**
- * Custom exception class for linter-related errors.
- *
- * This exception is thrown when errors occur during file scanning operations,
- * including file access issues, parsing errors, and other scanning-related problems.
- */
+/** Represents errors raised while scanning PHP files. */
 final class LinterException extends \RuntimeException
 {
-    /**
-     * LinterException constructor
-     *
-     * @param string $message The exception message
-     * @param int $code The exception code
-     * @param Throwable|null $previous Previous exception if nested
-     * @param string|null $context Additional context abouterror
-     */
+    /** Create a linter exception with optional diagnostic context. */
     public function __construct(
         string $message = "",
         int $code = 0,
@@ -38,22 +19,13 @@ final class LinterException extends \RuntimeException
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * Get additional context abouterror.
-     *
-     * @return string|null
-     */
+    /** Return additional diagnostic context, if available. */
     public function getContext(): ?string
     {
         return $this->context;
     }
 
-    /**
-     * Create an exception for file access errors.
-     *
-     * @param string $filePath Path tofile that couldn't be accessed
-     * @return self
-     */
+    /** Create an exception for an inaccessible file. */
     public static function fileAccessError(string $filePath): self
     {
         return new self(
@@ -64,13 +36,7 @@ final class LinterException extends \RuntimeException
         );
     }
 
-    /**
-     * Create an exception for parsing errors.
-     *
-     * @param string $filePath Path tofile with parsing issues
-     * @param string $error Details ofparsing error
-     * @return self
-     */
+    /** Create an exception for a file parsing failure. */
     public static function parsingError(string $filePath, string $error): self
     {
         return new self(
@@ -81,12 +47,7 @@ final class LinterException extends \RuntimeException
         );
     }
 
-    /**
-     * Create an exception for invalid rules.
-     *
-     * @param string $rule The rule that causederror
-     * @return self
-     */
+    /** Create an exception for an invalid security rule. */
     public static function invalidRule(string $rule): self
     {
         return new self(
@@ -97,11 +58,7 @@ final class LinterException extends \RuntimeException
         );
     }
 
-    /**
-     * String representation ofexception.
-     *
-     * @return string
-     */
+    /** Return the exception message, context, and stack trace. */
     public function __toString(): string
     {
         $str = self::class . sprintf(': [%s]: %s%s', $this->code, $this->message, PHP_EOL);

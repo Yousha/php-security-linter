@@ -9,15 +9,7 @@ use Yousha\PhpSecurityLinter\Reporting\SarifFormatter;
 use Yousha\PhpSecurityLinter\Rules\CisRules;
 use Yousha\PhpSecurityLinter\Rules\OwaspRules;
 
-/**
- * Tests SARIF 2.1.0 report serialization.
- */
-#[\PHPUnit\Framework\Attributes\Small]
-final class SarifFormatterTest extends TestCase
-{
-    /**
-     * Verify finding metadata and its physical source location.
-     */
+/** Tests SARIF 2.1.0 report serialization. */
     public function testFormatsFindingsAsSarif21(): void
     {
         // Arrange
@@ -70,9 +62,7 @@ final class SarifFormatterTest extends TestCase
         }
     }
 
-    /**
-     * Verify a scan with no findings produces an empty result set.
-     */
+    /** Verify a scan with no findings produces an empty result set. */
     public function testFormatsCleanScanWithoutFindings(): void
     {
         // Arrange
@@ -93,9 +83,7 @@ final class SarifFormatterTest extends TestCase
         self::assertTrue($document['runs'][0]['invocations'][0]['executionSuccessful']);
     }
 
-    /**
-     * Verify scan warnings are execution notifications, not vulnerability results.
-     */
+    /** Verify scan warnings are execution notifications, not vulnerability results. */
     public function testFormatsScanWarningsAsExecutionNotifications(): void
     {
         // Arrange
@@ -120,9 +108,7 @@ final class SarifFormatterTest extends TestCase
         );
     }
 
-    /**
-     * Verify every registered rule is declared once and result indexes match descriptors.
-     */
+    /** Verify every registered rule is declared once and result indexes match descriptors. */
     public function testIncludesAllRegisteredRulesWithStableIndexes(): void
     {
         // Arrange
@@ -145,9 +131,7 @@ final class SarifFormatterTest extends TestCase
         }
     }
 
-    /**
-     * Verify legacy OWASP message prefixes still resolve to their registered rule IDs.
-     */
+    /** Verify legacy OWASP message prefixes still resolve to their registered rule IDs. */
     public function testResolvesOwaspRulesWhoseMessagePrefixDiffersFromRuleId(): void
     {
         // Arrange
@@ -171,9 +155,7 @@ final class SarifFormatterTest extends TestCase
         self::assertArrayNotHasKey('properties', $document['runs'][0]['results'][0]);
     }
 
-    /**
-     * Verify all supported scanner severities map to valid SARIF levels.
-     */
+    /** Verify all supported scanner severities map to valid SARIF levels. */
     public function testMapsScannerSeveritiesToSarifLevels(): void
     {
         // Arrange
@@ -214,9 +196,7 @@ final class SarifFormatterTest extends TestCase
         }
     }
 
-    /**
-     * Verify artifact URI encoding and invalid line numbers are normalized.
-     */
+    /** Verify artifact URI encoding and invalid line numbers are normalized. */
     public function testEncodesArtifactUriAndNormalizesLineNumber(): void
     {
         // Arrange
@@ -252,9 +232,7 @@ final class SarifFormatterTest extends TestCase
         }
     }
 
-    /**
-     * Verify unrecognized findings are not emitted as fabricated SARIF results.
-     */
+    /** Verify unrecognized findings are not emitted as fabricated SARIF results. */
     public function testSkipsFindingsThatDoNotMatchRegisteredRules(): void
     {
         // Arrange
@@ -274,11 +252,7 @@ final class SarifFormatterTest extends TestCase
         self::assertSame([], $document['runs'][0]['results']);
     }
 
-    /**
-     * Find a registered rule by its stable identifier.
-     *
-     * @return array<string, mixed>
-     */
+    /** Find a registered rule by its identifier. */
     private function getRuleById(string $ruleId): array
     {
         foreach (array_merge(CisRules::getRules(), OwaspRules::getRules()) as $rule) {

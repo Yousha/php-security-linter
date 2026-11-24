@@ -6,45 +6,18 @@ use Yousha\PhpSecurityLinter\Linter;
 use Yousha\PhpSecurityLinter\Exceptions\LinterException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Class LinterTest
- *
- * This class contains unit tests forLinter class, ensuring that
- * it correctly detects security vulnerabilities, handles exclusions,
- * and raises exceptions for invalid paths.
- */
-#[\PHPUnit\Framework\Attributes\Small]
-final class LinterTest extends TestCase
-{
-    private Linter $linter;
-
-    /**
-     * This method is called before the first test method in the test class is executed.
-     *
-     *
-     * @return void
-     */
+/** Initialize shared test fixtures before the test class runs. */
     #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public static function setUpBeforeClass(): void {}
 
-    /**
-     * This method is called after the last test method in the test class has been executed.
-     *
-     *
-     * @return void
-     */
+    /** Release shared resources after the test class finishes. */
     #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public static function tearDownAfterClass(): void
     {
         gc_collect_cycles();
     }
 
-    /**
-     * This method is called BEFORE each test method.
-     *
-     *
-     * @return void
-     */
+    /** Initialize resources required by each test. */
     #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     protected function setUp(): void
     {
@@ -52,12 +25,7 @@ final class LinterTest extends TestCase
         $this->linter = new Linter();
     }
 
-    /**
-     * This method is called AFTER each test method.
-     *
-     *
-     * @return void
-     */
+    /** Release resources created by each test. */
     #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     protected function tearDown(): void
     {
@@ -65,75 +33,78 @@ final class LinterTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     *
-     *
-     * @return void
-     */
+    /** Verify  class is final behavior. */
     #[\PHPUnit\Framework\Attributes\Test]
     public function testClassIsFinal(): void
     {
-        $reflection = new \ReflectionClass(Linter::class);
+                // Arrange
+$reflection = new \ReflectionClass(Linter::class);
+        // Assert
+        
         $this->assertTrue($reflection->isFinal(), 'Linter class should be final');
     }
 
-    /**
-     *
-     *
-     * @return void
-     */
+    /** Verify  class is final behavior. */
     #[\PHPUnit\Framework\Attributes\Test]
     public function testClassHasCorrectNamespace(): void
     {
-        $this->assertStringStartsWith(
+                // Arrange
+        // Assert
+        
+$this->assertStringStartsWith(
             'Yousha\PhpSecurityLinter',
             Linter::class,
             'Class should be in correct namespace'
         );
     }
 
-    /**
-     *
-     *
-     * @return void
-     */
+    /** Verify  class is final behavior. */
     #[\PHPUnit\Framework\Attributes\Test]
     public function testLinterInitializesWithRules(): void
     {
-        $reflection = new \ReflectionClass(Linter::class);
+                // Arrange
+$reflection = new \ReflectionClass(Linter::class);
         $property = $reflection->getProperty('rules');
         $rules = $property->getValue($this->linter);
+        // Assert
+        
         $this->assertIsArray($rules);
+        // Assert
+        
         $this->assertNotEmpty($rules);
         // Check some sample rule structure.
         $firstRule = reset($rules);
+        // Assert
+        
         $this->assertArrayHasKey('pattern', $firstRule);
+        // Assert
+        
         $this->assertArrayHasKey('severity', $firstRule);
+        // Assert
+        
         $this->assertArrayHasKey('message', $firstRule);
     }
 
-    /**
-     *
-     *
-     * @return void
-     */
+    /** Verify  class is final behavior. */
     #[\PHPUnit\Framework\Attributes\Test]
     public function testScanMethodExists(): void
     {
-        $this->assertTrue(
+                // Arrange
+        // Assert
+        
+$this->assertTrue(
             method_exists(Linter::class, 'scan')
         );
     }
 
-    /**
-     *
-     *
-     * @return void
-     */
+    /** Verify  class is final behavior. */
     #[\PHPUnit\Framework\Attributes\Test]
     public function testScanMethodSignature(): void
     {
-        $method = new \ReflectionMethod(Linter::class, 'scan');
+                // Arrange
+$method = new \ReflectionMethod(Linter::class, 'scan');
+        // Assert
+        
 
         $this->assertEquals(
             'array',
@@ -141,32 +112,47 @@ final class LinterTest extends TestCase
         );
 
         $parameters = $method->getParameters();
+        // Assert
+        
         $this->assertCount(2, $parameters);
+        // Assert
+        
 
         $this->assertEquals('path', $parameters[0]->getName());
+        // Assert
+        
         $this->assertEquals('string', $parameters[0]->getType()->getName());
+        // Assert
+        
 
         $this->assertEquals('exclude', $parameters[1]->getName());
+        // Assert
+        
         $this->assertEquals('array', $parameters[1]->getType()->getName());
+        // Assert
+        
         $this->assertTrue($parameters[1]->isDefaultValueAvailable());
+        // Assert
+        
         $this->assertEquals([], $parameters[1]->getDefaultValue());
     }
 
-    /**
-     *
-     *
-     * @return void
-     */
+    /** Verify  class is final behavior. */
     #[\PHPUnit\Framework\Attributes\Test]
     public function testScanDirectoryWithNonPhpFiles(): void
     {
-        $tempDir = sys_get_temp_dir() . '/test_dir_' . uniqid();
+                // Arrange
+$tempDir = sys_get_temp_dir() . '/test_dir_' . uniqid();
         mkdir($tempDir);
         file_put_contents($tempDir . '/test.txt', 'Not a PHP file');
 
         try {
             $results = $this->linter->scan($tempDir);
+        // Assert
+        
             $this->assertSame(0, $results['_meta']['scanned_count']);
+        // Assert
+        
             $this->assertSame(0, $results['_meta']['warning_count']);
         } finally {
             unlink($tempDir . '/test.txt');
@@ -174,22 +160,23 @@ final class LinterTest extends TestCase
         }
     }
 
-    /**
-     *
-     *
-     * @return void
-     */
+    /** Verify  class is final behavior. */
     #[\PHPUnit\Framework\Attributes\Test]
     public function testScanReturnsMetadataWithFiles(): void
     {
-        // Create temp dir with sample PHP file
+                // Arrange
+// Create temp dir with sample PHP file
         $tempDir = sys_get_temp_dir() . '/test_dir_' . uniqid();
         mkdir($tempDir);
         file_put_contents($tempDir . '/test.php', '<?php echo "test";');
 
         try {
             $results = $this->linter->scan($tempDir);
+        // Assert
+        
             $this->assertArrayHasKey('_meta', $results);
+        // Assert
+        
             $this->assertEquals(1, $results['_meta']['scanned_count']);
         } finally {
             unlink($tempDir . '/test.php');
@@ -197,29 +184,27 @@ final class LinterTest extends TestCase
         }
     }
 
-    /**
-     *
-     *
-     * @return void
-     */
+    /** Verify  class is final behavior. */
     #[\PHPUnit\Framework\Attributes\Test]
     public function testScanThrowsExceptionForInvalidPath(): void
     {
-        $this->expectException(LinterException::class);
+                // Arrange
+        // Act
+        
+$this->expectException(LinterException::class);
+        // Act
+        
         $this->expectExceptionMessage('Path does not exist: /nonexistent/path');
 
         $this->linter->scan('/nonexistent/path');
     }
 
-    /**
-     *
-     *
-     * @return void
-     */
+    /** Verify  class is final behavior. */
     #[\PHPUnit\Framework\Attributes\Test]
     public function testCanScanEmptyDirectory(): void
     {
-        $tempDir = sys_get_temp_dir() . '/empty_test_dir_' . uniqid();
+                // Arrange
+$tempDir = sys_get_temp_dir() . '/empty_test_dir_' . uniqid();
         mkdir($tempDir);
 
         try {
@@ -229,6 +214,8 @@ final class LinterTest extends TestCase
             if (array_key_exists('_meta', $results)) {
                 unset($results['_meta']);
             }
+        // Assert
+        
 
             $this->assertEmpty($results);
         } finally {
@@ -239,39 +226,38 @@ final class LinterTest extends TestCase
         }
     }
 
-    /**
-     *
-     *
-     * @return void
-     */
+    /** Verify  class is final behavior. */
     #[\PHPUnit\Framework\Attributes\Test]
     public function testShouldExcludeMethodIsPrivate(): void
     {
-        $method = new \ReflectionMethod(Linter::class, 'shouldExclude');
+                // Arrange
+$method = new \ReflectionMethod(Linter::class, 'shouldExclude');
+        // Assert
+        
         $this->assertTrue($method->isPrivate());
     }
 
-    /**
-     *
-     *
-     * @return void
-     */
+    /** Verify  class is final behavior. */
     #[\PHPUnit\Framework\Attributes\Test]
     public function testScanFileMethodIsPrivate(): void
     {
-        $method = new \ReflectionMethod(Linter::class, 'scanFile');
+                // Arrange
+$method = new \ReflectionMethod(Linter::class, 'scanFile');
+        // Assert
+        
         $this->assertTrue($method->isPrivate());
     }
 
-    /**
-     *
-     *
-     * @return void
-     */
+    /** Verify  class is final behavior. */
     #[\PHPUnit\Framework\Attributes\Test]
     public function testInvalidDirectory(): void
     {
-        $this->expectException(LinterException::class);
+                // Arrange
+        // Act
+        
+$this->expectException(LinterException::class);
+        // Act
+        
         $this->expectExceptionMessage('Path does not exist: /nonexistent/path');
         $linter = new Linter();
         $linter->scan('/nonexistent/path');
@@ -280,15 +266,24 @@ final class LinterTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Test]
     public function testScanMetadataIsPresentForEmptyDirectory(): void
     {
-        $tempDir = sys_get_temp_dir() . '/scan_empty_' . uniqid();
+                // Arrange
+$tempDir = sys_get_temp_dir() . '/scan_empty_' . uniqid();
         mkdir($tempDir);
 
         try {
             $results = $this->linter->scan($tempDir);
+        // Assert
+        
 
             $this->assertSame(0, $results['_meta']['scanned_count']);
+        // Assert
+        
             $this->assertSame(0, $results['_meta']['issue_count']);
+        // Assert
+        
             $this->assertSame(0, $results['_meta']['warning_count']);
+        // Assert
+        
             $this->assertSame([], $results['_meta']['warnings']);
         } finally {
             rmdir($tempDir);

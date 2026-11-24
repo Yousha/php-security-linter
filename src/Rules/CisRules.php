@@ -1,27 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yousha\PhpSecurityLinter\Rules;
 
-/**
- * CIS Security Rules Implementation
- *
- * Provides security rules based on CIS PHP Benchmark recommendations
- * covering server configuration, filesystem security, and PHP best practices.
- *
- * @package PhpSecurityLinter\Rules
- */
+/** Provides the project's CIS PHP Benchmark security rules. */
 final class CisRules
 {
-    /**
-     * Get all CIS security rules
-     *
-     * @return array[] Array of rule definitions with:
-     * - id: string Unique identifier for the rule
-     * - severity: string (critical/high/medium/low)
-     * - message: string Description of the vulnerability
-     * - pattern: string Regex pattern to detect the issue
-     * - reference: string CIS Benchmark reference (optional)
-     */
+    /** Return all CIS rule definitions. */
     public static function getRules(): array
     {
         return [

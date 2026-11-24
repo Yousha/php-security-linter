@@ -11,33 +11,18 @@ final class CisRulesTest extends TestCase
 {
     private array $rules;
 
-    /**
-     * This method is called before the first test method in the test class is executed.
-     *
-     *
-     * @return void
-     */
+    /** Initialize shared test fixtures before the test class runs. */
     #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public static function setUpBeforeClass(): void {}
 
-    /**
-     * This method is called after the last test method in the test class has been executed.
-     *
-     *
-     * @return void
-     */
+    /** Release shared resources after the test class finishes. */
     #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public static function tearDownAfterClass(): void
     {
         gc_collect_cycles();
     }
 
-    /**
-     * This method is called BEFORE each test method.
-     *
-     *
-     * @return void
-     */
+    /** Initialize resources required by each test. */
     #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     protected function setUp(): void
     {
@@ -45,12 +30,7 @@ final class CisRulesTest extends TestCase
         $this->rules = CisRules::getRules();
     }
 
-    /**
-     * This method is called AFTER each test method.
-     *
-     *
-     * @return void
-     */
+    /** Release resources created by each test. */
     #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     protected function tearDown(): void
     {
@@ -58,34 +38,52 @@ final class CisRulesTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * Test that the rules array is correctly structured and not empty.
-     */
+    /** Test that the rules array is correctly structured and not empty. */
     public function testRulesArrayStructure(): void
     {
-        $this->assertIsArray($this->rules);
+                // Arrange
+        // Assert
+        
+$this->assertIsArray($this->rules);
+        // Assert
+        
         $this->assertNotEmpty($this->rules);
 
         foreach ($this->rules as $rule) {
+        // Assert
+        
             $this->assertArrayHasKey('id', $rule);
+        // Assert
+        
             $this->assertIsString($rule['id']);
+        // Assert
+        
             $this->assertStringStartsWith('CIS-', $rule['id']);
+        // Assert
+        
 
             $this->assertArrayHasKey('severity', $rule);
+        // Assert
+        
             $this->assertIsString($rule['severity']);
+        // Assert
+        
 
             $this->assertArrayHasKey('message', $rule);
+        // Assert
+        
             $this->assertIsString($rule['message']);
+        // Assert
+        
 
             $this->assertArrayHasKey('pattern', $rule);
+        // Assert
+        
             $this->assertIsString($rule['pattern']);
         }
     }
 
-    /**
-     * Data provider for vulnerable and clean code snippets for each CIS rule.
-     * * The array structure is: [rule_id, vulnerable_code, clean_code]
-     */
+    /** Provide rule definitions and their identifiers. */
     public static function ruleDataProvider(): array
     {
         return [

@@ -31,17 +31,13 @@ use RegexIterator;
 use FilesystemIterator;
 use UnexpectedValueException;
 
-/**
- * Scans PHP files in a directory and reports security-rule matches.
- */
+/** Scans PHP files and reports matches against security rules. */
 final class Linter
 {
     /** @var array Security rules to check against. */
     private array $rules = [];
 
-    /**
-     * @param array $excludeRuleIds List of rule IDs to exclude.
-     */
+    /** Initialize the linter and optionally exclude rule IDs. */
     public function __construct(
         private readonly array $excludedRuleIds = []
     ) {
@@ -53,14 +49,10 @@ final class Linter
     }
 
     /**
-     * Scan all PHP files below a directory.
+     * Scan PHP files recursively and return findings with scan metadata.
      *
-     * Unreadable files and directories are recorded as warnings. The scan
-     * continues where possible; callers can inspect _meta.warnings.
+     * Unreadable files and directories are recorded as warnings.
      *
-     * @param string $path Directory path to scan.
-     * @param array $exclude Paths to exclude.
-     * @return array Findings keyed by file, plus scan metadata.
      * @throws LinterException If the path does not exist or is not a directory.
      */
     public function scan(string $path, array $exclude = []): array
@@ -82,7 +74,7 @@ final class Linter
             $iterator = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS)
             );
-            $phpFiles = new RegexIterator($iterator, '/^.+\.php$/i', RegexIterator::GET_MATCH);
+            $phpFiles = new RegexIterator($iterator, '/^.+\\.php$/i', RegexIterator::GET_MATCH);
 
             foreach ($phpFiles as $file) {
                 $filePath = $file[0];
@@ -115,9 +107,7 @@ final class Linter
         return $results;
     }
 
-    /**
-     * Determine whether a file should be excluded.
-     */
+    /** Check whether a file matches any configured exclusion. */
     private function shouldExclude(string $filePath, array $exclude): bool
     {
         if ($exclude === []) {
@@ -129,7 +119,7 @@ final class Linter
             return false;
         }
 
-        $normalizedFilePath = str_replace('\\', '/', $resolvedFilePath);
+        $normalizedFilePath = str_replace('\\\\', '/', $resolvedFilePath);
 
         foreach ($exclude as $excludedPattern) {
             $excludedPattern = trim((string) $excludedPattern);
@@ -146,6 +136,7 @@ final class Linter
         return false;
     }
 
+    /** Match a file against an absolute exclusion path. */
     private function isAbsolutePathMatch(string $filePath, string $excludedPattern): bool
     {
         if (!$this->isAbsolutePath($excludedPattern)) {
@@ -157,19 +148,21 @@ final class Linter
             return false;
         }
 
-        $excludedPath = rtrim(str_replace('\\', '/', $excludedPath), '/');
+        $excludedPath = rtrim(str_replace('\\\\', '/', $excludedPath), '/');
         return $filePath === $excludedPath || str_starts_with($filePath, $excludedPath . '/');
     }
 
+    /** Determine whether a path is absolute on Unix or Windows. */
     private function isAbsolutePath(string $path): bool
     {
         return str_starts_with($path, '/')
-            || preg_match('/^[A-Za-z]:[\/\\\\]/', $path) === 1;
+            || preg_match('/^[A-Za-z]:[\\/\\\\]/', $path) === 1;
     }
 
+    /** Match a file by basename or relative path. */
     private function isBasenameOrRelativePathMatch(string $filePath, string $excludedPattern): bool
     {
-        $normalizedPattern = str_replace('\\', '/', $excludedPattern);
+        $normalizedPattern = str_replace('\\\\', '/', $excludedPattern);
         if (basename($filePath) === $normalizedPattern) {
             return true;
         }
@@ -178,8 +171,10 @@ final class Linter
     }
 
     /**
+     * Scan one file and collect read failures as warnings.
+     *
      * @param string[] $warnings Warnings collected during the scan.
-     * @return array|null Null means the file could not be read.
+     * @return array|null Null when the file cannot be read.
      */
     private function scanFile(string $filePath, array &$warnings): ?array
     {
@@ -194,7 +189,7 @@ final class Linter
         }
 
         $issues = [];
-        $lines = explode("\n", $content);
+        $lines = explode("\\n", $content);
 
         foreach ($this->rules as $rule) {
             if (preg_match($rule['pattern'], $content) !== 1) {

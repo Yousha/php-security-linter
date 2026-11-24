@@ -1,27 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yousha\PhpSecurityLinter\Rules;
 
-/**
- * OWASP Top 10 Security Rules Implementation
- *
- * Provides security rules based on the OWASP Top 10 (2021) list,
- * focusing on common, high-impact web application vulnerabilities in PHP.
- *
- * @package PhpSecurityLinter\Rules
- */
+/** Provides security rules based on the OWASP Top 10 (2021). */
 final class OwaspRules
 {
-    /**
-     * Get all OWASP Top 10 security rules
-     *
-     * @return array[] Array of rule definitions with:
-     * - id: string Unique identifier for the rule (e.g., OWASP-001)
-     * - severity: string (critical/high/medium/low)
-     * - message: string Description of the vulnerability
-     * - pattern: string Regex pattern to detect the issue
-     * - reference: string OWASP A-Code reference (optional)
-     */
+    /** Return all OWASP Top 10 rule definitions. */
     public static function getRules(): array
     {
         return [
