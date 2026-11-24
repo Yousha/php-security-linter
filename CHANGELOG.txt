@@ -1,3 +1,8 @@
+Unreleased
+----------
+* Fix scan accounting, exclusions, file selection, multiline locations, and PCRE error reporting.
+* Validate CLI options, support custom Composer dependency directories, and distinguish findings and incomplete scans by exit status.
+
 2.0.2.4 - 2025-12-17
 -------------------------
 * Fix minor bugs.

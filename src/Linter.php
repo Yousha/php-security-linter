@@ -25,9 +25,6 @@ namespace Yousha\PhpSecurityLinter;
 use Yousha\PhpSecurityLinter\Rules\CisRules;
 use Yousha\PhpSecurityLinter\Rules\OwaspRules;
 use Yousha\PhpSecurityLinter\Exceptions\LinterException;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use RegexIterator;
 
 /**
  * Class Linter
@@ -53,186 +50,151 @@ final class Linter
         );
     }
 
-    /**
-     * Scans PHP files ingiven directory for security issues.
-     *
-     * @param string $path Path todirectory to scan.
-     * @param array $exclude List of file patterns or paths to exclude from scanning.
-     * @return array An associative array of detected security issues by file.
-     * @throws LinterException Ifspecified path does not exist.
-     */
+    /** Return findings by file and, for nonempty or incomplete scans, scan metadata. */
     public function scan(string $path, array $exclude = []): array
     {
         if (!file_exists($path)) {
             throw new LinterException("Path does not exist: {$path}");
         }
+        $root = realpath($path);
+        if ($root === false || !is_dir($root)) {
+            throw new LinterException("Path is not a directory: {$path}");
+        }
 
+        $root = str_replace('\\', '/', $root);
+        $exclude = array_map(static function (string $entry): string {
+            $pattern = str_replace('\\', '/', trim($entry));
+            if (strpos($pattern, '/') === 0 || preg_match('~^[a-z]:/~i', $pattern)) {
+                $resolved = realpath($pattern);
+                if ($resolved !== false) {
+                    $pattern = str_replace('\\', '/', $resolved);
+                }
+                return $pattern;
+            }
+            return rtrim($pattern, '/');
+        }, $exclude);
+        $pending = $this->shouldExclude($root, '', $exclude) ? [] : [[$path, '']];
         $results = [];
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($path)
-        );
-        $phpFiles = new RegexIterator($iterator, '/^.+\.php$/i', RegexIterator::GET_MATCH);
-
-        $scannedCount = 0;
-        $issueCount = 0;
-
-        foreach ($phpFiles as $file) {
-            $filePath = $file[0];
-
-            if ($this->shouldExclude($filePath, $exclude)) {
+        $warnings = [];
+        $scanned = 0;
+        $count = 0;
+        while ($pending) {
+            [$directory, $relativeDirectory] = array_pop($pending);
+            $entries = DIRECTORY_SEPARATOR === '/' && !is_executable($directory)
+                ? false
+                : @scandir($directory, SCANDIR_SORT_NONE);
+            if ($entries === false) {
+                $warnings[] = "Could not read directory: {$directory}";
                 continue;
             }
-
-            $scannedCount++;
-            $issues = $this->scanFile($filePath);
-
-            if (!empty($issues)) {
-                $results[$filePath] = $issues;
-                $issueCount += count($issues);
+            foreach ($entries as $entry) {
+                if ($entry === '.' || $entry === '..') {
+                    continue;
+                }
+                $relative = ltrim($relativeDirectory . '/' . $entry, '/');
+                $absolute = rtrim($root, '/') . '/' . $relative;
+                if ($this->shouldExclude($absolute, $relative, $exclude)) {
+                    continue;
+                }
+                $file = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $entry;
+                if (is_dir($file)) {
+                    if (!is_link($file)) {
+                        $pending[] = [$file, $relative];
+                    }
+                    continue;
+                }
+                if (strcasecmp(substr($entry, -4), '.php') !== 0 || !is_file($file)) {
+                    continue;
+                }
+                if (is_link($file)) {
+                    $target = str_replace('\\', '/', (string) realpath($file));
+                    $prefix = rtrim($root, '/') . '/';
+                    if (strpos($target, $prefix) !== 0 || $this->shouldExclude($target, substr($target, strlen($prefix)), $exclude)) {
+                        continue;
+                    }
+                }
+                $issues = $this->scanFile($file, $warnings);
+                if ($issues === null) {
+                    continue;
+                }
+                $scanned++;
+                if ($issues) {
+                    $results[$file] = $issues;
+                    $count += count($issues);
+                }
             }
         }
-
-        // Only add metadata if we actually scanned something.
-        if ($scannedCount > 0) {
-            $results['_meta'] = [
-                'scanned_count' => $scannedCount,
-                'issue_count' => $issueCount,
-            ];
+        if ($scanned || $warnings) {
+            $results['_meta'] = ['scanned_count' => $scanned, 'issue_count' => $count];
+            if ($warnings) {
+                $results['_meta']['warnings'] = $warnings;
+            }
         }
-
         return $results;
     }
 
-    /**
-     * Determines whether a file should be excluded from scanning based on exclusion patterns.
-     *
-     * @param string $filePath The full path to the file being checked
-     * @param array $exclude List of exclusion patterns/paths to match against
-     * @return bool Returns true if the file matches any exclusion pattern, false otherwise
-     */
-    private function shouldExclude(string $filePath, array $exclude): bool
+    private function shouldExclude(string $absolute, string $relative, array $exclude): bool
     {
-        if (empty($exclude)) {
-            return false;
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $absolute = strtolower($absolute);
+            $relative = strtolower($relative);
         }
-
-        $filePath = realpath($filePath);
-
-        if ($filePath === false) {
-            return false;
-        }
-
-        $filePath = str_replace('\\', '/', $filePath);
-
-        foreach ($exclude as $excludedPattern) {
-            $excludedPattern = trim($excludedPattern);
-            if (empty($excludedPattern)) {
+        foreach ($exclude as $pattern) {
+            if ($pattern === '') {
                 continue;
             }
-
-            if (($this->isAbsolutePathMatch($filePath, $excludedPattern)) ||
-                ($this->isBasenameOrRelativePathMatch($filePath, $excludedPattern))
-            ) {
+            if (DIRECTORY_SEPARATOR === '\\') {
+                $pattern = strtolower($pattern);
+            }
+            if ($pattern[0] === '/' || preg_match('~^[a-z]:/~i', $pattern)) {
+                if ($absolute === $pattern || strpos($absolute, rtrim($pattern, '/') . '/') === 0) {
+                    return true;
+                }
+                continue;
+            }
+            if (strpos($pattern, './') === 0) {
+                $pattern = substr($pattern, 2);
+            }
+            if ($relative === $pattern || strpos('/' . $relative . '/', '/' . $pattern . '/') !== false) {
                 return true;
             }
         }
-
         return false;
     }
 
-    /**
-     * Checks if a file path matches an absolute path exclusion pattern.
-     *
-     * @param string $filePath The file path to check
-     * @param string $excludedPattern The absolute path pattern to match against
-     * @return bool Returns true if the file path starts with the excluded absolute path
-     */
-    private function isAbsolutePathMatch(string $filePath, string $excludedPattern): bool
+    private function scanFile(string $file, array &$warnings): ?array
     {
-        if (!$this->isAbsolutePath($excludedPattern)) {
-            return false;
+        $content = @file_get_contents($file);
+        if ($content === false) {
+            $warnings[] = "Could not read file: {$file}";
+            return null;
         }
-
-        $excludedPath = realpath($excludedPattern);
-
-        if ($excludedPath === false) {
-            return false;
-        }
-
-        $excludedPath = str_replace('\\', '/', $excludedPath);
-        return strpos($filePath, $excludedPath) === 0;
-    }
-
-    /**
-     * Determines if a given path is an absolute path (Unix or Windows format).
-     *
-     * @param string $path The path to check
-     * @return bool Returns true for absolute paths (starting with / or drive letter)
-     */
-    private function isAbsolutePath(string $path): bool
-    {
-        return strpos($path, '/') === 0 ||  // Unix
-            preg_match('/^[A-Za-z]:[\/\\\\]/', $path);  // Windows
-    }
-
-    /**
-     * Checks if a file matches exclusion patterns based on basename or relative path.
-     *
-     * @param string $filePath The full file path to check
-     * @param string $excludedPattern The pattern to match against (filename or partial path)
-     * @return bool Returns true if basename matches exactly or pattern exists in path
-     */
-    private function isBasenameOrRelativePathMatch(string $filePath, string $excludedPattern): bool
-    {
-        return basename($filePath) === $excludedPattern ||
-            strpos($filePath, $excludedPattern) !== false;
-    }
-
-    /**
-     * Scans a PHP file for security vulnerabilities based on predefined rules.
-     *
-     * @param string $filePath Path tofile to scan.
-     * @return array List of detected security issues withinfile.
-     */
-    private function scanFile(string $filePath): array
-    {
+        $content = str_replace(["\r\n", "\r"], "\n", $content);
         $issues = [];
-        $content = file_get_contents($filePath);
-
-        if ($content === false || trim($content) === '') {
-            return $issues;
-        }
-
-        $lines = explode("\n", $content);
-
         foreach ($this->rules as $rule) {
-            // Check full content first for better pattern matching.
-            if (preg_match($rule['pattern'], $content)) {
-                // Findline number where it occurs.
-                $lineNumber = 1;
-                foreach ($lines as $line) {
-                    if (preg_match($rule['pattern'], $line)) {
-                        $issues[] = [
-                            'severity' => $rule['severity'],
-                            'message' => $rule['message'],
-                            'line' => $lineNumber,
-                        ];
-                    }
-
-                    $lineNumber++;
+            $cursor = 0;
+            $previousOffset = 0;
+            $line = 1;
+            $reportedLine = 0;
+            while (($matched = preg_match($rule['pattern'], $content, $match, PREG_OFFSET_CAPTURE, $cursor)) === 1) {
+                [$text, $offset] = $match[0];
+                if ($offset > $previousOffset) {
+                    $line += substr_count($content, "\n", $previousOffset, $offset - $previousOffset);
                 }
-
-                // If no specific line was found, default to line 1.
-                if (empty($issues) || $issues[count($issues) - 1]['message'] !== $rule['message']) {
-                    $issues[] = [
-                        'severity' => $rule['severity'],
-                        'message' => $rule['message'],
-                        'line' => 1,
-                    ];
+                $previousOffset = $offset;
+                if ($line !== $reportedLine) {
+                    $issues[] = ['severity' => $rule['severity'], 'message' => $rule['message'], 'line' => $line];
+                    $reportedLine = $line;
+                }
+                $cursor = $offset + max(1, strlen($text));
+                if ($cursor > strlen($content)) {
+                    break;
                 }
             }
+            if ($matched === false) {
+                $warnings[] = sprintf('PCRE error %d in %s for %s', preg_last_error(), $file, $rule['message']);
+            }
         }
-
         return $issues;
     }
 }

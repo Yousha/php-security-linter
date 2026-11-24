@@ -8,7 +8,7 @@ A: Use the --exclude option with comma-separated paths:
 --exclude=vendor,tests,config.php
 
 Q: Can I use this in CI pipelines?
-A: Yes, the JSON output format (--format=json) works well for CI integration.
+A: Use the CLI exit status: 0 clean, 1 findings, 2 invalid input, 3 fatal error, 4 incomplete scan.
 
 Q: How do I add custom rules?
 A: Create a php-security-config.json file with your custom rules pattern.
@@ -21,8 +21,7 @@ A: Update to the latest version via Composer:
 composer update yousha/php-security-linter
 
 Q: Can I scan single files?
-A: Yes, provide the file path instead of directory:
---path=src/file.php
+A: Pass a directory as the scan target, for example --path=src.
 
 Q: How do I interpret the severity levels?
 * Critical: Immediate security risk
@@ -31,7 +30,7 @@ Q: How do I interpret the severity levels?
 * Low: Informational notice
 
 Q: Where can I see all available rules?
-A: Run with --verbose flag or check the RULES.md documentation.
+A: See src/Rules/CisRules.php and src/Rules/OwaspRules.php.
 
 Q: How do I contribute new rules?
 A: Fork the repository and submit a PR with your rule additions to the appropriate ruleset file.
@@ -53,7 +52,7 @@ A: Extend the built-in rules by adding a php-security-custom-rules.json file in 
 }
 
 Q: Can I integrate this with PHPStan or Psalm for combined analysis?
-A: Yes, chain it in your CI pipeline after static analysis tools. For direct integration, use the JSON output as input for custom rules in those tools.
+A: Yes, chain it in your CI pipeline after static analysis tools.
 
 Q: How do I handle false positives?
 A: Three approaches:
@@ -68,8 +67,7 @@ A: Benchmarks show:
 Use --exclude=vendor,node_modules for best performance
 
 Q: How can I export results to a security dashboard?
-A: Pipe JSON output to your monitoring system:
-php php-sl --format=json | jq '.results' > security-report.json
+A: The CLI writes a text report. Use the Linter::scan() result array for custom integrations.
 
 Q: How does the linter handle obfuscated or dynamically generated code?
 A: The static analyzer:

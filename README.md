@@ -42,7 +42,7 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
   * OWASP Top 10 2021
   * Custom rule sets
 * **Fast static analysis** without executing code
-* **Multiple output formats** (Console, JSON)
+* **Text reports** with file paths and line numbers
 * **Configurable ruleset** with severity levels
 * **DevSecOps ready** CI/CD pipeline integration
 * **Exclusion support** for ignoring specific paths
@@ -127,11 +127,17 @@ Lint with exclusions:
 php vendor/bin/php-sl --path=./app --exclude=vendor,tests
 ```
 
-JSON output:
+A scan accepts one directory. It skips excluded subtrees, special files, directory symlinks, and file symlinks leading outside the scan root. Relative exclusions match complete path components within the root. Absolute exclusions match the named path and its descendants.
 
-```shell
-php vendor/bin/php-sl --path=./public --format=json
-```
+Reports go to stdout. Warnings and argument errors go to stderr. An incomplete scan preserves findings from files it could check. The scanned-file count includes successfully read PHP files.
+
+| Exit code | Meaning |
+|---|---|
+| 0 | Clean scan or help |
+| 1 | Findings |
+| 2 | Invalid arguments or scan target |
+| 3 | Fatal error |
+| 4 | Incomplete scan (read, traversal, or rule evaluation warning), including when findings are present |
 
 ### Command options
 
