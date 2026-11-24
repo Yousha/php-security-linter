@@ -34,7 +34,7 @@ final class SarifFormatter
 
             foreach ($findings as $finding) {
                 $message = (string) ($finding['message'] ?? '');
-                $ruleId = $this->extractRuleId($message);
+                $ruleId = $this->findRuleId($message, $rules);
 
                 if ($ruleId === null || !isset($rules[$ruleId])) {
                     continue;
@@ -153,11 +153,15 @@ final class SarifFormatter
     /**
      * Extract the registered rule identifier embedded in a finding message.
      */
-    private function extractRuleId(string $message): ?string
+    private function findRuleId(string $message, array $rules): ?string
     {
-        return preg_match('/^(CIS-\d{3}|OWASP-\d{3}):/', $message, $matches) === 1
-            ? $matches[1]
-            : null;
+        foreach ($rules as $ruleId => $rule) {
+            if ($rule['message'] === $message) {
+                return $ruleId;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -202,7 +206,7 @@ final class SarifFormatter
         }
 
         return str_starts_with($reference, 'A')
-            ? 'https://owasp.org/Top10/' . rawurlencode($reference) . '/'
+            ? 'https://owasp.org/Top10/' . str_replace(':', '_', $reference) . '/'
             : null;
     }
 
