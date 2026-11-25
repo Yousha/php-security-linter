@@ -54,25 +54,43 @@ final class DetectionAccuracyTest extends TestCase
             ['CIS-003', 'include $base . $_GET["view"];', 'require("../layout/header.php");'],
             ['CIS-004', 'fopen("/tmp/report.txt", "w");', 'tmpfile(); tempnam(sys_get_temp_dir(), "report"); fopen("/tmp/report.txt", "x");'],
             ['CIS-005', 'session_id($_COOKIE["id"]);', "session_start();\nsession_regenerate_id(true);"],
-            ['CIS-006', 'md5($password);', 'md5($asset); $passwordField = null;'],
+            ['CIS-006', 'md5($password);', 'hash("sha256", $asset); $passwordField = null;'],
+            ['CIS-006', "hash('md5', $password);", "hash('sha256', $password);"],
+            ['CIS-006', 'crypt($password);', 'crypt($password, \'$6$strong-salt$\');'],
             ['CIS-007', 'openssl_encrypt($data, $cipher, "literal-test-key");', '$key = "0123456789abcdef";'],
             ['CIS-008', 'mysqli_query($db, $query . $_POST["field"]);', 'mysqli_query($db, "SELECT 1"); $form = $_POST;'],
             ['CIS-009', 'header( "Location: " . $_GET["next"] );', 'header("Location: /home"); $form = $_GET;'],
             ['CIS-009', 'header("Location: {$_GET[\'next\']}");', 'header("Location: /page/" . $_GET["page"]);'],
             ['CIS-010', 'curl_setopt($client, CURLOPT_SSL_VERIFYPEER, false);', 'curl_setopt($client, CURLOPT_SSL_VERIFYPEER, true); $other = false;'],
             ['OWASP-A1-SQL', '$sql = "SELECT item FROM items WHERE id=" . $_GET["id"];', '$sql = "SELECT 1"; $form = $_GET;'],
+            ['OWASP-A1-SQL', '$id = $_GET["id"]; $sql = "SELECT item FROM items WHERE id=" . $id;', '$id = 10; $sql = "SELECT item FROM items WHERE id=" . $id;'],
+            ['CIS-008', '$id = $_GET["id"]; $pdo->query("SELECT * FROM items WHERE id=" . $id);', '$id = 10; $pdo->query("SELECT * FROM items WHERE id=" . $id);'],
+            ['CIS-008', '$query = "SELECT * FROM items WHERE id=" . $_GET["id"]; pg_query($connection, $query);', '$query = "SELECT 1"; pg_query($connection, $query);'],
+            ['CIS-008', 'DB::raw($_GET["sort"]);', 'DB::raw("created_at DESC");'],
+            ['CIS-008', 'DB::select("SELECT * FROM items WHERE id=" . $_GET["id"]);', 'DB::select("SELECT 1");'],
+            ['CIS-008', '$query->whereRaw($_GET["filter"]);', '$query->whereRaw("status = 1");'],
             ['OWASP-A1-CMD', 'system($_GET["command"]);', '$runner->system($_GET["command"]);'],
+            ['OWASP-A1-CMD', '$command = $_GET["command"]; system($command);', '$command = "uptime"; system($command);'],
             ['OWASP-A2', '$password = "test-password";', '$compass = "north";'],
             ['OWASP-A3', 'echo $_POST["name"];', 'echo htmlspecialchars($_POST["name"]);'],
+            ['OWASP-A3', '$name = $_GET["name"]; echo $name;', '$name = $_GET["name"]; $safe = htmlspecialchars($name); echo $safe;'],
             ['OWASP-A4', '?><form method="post"></form>', "?><form method='post'>\n<input name='csrf_token' type='hidden'></form><form method='get'></form>"],
             ['OWASP-A4', '?><form method="post"></form>', '?><form method="POST"><?= csrf_field() ?></form>'],
+            ['OWASP-A4', '?> <form method="post"><?php echo $dynamicContent; ?></form>', '?> <form method="post"><?php echo csrf_field(); ?></form>'],
+            ['OWASP-A4', '?> <form method="post"></form>', '?> <form method="post"><input type="hidden" name="csrfmiddlewaretoken" value="x"></form>'],
             ['OWASP-A5', "define(\n'APP_DEBUG', true);", '// define("APP_DEBUG", true);'],
             ['OWASP-A6', '?><script src="/js/jquery-3.4.1.min.js"></script>', '?><p>Previously used jquery 1.2</p><script src="/jquery-3.5.0.min.js"></script>'],
             ['OWASP-A6', '?><script src="/bootstrap@3.4.0/dist/js/bootstrap.min.js"></script>', '?><script src="/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>'],
             ['OWASP-A7', '$min_password_length = 6;', '$min_password_length = 60;'],
             ['OWASP-A8', 'error_log($_POST["ssn"]);', 'isset($_POST["ssn"]);'],
             ['OWASP-A10', 'file_get_contents($_GET["source"]);', 'file_get_contents("local.txt"); $form = $_GET;'],
+            ['OWASP-A10', '$url = $_GET["url"]; curl_init($url);', '$url = "https://example.test"; curl_init($url);'],
+            ['OWASP-A10', '$url = $_GET["url"]; $client->request("GET", $url);', '$url = "https://example.test"; $client->request("GET", $url);'],
+            ['OWASP-A10', '$url = $_GET["url"]; curl_setopt($client, CURLOPT_URL, $url);', '$url = "https://example.test"; curl_setopt($client, CURLOPT_URL, $url);'],
             ['OWASP-API1', 'Route::get("/status", $handler)->withoutMiddleware("throttle:api");', 'function api_status() { return 1; }'],
+            ['OWASP-API1', '$route->withoutMiddleware(["auth", "throttle:api"]);', '$route->middleware(["auth", "throttle:api"]);'],
+            ['OWASP-WEAK-RNG', '$random = mt_rand(); $resetToken = $random;', '$resetToken = bin2hex(random_bytes(32));'],
+            ['OWASP-DESERIALIZATION', '$object = unserialize($payload);', '$object = unserialize($payload, ["allowed_classes" => false]);'],
             ['OWASP-CLOUD1', '$aws_key = "AKIA' . str_repeat('TEST', 4) . '";', '$aws_key = "placeholder";'],
             ['OWASP-CLOUD1', '$aws_secret = "' . str_repeat('Test1234', 5) . '";', '$aws_access_key_id = "AKIAIOSFODNN7EXAMPLE";'],
             ['OWASP-A5', 'define("APP_DEBUG", true);', <<<'SRC'
@@ -120,7 +138,7 @@ final class DetectionAccuracyTest extends TestCase
         sort($tested);
 
         // Assert
-        self::assertCount(22, $registered);
+        self::assertCount(24, $registered);
         self::assertSame($registered, $tested);
     }
 }
