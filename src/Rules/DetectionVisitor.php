@@ -190,7 +190,8 @@ final class DetectionVisitor extends NodeVisitorAbstract
                 return in_array(strtolower(self::literal($first) ?? ''), ['md5', 'sha1'], true) ? 'CIS-006' : null;
             case 'crypt':
                 $salt = self::literal($second);
-                return $second === null || $salt === '' || ($salt !== null && (strpos($salt, '$1
+                return $second === null || $salt === '' || ($salt !== null && (strpos($salt, '$1$') === 0
+                    || (strpos($salt, '$') !== 0 && strlen($salt) <= 2))) ? 'CIS-006' : null;
             case 'openssl_encrypt':
             case 'openssl_decrypt':
                 return self::literal($third) !== null && self::literal($third) !== '' ? 'CIS-007' : null;
