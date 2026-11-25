@@ -1,4 +1,4 @@
-Unreleased
+3.2.0.7 - 2026-11-26
 ----------
 * Add 13 security rules, including optional MITRE ATT&CK checks.
 * Add SARIF 2.1.0 output.
