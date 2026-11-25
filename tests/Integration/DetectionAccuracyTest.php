@@ -19,8 +19,8 @@ final class DetectionAccuracyTest extends TestCase
         mkdir($dir);
         $hit = $dir . '/positive.php';
         $clean = $dir . '/negative.php';
-        $hitKey = str_replace('\\\\', '/', $hit);
-        $cleanKey = str_replace('\\\\', '/', $clean);
+        $hitKey = str_replace('\\', '/', $hit);
+        $cleanKey = str_replace('\\', '/', $clean);
         file_put_contents($hit, "<?php\n\n" . $positive);
         file_put_contents($clean, "<?php\n\n" . $negative);
         try {
