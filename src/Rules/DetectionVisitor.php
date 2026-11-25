@@ -269,7 +269,7 @@ final class DetectionVisitor extends NodeVisitorAbstract
     {
         $method = $node->name instanceof Node\Identifier ? strtolower($node->name->name) : '';
         $first = $node->args[0]->value ?? null;
-        if (in_array($method, ['raw', 'selectraw', 'whereraw', 'havingraw', 'orderbyraw', 'groupbyraw', 'fromraw', 'joinraw', 'unionraw', 'select', 'statement', 'unprepared', 'insert', 'update', 'delete'], true)
+        if (in_array($method, ['raw', 'selectraw', 'whereraw', 'havingraw', 'orderbyraw', 'groupbyraw', 'fromraw', 'joinraw', 'unionraw', 'select', 'statement', 'unprepared', 'createquery', 'createnativequery'], true)
             && $this->isTainted($first)) {
             return 'CIS-008';
         }
