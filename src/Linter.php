@@ -2,19 +2,19 @@
 
 /*
  * Name: PHP Security Linter
- * Description: A PHP tool to lint PHP files for security issues based on CIS and OWASP best practices.
- * Version: 3.1.8.6
+ * Description: Static security checks for PHP 7.4 code and inline HTML.
+ * Version: 2.0.2.4
  * Locale: en_International
- * Last update: 2026
+ * Last update: 2025
  * Architecture: no-arch
- * API: 8.2
- * Executor: Apache module, FPM, CGI
+ * API: 7.4
+ * Executor: PHP CLI or Composer library
  * Builder:
  * License: GPL-3.0
- * Copyright: Copyright (c) 2026 Yousha Aleayoub.
+ * Copyright: Copyright (c) 2025 Yousha Aleayoub.
  * Producer: Yousha Aleayoub
  * Maintainer: Yousha Aleayoub
- * Contact: y.aleayoub@gmail.com
+ * Contact: yousha.a@hotmail.com
  * Link: http://yousha.blog.ir
  */
 
@@ -22,239 +22,208 @@ declare(strict_types=1);
 
 namespace Yousha\PhpSecurityLinter;
 
+use PhpParser\ErrorHandler\Collecting;
+use PhpParser\NodeTraverser;
+use PhpParser\ParserFactory;
+use Yousha\PhpSecurityLinter\Rules\DetectionVisitor;
+use Yousha\PhpSecurityLinter\Rules\TemplateInspector;
 use Yousha\PhpSecurityLinter\Rules\CisRules;
 use Yousha\PhpSecurityLinter\Rules\OwaspRules;
 use Yousha\PhpSecurityLinter\Exceptions\LinterException;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use RegexIterator;
-use FilesystemIterator;
-use UnexpectedValueException;
 
 /**
- * Scans PHP files in a directory and reports security-rule matches.
+ * Class Linter
+ *
+ * This class is responsible for scanning PHP files within a directory (or a single file) for security vulnerabilities.
+ * It applies predefined security rules to detect unsafe patterns and reports findings.
  */
 final class Linter
 {
-    /** @var array Security rules to check against. */
-    private array $rules = [];
+    /**
+     * @var array Security rules to check against.
+     */
+    private $rules = [];
+
+    private $parser;
 
     /**
-     * @param array $excludeRuleIds List of rule IDs to exclude.
+     * Constructor initializes security rules based on CIS and OWASP guidelines.
      */
-    public function __construct(
-        private readonly array $excludedRuleIds = []
-    ) {
-        $allRules = array_merge(CisRules::getRules(), OwaspRules::getRules());
-        $this->rules = array_filter(
-            $allRules,
-            fn(array $rule): bool => !in_array($rule['id'], $this->excludedRuleIds, true)
-        );
+    public function __construct()
+    {
+        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        $this->rules = array_column(array_merge(
+            CisRules::getRules(),
+            OwaspRules::getRules()
+        ), null, 'id');
     }
 
-    /**
-     * Scan all PHP files below a directory.
-     *
-     * Unreadable files and directories are recorded as warnings. The scan
-     * continues where possible; callers can inspect _meta.warnings.
-     *
-     * @param string $path Directory path to scan.
-     * @param array $exclude Paths to exclude.
-     * @return array Findings keyed by file, plus scan metadata.
-     * @throws LinterException If the path does not exist or is not a directory.
-     */
+    /** Return findings by file and, for nonempty or incomplete scans, scan metadata. */
     public function scan(string $path, array $exclude = []): array
     {
         if (!file_exists($path)) {
-            throw new LinterException('Path does not exist: ' . $path);
+            throw new LinterException("Path does not exist: {$path}");
         }
 
-        if (!is_dir($path)) {
-            throw new LinterException('Path is not a directory: ' . $path);
+        // Support single PHP file
+        if (is_file($path) && strcasecmp(substr($path, -4), '.php') === 0) {
+            $warnings = [];
+            $issues = $this->scanFile($path, $warnings);
+            $results = [];
+            if ($issues) {
+                $results[$path] = $issues;
+            }
+            $results['_meta'] = [
+                'scanned_count' => $issues === null ? 0 : 1,
+                'issue_count' => $issues ? count($issues) : 0,
+            ];
+            if ($warnings) {
+                $results['_meta']['warnings'] = $warnings;
+            }
+            return $results;
         }
 
+        $root = realpath($path);
+        if ($root === false || !is_dir($root)) {
+            throw new LinterException("Path is not a directory: {$path}");
+        }
+
+        $root = str_replace('\\', '/', $root);
+        $exclude = array_map(static function (string $entry): string {
+            $pattern = str_replace('\\', '/', trim($entry));
+            if (strpos($pattern, '/') === 0 || preg_match('~^[a-z]:/~i', $pattern)) {
+                $resolved = realpath($pattern);
+                if ($resolved !== false) {
+                    $pattern = str_replace('\\', '/', $resolved);
+                }
+                return $pattern;
+            }
+            return rtrim($pattern, '/');
+        }, $exclude);
+        $pending = $this->shouldExclude($root, '', $exclude) ? [] : [[$path, '']];
         $results = [];
         $warnings = [];
-        $scannedCount = 0;
-        $issueCount = 0;
-
-        try {
-            $iterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS)
-            );
-            $phpFiles = new RegexIterator($iterator, '/^.+\.php$/i', RegexIterator::GET_MATCH);
-
-            foreach ($phpFiles as $file) {
-                $filePath = $file[0];
-                if ($this->shouldExclude($filePath, $exclude)) {
+        $scanned = 0;
+        $count = 0;
+        while ($pending) {
+            [$directory, $relativeDirectory] = array_pop($pending);
+            $entries = DIRECTORY_SEPARATOR === '/' && !is_executable($directory)
+                ? false
+                : @scandir($directory, SCANDIR_SORT_NONE);
+            if ($entries === false) {
+                $warnings[] = "Could not read directory: {$directory}";
+                continue;
+            }
+            foreach ($entries as $entry) {
+                if ($entry === '.' || $entry === '..') {
                     continue;
                 }
-
-                $issues = $this->scanFile($filePath, $warnings);
+                $relative = ltrim($relativeDirectory . '/' . $entry, '/');
+                $absolute = rtrim($root, '/') . '/' . $relative;
+                if ($this->shouldExclude($absolute, $relative, $exclude)) {
+                    continue;
+                }
+                $file = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $entry;
+                if (is_dir($file)) {
+                    if (!is_link($file)) {
+                        $pending[] = [$file, $relative];
+                    }
+                    continue;
+                }
+                if (strcasecmp(substr($entry, -4), '.php') !== 0 || !is_file($file)) {
+                    continue;
+                }
+                if (is_link($file)) {
+                    $target = str_replace('\\', '/', (string) realpath($file));
+                    $prefix = rtrim($root, '/') . '/';
+                    if (strpos($target, $prefix) !== 0 || $this->shouldExclude($target, substr($target, strlen($prefix)), $exclude)) {
+                        continue;
+                    }
+                }
+                $issues = $this->scanFile($file, $warnings);
                 if ($issues === null) {
                     continue;
                 }
-
-                $scannedCount++;
-                if ($issues !== []) {
-                    $results[$filePath] = $issues;
-                    $issueCount += count($issues);
+                $scanned++;
+                if ($issues) {
+                    $results[$file] = $issues;
+                    $count += count($issues);
                 }
             }
-        } catch (UnexpectedValueException $exception) {
-            $warnings[] = sprintf('Could not traverse directory: %s', $exception->getMessage());
         }
-
-        $results['_meta'] = [
-            'scanned_count' => $scannedCount,
-            'issue_count' => $issueCount,
-            'warning_count' => count($warnings),
-            'warnings' => $warnings,
-        ];
-
+        if ($scanned || $warnings) {
+            $results['_meta'] = ['scanned_count' => $scanned, 'issue_count' => $count];
+            if ($warnings) {
+                $results['_meta']['warnings'] = $warnings;
+            }
+        }
         return $results;
     }
 
-    /**
-     * Determine whether a file should be excluded from the scan.
-     *
-     * @param string $filePath Absolute or relative file path
-     * @param array $exclude List of exclusion patterns
-     * @return bool
-     */
-    private function shouldExclude(string $filePath, array $exclude): bool
+    private function shouldExclude(string $absolute, string $relative, array $exclude): bool
     {
-        if ($exclude === []) {
-            return false;
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $absolute = strtolower($absolute);
+            $relative = strtolower($relative);
         }
-
-        $resolvedFilePath = realpath($filePath);
-        if ($resolvedFilePath === false) {
-            return false;
-        }
-
-        $normalizedFilePath = str_replace('\\', '/', $resolvedFilePath);
-
-        foreach ($exclude as $excludedPattern) {
-            $excludedPattern = trim((string) $excludedPattern);
-            if ($excludedPattern === '') {
+        foreach ($exclude as $pattern) {
+            if ($pattern === '') {
                 continue;
             }
-
-            if ($this->isAbsolutePathMatch($normalizedFilePath, $excludedPattern)
-                || $this->isBasenameOrRelativePathMatch($normalizedFilePath, $excludedPattern)) {
+            if (DIRECTORY_SEPARATOR === '\\') {
+                $pattern = strtolower($pattern);
+            }
+            if ($pattern[0] === '/' || preg_match('~^[a-z]:/~i', $pattern)) {
+                if ($absolute === $pattern || strpos($absolute, rtrim($pattern, '/') . '/') === 0) {
+                    return true;
+                }
+                continue;
+            }
+            if (strpos($pattern, './') === 0) {
+                $pattern = substr($pattern, 2);
+            }
+            if ($relative === $pattern || strpos('/' . $relative . '/', '/' . $pattern . '/') !== false) {
                 return true;
             }
         }
-
         return false;
     }
 
-    /**
-     * Check if a file matches an absolute exclusion path.
-     *
-     * @param string $filePath Normalized file path
-     * @param string $excludedPattern Exclusion pattern
-     * @return bool
-     */
-    private function isAbsolutePathMatch(string $filePath, string $excludedPattern): bool
+    private function scanFile(string $file, array &$warnings): ?array
     {
-        if (!$this->isAbsolutePath($excludedPattern)) {
-            return false;
-        }
-
-        $excludedPath = realpath($excludedPattern);
-        if ($excludedPath === false) {
-            return false;
-        }
-
-        $excludedPath = rtrim(str_replace('\\', '/', $excludedPath), '/');
-        return $filePath === $excludedPath || str_starts_with($filePath, $excludedPath . '/');
-    }
-
-    /**
-     * Determine whether a path is absolute (Unix or Windows).
-     *
-     * @param string $path Path to check
-     * @return bool
-     */
-    private function isAbsolutePath(string $path): bool
-    {
-        return str_starts_with($path, '/')
-            || preg_match('/^[A-Za-z]:[\/\\\\]/', $path) === 1;
-    }
-
-    /**
-     * Check if a file matches by basename or relative path segment (case-insensitive).
-     *
-     * @param string $filePath Normalized file path
-     * @param string $excludedPattern Exclusion pattern
-     * @return bool
-     */
-    private function isBasenameOrRelativePathMatch(string $filePath, string $excludedPattern): bool
-    {
-        $normalizedPattern = str_replace('\\', '/', $excludedPattern);
-        // Case-insensitive so Windows (case-insensitive FS) and mixed-case dirs are handled.
-        $fileBase = basename($filePath);
-        if (strcasecmp($fileBase, $normalizedPattern) === 0) {
-            return true;
-        }
-
-        $haystack = '/' . ltrim($filePath, '/') . '/';
-        $needle = '/' . trim($normalizedPattern, '/') . '/';
-        return stripos($haystack, $needle) !== false;
-    }
-
-    /**
-     * Scan a single PHP file for security issues.
-     *
-     * @param string $filePath Path to the PHP file
-     * @param string[] $warnings Warnings collected during the scan
-     * @return array|null Null if the file could not be read
-     */
-    private function scanFile(string $filePath, array &$warnings): ?array
-    {
-        $content = @file_get_contents($filePath);
+        $content = @file_get_contents($file);
         if ($content === false) {
-            $warnings[] = sprintf('Could not read file: %s', $filePath);
+            $warnings[] = "Could not read file: {$file}";
             return null;
         }
-
-        if (trim($content) === '') {
-            return [];
-        }
-
-        // Normalize line endings so Windows CRLF does not break $ anchors or line matching.
         $content = str_replace(["\r\n", "\r"], "\n", $content);
-        $issues = [];
-        $lines = explode("\n", $content);
-
-        foreach ($this->rules as $rule) {
-            if (preg_match($rule['pattern'], $content) !== 1) {
-                continue;
-            }
-
-            $foundOnLine = false;
-            foreach ($lines as $index => $line) {
-                if (preg_match($rule['pattern'], $line) === 1) {
-                    $issues[] = [
-                        'severity' => $rule['severity'],
-                        'message' => $rule['message'],
-                        'line' => $index + 1,
-                    ];
-                    $foundOnLine = true;
-                }
-            }
-
-            if (!$foundOnLine) {
-                $issues[] = [
-                    'severity' => $rule['severity'],
-                    'message' => $rule['message'],
-                    'line' => 1,
-                ];
-            }
+        $errors = new Collecting();
+        $nodes = $this->parser->parse($content, $errors);
+        foreach ($errors->getErrors() as $error) {
+            $warnings[] = sprintf('Could not fully parse %s: %s', $file, $error->getMessage());
         }
 
+        $issues = [];
+        $seen = [];
+        $report = function (string $id, int $line) use (&$issues, &$seen): void {
+            if (!isset($seen[$id][$line])) {
+                $seen[$id][$line] = true;
+                $rule = $this->rules[$id];
+                $finding = ['severity' => $rule['severity'], 'message' => $rule['message'], 'line' => $line];
+                if (isset($rule['standardReference'])) {
+                    $finding['standardReference'] = $rule['standardReference'];
+                }
+                $issues[] = $finding;
+            }
+        };
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor(new DetectionVisitor($report));
+        try {
+            $traverser->traverse($nodes ?? []);
+            TemplateInspector::inspect($content, $report);
+        } catch (\RuntimeException $runtimeException) {
+            $warnings[] = sprintf('Incomplete analysis of %s: %s', $file, $runtimeException->getMessage());
+        }
         return $issues;
     }
 }

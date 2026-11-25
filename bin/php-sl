@@ -16,232 +16,140 @@ if (PHP_SAPI !== 'cli') {
     exit(1);
 }
 
-$autoloadPath = __DIR__ . '/../../../../vendor/autoload.php'; // Path for Composer-installed package as user.
-
-if (!file_exists($autoloadPath)) {
-    $autoloadPath = __DIR__ . '/../vendor/autoload.php'; // Path for local development.
+$autoloadPath = $GLOBALS['_composer_autoload_path'] ?? dirname(__DIR__) . '/vendor/autoload.php';
+if (!is_file($autoloadPath)) {
+    $autoloadPath = dirname(__DIR__, 3) . '/autoload.php';
 }
 
 if (!file_exists($autoloadPath)) {
     fwrite(STDERR, "Error: Vendor autoload file not found. Run 'composer install'.\n");
-    exit(1);
+    exit(3);
 }
 
 require_once $autoloadPath;
 
 use Yousha\PhpSecurityLinter\Linter;
-use Yousha\PhpSecurityLinter\Reporting\SarifFormatter;
 use Yousha\PhpSecurityLinter\Exceptions\LinterException;
 
 /**
  * Displays command line help information for PHP Security Linter.
- *
- * Outputs formatted usage instructions, available options, and examples
- * for running security linter from command line.
- *
- * @return void Outputs directly to STDOUT
  */
 function showHelp(): void
 {
     echo <<<HELP
-        PHP Security Linter - 3.1.8.6
-        Usage: php bin/php-sl [options]
+PHP Security Linter - 2.0.2.4
+Usage: php vendor/bin/php-sl [options]
 
-        Options:
-          -p, --path=PATH      Path to scan (required).
-          --exclude=LIST       Comma-separated paths to exclude.
-          --exclude-rules=LIST Comma-separated rule IDs to ignore.
-          --list-rules         Show all available rule IDs.
-          --format=FORMAT      Output format: text (default) or sarif.
-          --output=FILE        Write SARIF output to a file.
-          --help               Show this help message.
+Options:
+  -p, --path=PATH      Directory or single .php file to scan (required)
+  --exclude=LIST       Comma-separated exclusions (dirs/files)
+  --help               Show this help message
 
-        Examples:
-          php bin/php-sl --path ./src
-          php bin/php-sl -p ./app --exclude .git,storage,vendor,tests
-          php bin/php-sl -p ./src --exclude-rules CIS-003,OWASP-001
+Examples:
+  php vendor/bin/php-sl --path=./src
+  php vendor/bin/php-sl -p ./app --exclude=vendor,tests
+  php vendor/bin/php-sl --path=./src/Controller.php
 
-        HELP;
+HELP;
 }
 
 /**
- * Outputs a human-readable security scan summary with file-specific details.
- *
- * @param array $results The security scan results, indexed by file path.
- * @return void
+ * Outputs security scan results.
  */
 function outputResults(array $results): void
 {
     $scannedCount = $results['_meta']['scanned_count'] ?? 0;
     $issueCount = $results['_meta']['issue_count'] ?? 0;
-    unset($results['_meta']); // Don't show meta data in file list.
+    unset($results['_meta']);
+
     echo "Scan results\n";
     echo str_repeat("=", 40) . "\n\n";
 
     foreach ($results as $file => $issues) {
-        echo sprintf('File: %s%s', $file, PHP_EOL);
+        echo "File: {$file}\n";
         foreach ($issues as $issue) {
             echo sprintf(
-                "  ✗ [%s] %s (Line %d)\n",
-                strtoupper((string) $issue['severity']),
+                "  \u2717 [%s] %s (Line %d)%s\n",
+                strtoupper($issue['severity']),
                 $issue['message'],
-                $issue['line']
+                $issue['line'],
+                isset($issue['standardReference']) ? ' [OWASP ' . $issue['standardReference'] . ']' : ''
             );
         }
-
-        echo "\n";
+        echo PHP_EOL;
     }
 
     echo "Summary: Scanned {$scannedCount} files, found {$issueCount} potential issues.\n";
 }
 
-/**
- * Fetches and displays all available security rule IDs (CIS and OWASP).
- *
- * @return void Outputs directly to STDOUT
- */
-function listRules(): void
-{
-    // The rules classes must be fully loaded via the autoloader by this point.
-    $cisRules = Yousha\PhpSecurityLinter\Rules\CisRules::getRules();
-    $owaspRules = Yousha\PhpSecurityLinter\Rules\OwaspRules::getRules();
-    $allRules = array_merge($cisRules, $owaspRules);
-    echo "Available Rule IDs\n";
-    echo str_repeat("=", 40) . "\n\n";
-    // Sort by ID for easier reading.
-    usort($allRules, fn($a, $b): int => strcmp((string) $a['id'], (string) $b['id']));
-
-    foreach ($allRules as $rule) {
-        $severity = strtoupper((string) $rule['severity']);
-        $id = $rule['id'];
-        $message = str_replace([$id . ': ', $id . ':'], ['', ''], $rule['message']);
-        echo sprintf(
-            "[%s] %s: %s\n",
-            $severity,
-            $id,
-            $message
-        );
-    }
-
-    echo "\nTotal rules: " . count($allRules) . "\n";
-}
-
 function runCli(array $argv): int
 {
-    $shortOpts = 'p:';
-    $longOpts = [
-        'path:',
-        'exclude:',
-        'exclude-rules:',
-        'help',
-        'list-rules',
-        'format:',
-        'output:',
-    ];
-    $options = getopt($shortOpts, $longOpts);
-
-    if (isset($options['help'])) {
+    $path = null;
+    $exclude = [];
+    $help = false;
+    for ($i = 1, $argc = count($argv); $i < $argc; $i++) {
+        $argument = $argv[$i];
+        if ($argument === '--help') {
+            $help = true;
+            continue;
+        }
+        $parts = explode('=', $argument, 2);
+        $option = $parts[0];
+        $value = $parts[1] ?? null;
+        if (substr($argument, 0, 2) === '-p' && strlen($argument) > 2 && $argument[2] !== '=') {
+            $option = '-p';
+            $value = substr($argument, 2);
+        }
+        if (!in_array($option, ['-p', '--path', '--exclude'], true)) {
+            fwrite(STDERR, "Unknown argument: {$argument}\n");
+            return 2;
+        }
+        if ($value === null && isset($argv[$i + 1]) && substr($argv[$i + 1], 0, 1) !== '-') {
+            $value = $argv[++$i];
+        }
+        if ($value === null || $value === '') {
+            fwrite(STDERR, "Missing value for {$option}\n");
+            return 2;
+        }
+        if ($option === '--exclude') {
+            $exclude = array_merge($exclude, explode(',', $value));
+        } elseif ($path === null) {
+            $path = $value;
+        } else {
+            fwrite(STDERR, "Specify the scan directory only once.\n");
+            return 2;
+        }
+    }
+    if ($help) {
         showHelp();
         return 0;
     }
-
-    // Check for --list-rules
-    if (isset($options['list-rules'])) {
-        listRules();
-        return 0;
-    }
-
-    // Validate path.
-    $path = $options['p'] ?? $options['path'] ?? null;
-
-    if (!$path || !is_dir($path)) {
-        fwrite(STDERR, "Error: --path must specify an existing directory.\n");
-        showHelp();
+    if ($path === null) {
+        fwrite(STDERR, "Missing required --path directory or file.\n");
         return 2;
-    }
-
-    // Process file/dir exclusions.
-    $excludePaths = [
-        // Default exclusions.
-        'vendor',
-        '.git',
-        '.github',
-        '.gitlab',
-        '.azure-pipelines',
-        '.husky',
-        '.circleci',
-        '.vscode',
-        '.idea',
-    ];
-
-    if (isset($options['exclude'])) {
-        $userExclusions = is_array($options['exclude'])
-            ? $options['exclude']
-            : explode(',', $options['exclude']);
-        // Merge user exclusions into the default list, and ensure unique values.
-        $excludePaths = array_unique(array_merge($excludePaths, $userExclusions));
-    }
-
-    // Process rule exclusions.
-    $excludeRules = [];
-
-    if (isset($options['exclude-rules'])) {
-        $excludeRules = is_array($options['exclude-rules'])
-            ? $options['exclude-rules']
-            : explode(',', $options['exclude-rules']);
-        // Normalize and trim each rule ID.
-        $excludeRules = array_map(trim(...), $excludeRules);
     }
 
     try {
-        // Pass rule exclusions to Linter constructor.
-        $linter = new Linter($excludeRules);
-        $results = $linter->scan($path, $excludePaths);
-        $format = strtolower((string) ($options['format'] ?? 'text'));
-        if (!in_array($format, ['text', 'sarif'], true)) {
-            fwrite(STDERR, sprintf("Error: Unsupported output format '%s'. Use text or sarif.\n", $format));
-            return 2;
-        }
-
-        if ($format === 'sarif') {
-            $report = (new SarifFormatter())->format($results, $path);
-            $outputPath = $options['output'] ?? null;
-            if (is_string($outputPath) && $outputPath !== '') {
-                if (@file_put_contents($outputPath, $report) === false) {
-                    fwrite(STDERR, sprintf("Error: Could not write SARIF report to '%s'.\n", $outputPath));
-                    return 3;
-                }
-            } else {
-                fwrite(STDOUT, $report);
-            }
-        } else {
-            if (isset($options['output'])) {
-                fwrite(STDERR, "Error: --output requires --format=sarif.\n");
-                return 2;
-            }
-            outputResults($results);
-        }
-
+        $linter = new Linter();
+        $results = $linter->scan($path, $exclude);
+        outputResults($results);
         $warnings = $results['_meta']['warnings'] ?? [];
         foreach ($warnings as $warning) {
-            fwrite(STDERR, sprintf("WARNING: %s\n", $warning));
+            fwrite(STDERR, "WARNING: {$warning}\n");
         }
-
-        $issueCount = $results['_meta']['issue_count'] ?? 0;
-        if ($warnings !== []) {
+        if ($warnings) {
             return 4;
         }
-        if ($issueCount > 0) {
-            return 1;
-        }
-        return 0;
+        return ($results['_meta']['issue_count'] ?? 0) > 0 ? 1 : 0;
     } catch (LinterException $e) {
-        fwrite(STDERR, sprintf('SCAN ERROR [%d]: %s%s', $e->getCode(), $e->getMessage(), PHP_EOL));
+        fwrite(STDERR, "SCAN ERROR [{$e->getCode()}]: {$e->getMessage()}\n");
         return 2;
     } catch (Throwable $e) {
-        fwrite(STDERR, sprintf('FATAL ERROR: %s%s', $e->getMessage(), PHP_EOL));
+        fwrite(STDERR, "FATAL ERROR: {$e->getMessage()}\n");
         return 3;
     }
 }
 
-exit(runCli($argv));
+if (basename(realpath($_SERVER['SCRIPT_FILENAME'])) === basename(__FILE__)) {
+    exit(runCli($argv));
+}

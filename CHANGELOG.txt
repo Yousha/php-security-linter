@@ -1,46 +1,30 @@
 Unreleased
 ----------
-* Add SARIF 2.1.0 report output.
-* Add CLI format and output options while preserving text output by default.
-* Add SARIF formatter tests for findings, clean scans, and scan warnings.
-* Normalize line endings (CRLF → LF) for cross-platform rule matching.
-* Make path exclusion case-insensitive.
-* Fix CIS-001 and CIS-015 false-positive patterns.
-* Align OWASP rule messages with their IDs.
-* Exit code 1 when findings are present.
-* Update README and FAQ for current CLI and SARIF support.
+* Add basic intra-file taint tracking so assignments from request input are followed into sinks (reduces false negatives for simple cases).
+* Support scanning a single .php file in addition to directories.
+* Expand command-injection sinks (proc_open, popen) and SQL sinks (pg_query).
+* Reduce false positives on password/AWS literals containing TEST/DUMMY/PLACEHOLDER/EXAMPLE.
+* Fix CLI help text indentation and update usage to mention single-file support.
+* Distinguish project rule IDs from versioned OWASP references in both text and library output; document the PHP 7.4 catalog and installation commands.
+* Repair Rector configuration, lint the CLI, and verify CLI help in a real process. Make tests portable across checkout paths and integer sizes.
+* Remove the optional composer-unused development dependency that pulled in an abandoned package on PHP 7.4.
+* Use PHP syntax trees and inline HTML structure to reduce false positives across the 22 built-in checks. Add matching and clean fixtures for every detector.
+* Fix scan accounting, exclusions, file selection, multiline locations, and PCRE error reporting.
+* Validate CLI options, support custom Composer dependency directories, and distinguish findings and incomplete scans by exit status.
 
-3.1.8.6 - 2026-08-17
+2.0.2.4 - 2025-12-17
 -------------------------
-* Cleanup.
-
-3.1.7.5 - 2025-12-17
--------------------------
-* Rename CLI bin file.
-* Update/Fix readme file.
+* Fix minor bugs.
+* Add Rector tool for development.
+* Add new Composer commands.
+* Reformat codes.
 * Cleanup codes.
-
-3.1.6.4 - 2025-10-15
--------------------------
-* Fix issue #17. (config and rule exclude bug)
-* Fix issue #16. (vendor path bug)
-* Add more security rules.
-* Add --exclude-rules option.
-* Add --list-rules option.
-* Add more unit tests.
+* Update libraries.
 * Update documents.
-* Minor optimizations.
-* Cleanup codes.
 
-3.0.1.3 - 2025-4-28
+2.0.1.3 - 2025-4-28
 -------------------------
-* Update .gitattributes file.
-* Remove classmap-authoritative from composer.json file.
-* Fix minor bug in composer.json file.
-
-3.0.0.3 - 2025-4-8
--------------------------
-* Update to PHP version 8.3.*.
+* Update documents.
 
 2.0.0.2 - 2023-12-7
 -------------------------
