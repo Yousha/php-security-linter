@@ -67,6 +67,7 @@ final class DetectionAccuracyTest extends TestCase
             ['CIS-008', '$id = $_GET["id"]; $pdo->query("SELECT * FROM items WHERE id=" . $id);', '$id = 10; $pdo->query("SELECT * FROM items WHERE id=" . $id);'],
             ['CIS-008', '$query = "SELECT * FROM items WHERE id=" . $_GET["id"]; pg_query($connection, $query);', '$query = "SELECT 1"; pg_query($connection, $query);'],
             ['CIS-008', 'DB::raw($_GET["sort"]);', 'DB::raw("created_at DESC");'],
+            ['CIS-008', 'DB::select("SELECT * FROM items WHERE id=" . $_GET["id"]);', 'DB::select("SELECT 1");'],
             ['CIS-008', '$query->whereRaw($_GET["filter"]);', '$query->whereRaw("status = 1");'],
             ['OWASP-A1-CMD', 'system($_GET["command"]);', '$runner->system($_GET["command"]);'],
             ['OWASP-A1-CMD', '$command = $_GET["command"]; system($command);', '$command = "uptime"; system($command);'],
