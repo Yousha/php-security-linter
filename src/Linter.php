@@ -127,7 +127,8 @@ final class Linter
                 }
                 $scanned++;
                 if ($issues) {
-                    $results[$file] = $issues;
+                    // Use the normalized absolute path so result keys are stable across operating systems.
+                    $results[$absolute] = $issues;
                     $count += count($issues);
                 }
             }
