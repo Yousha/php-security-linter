@@ -308,17 +308,17 @@ final class DetectionVisitor extends NodeVisitorAbstract
 
     private function isSensitiveInput(?Node $node): bool
     {
-        if ($node instanceof Expr\\Variable && is_string($node->name)) {
+        if ($node instanceof Expr\Variable && is_string($node->name)) {
             return isset($this->sensitiveVariables[$node->name]);
         }
-        if ($node instanceof Expr\\ArrayDimFetch) {
+        if ($node instanceof Expr\ArrayDimFetch) {
             $field = strtolower(self::literal($node->dim) ?? '');
             if (in_array($field, ['credit_card', 'ssn'], true)) {
                 return true;
             }
             return $this->isSensitiveInput($node->var);
         }
-        if ($node instanceof Expr\\BinaryOp) {
+        if ($node instanceof Expr\BinaryOp) {
             return $this->isSensitiveInput($node->left) || $this->isSensitiveInput($node->right);
         }
         if ($node instanceof Scalar\\Encapsed) {
