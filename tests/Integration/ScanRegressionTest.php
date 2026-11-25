@@ -131,7 +131,11 @@ final class ScanRegressionTest extends TestCase
         $results = (new Linter())->scan($this->root);
 
         // Assert
-        self::assertSame([4, 6], array_column($results[$file], 'line'));
+        $findingFiles = array_values(array_filter(array_keys($results), static function ($key): bool {
+            return $key !== '_meta';
+        }));
+        self::assertCount(1, $findingFiles);
+        self::assertSame([4, 6], array_column($results[$findingFiles[0]], 'line'));
     }
 
     public static function lineEndings(): array
