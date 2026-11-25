@@ -108,11 +108,12 @@ final class SarifFormatterCoverageTest extends TestCase
             $method->setAccessible(true);
         }
 
-        $root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'php-sl-sarif-root-' . uniqid('', true);
-        $outside = tempnam(sys_get_temp_dir(), 'outside-');
-        $this->assertNotFalse($outside);
+        $temporaryDirectory = sys_get_temp_dir();
+        $suffix = uniqid('', true);
+        $root = $temporaryDirectory . DIRECTORY_SEPARATOR . 'php-sl-sarif-root-' . $suffix;
+        $outside = $temporaryDirectory . DIRECTORY_SEPARATOR . 'outside-' . $suffix . '.php';
         $this->assertTrue(mkdir($root));
-        file_put_contents($outside, '<?php');
+        $this->assertNotFalse(file_put_contents($outside, '<?php'));
 
         try {
             // Act
