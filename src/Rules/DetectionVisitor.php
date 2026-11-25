@@ -142,6 +142,13 @@ final class DetectionVisitor extends NodeVisitorAbstract
         if ($node instanceof Expr\Ternary) {
             return $this->hasUnsafeOutput($node->if) || $this->hasUnsafeOutput($node->else);
         }
+        if ($node instanceof Expr\FuncCall || $node instanceof Expr\MethodCall || $node instanceof Expr\StaticCall) {
+            foreach ($node->args as $arg) {
+                if ($this->hasUnsafeOutput($arg->value)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
