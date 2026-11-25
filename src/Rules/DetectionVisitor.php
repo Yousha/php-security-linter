@@ -38,7 +38,7 @@ final class DetectionVisitor extends NodeVisitorAbstract
                     $id = 'OWASP-A3';
                 }
             }
-        } elseif ($node instanceof Expr\MethodCall || $node instanceof Expr\StaticCall) {
+        } elseif ($node instanceof Expr\MethodCall) {
             $id = $this->inspectMethodCall($node);
         } elseif ($node instanceof Expr\ShellExec && $this->isTainted($node->shell)) {
             $id = 'OWASP-A1-CMD';
