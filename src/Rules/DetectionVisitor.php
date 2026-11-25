@@ -18,6 +18,7 @@ final class DetectionVisitor extends NodeVisitorAbstract
     private array $taintedVariables = [];
     private array $htmlSafeVariables = [];
     private array $sensitiveVariables = [];
+    private array $weakRandomVariables = [];
 
     public function __construct(Closure $report)
     {
@@ -366,7 +367,14 @@ final class DetectionVisitor extends NodeVisitorAbstract
         if (in_array($name, ['encryptionkey', 'encryption_key'], true)) {
             return 'CIS-007';
         }
-        if ($this->containsWeakRandom($expr) && self::matches('/(?:token|nonce|session|csrf|secret|key|otp|reset)/i', $name)) {
+        $weakRandom = $this->containsWeakRandom($expr)
+            || ($expr instanceof Expr\Variable && is_string($expr->name) && isset($this->weakRandomVariables[$expr->name]));
+        if ($weakRandom) {
+            $this->weakRandomVariables[$name] = true;
+        } else {
+            unset($this->weakRandomVariables[$name]);
+        }
+        if ($weakRandom && self::matches('/(?:token|nonce|session|csrf|secret|key|otp|reset)/i', $name)) {
             return 'OWASP-WEAK-RNG';
         }
         $value = self::literal($expr);
