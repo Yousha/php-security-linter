@@ -1,5 +1,16 @@
 Unreleased
 ----------
+* Expand the rule catalog to 48 checks: 16 CIS, 29 OWASP, and 3 optional MITRE ATT&CK indicators; add rule listing, per-rule exclusions, and opt-in ATT&CK activation.
+* Add token-based CallInspector checks for PHP configuration, session-cookie attributes, weak bcrypt cost, and selected suspicious execution, remote-file, and cron-writing patterns.
+* Add SARIF 2.1.0 reporting with rule descriptors, severity mapping, source locations, standard references, and scan-warning notifications; support SARIF output to stdout or a file through CLI options.
+* Improve CLI behavior with argument and output-format validation, consistent exit codes for findings, incomplete scans, invalid input, and fatal/report-write errors; retain text output as the default.
+* Improve scan reliability by recording unreadable-file and directory-traversal warnings, preserving findings from partial scans, tracking scan metadata, and handling missing or invalid scan roots consistently.
+* Improve cross-platform scanning with CRLF/CR line-ending normalization, case-insensitive path exclusions, and normalized path handling.
+* Correct CIS and OWASP detection patterns and finding identifiers; align SARIF rule resolution with registered finding messages.
+* Add/expand PHPUnit coverage for rule behavior, CLI execution in real processes, SARIF output and write failures, scan metadata, and cross-platform path handling; apply PHPUnit attributes and AAA-style test structure.
+* Update CI to test PHP 8.0–8.5 and validate YAML, XML, JSON, PHP syntax, coding style, dependencies, tests, and generated SARIF.
+* Update project documentation, FAQ, screenshots, and diagrams; add UML C2 container, C3 component, and activity-based dataflow diagrams.
+
 * Add ten OWASP checks and three opt-in MITRE ATT&CK checks, with SARIF references and mock-free integration tests.
 * Lower the minimum PHP version on main to 8.0 and test PHP 8.0 through 8.5 in CI.
 * Add SARIF 2.1.0 report output.
