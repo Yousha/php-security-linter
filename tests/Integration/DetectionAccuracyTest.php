@@ -88,7 +88,7 @@ final class DetectionAccuracyTest extends TestCase
             ['OWASP-A10', '$url = $_GET["url"]; curl_setopt($client, CURLOPT_URL, $url);', '$url = "https://example.test"; curl_setopt($client, CURLOPT_URL, $url);'],
             ['OWASP-API1', 'Route::get("/status", $handler)->withoutMiddleware("throttle:api");', 'function api_status() { return 1; }'],
             ['OWASP-API1', '$route->withoutMiddleware(["auth", "throttle:api"]);', '$route->middleware(["auth", "throttle:api"]);'],
-            ['OWASP-WEAK-RNG', '$resetToken = bin2hex(mt_rand());', '$resetToken = bin2hex(random_bytes(32));'],
+            ['OWASP-WEAK-RNG', '$random = mt_rand(); $resetToken = $random;', '$resetToken = bin2hex(random_bytes(32));'],
             ['OWASP-DESERIALIZATION', '$object = unserialize($payload);', '$object = unserialize($payload, ["allowed_classes" => false]);'],
             ['OWASP-CLOUD1', '$aws_key = "AKIA' . str_repeat('TEST', 4) . '";', '$aws_key = "placeholder";'],
             ['OWASP-CLOUD1', '$aws_secret = "' . str_repeat('Test1234', 5) . '";', '$aws_access_key_id = "AKIAIOSFODNN7EXAMPLE";'],
