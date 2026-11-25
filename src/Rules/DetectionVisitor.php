@@ -38,7 +38,7 @@ final class DetectionVisitor extends NodeVisitorAbstract
                     $id = 'OWASP-A3';
                 }
             }
-        } elseif ($node instanceof Expr\MethodCall) {
+        } elseif ($node instanceof Expr\MethodCall || $node instanceof Expr\StaticCall) {
             $id = $this->inspectMethodCall($node);
         } elseif ($node instanceof Expr\ShellExec && $this->isTainted($node->shell)) {
             $id = 'OWASP-A1-CMD';
@@ -196,6 +196,9 @@ final class DetectionVisitor extends NodeVisitorAbstract
             case 'header':
                 return self::matches('/^location:\s*(?:(?:https?:)?\/\/)?$/iD', self::prefix($first)) && $this->isTainted($first) ? 'CIS-009' : null;
             case 'curl_setopt':
+                if ($second instanceof Expr\ConstFetch && strtoupper($second->name->toString()) === 'CURLOPT_URL' && $this->isTainted($third)) {
+                    return 'OWASP-A10';
+                }
                 return $second instanceof Expr\ConstFetch && strtoupper($second->name->toString()) === 'CURLOPT_SSL_VERIFYPEER'
                     && self::boolean($third) === false ? 'CIS-010' : null;
             case 'curl_setopt_array':
@@ -239,7 +242,7 @@ final class DetectionVisitor extends NodeVisitorAbstract
             return 'CIS-008';
         }
         if (in_array($method, ['request', 'get', 'post', 'put', 'patch', 'delete', 'send'], true)
-            && $this->isTainted($first)) {
+            && ($this->isTainted($first) || ($method === 'request' && $this->isTainted($node->args[1]->value ?? null)))) {
             return 'OWASP-A10';
         }
         if ($method === 'setoption' && ($node->args[0]->value ?? null) instanceof Expr\ConstFetch
