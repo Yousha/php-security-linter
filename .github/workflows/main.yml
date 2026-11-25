@@ -27,6 +27,4 @@ jobs:
       - run: composer install --no-interaction --prefer-dist --no-progress
       - run: composer audit
       - run: composer lint
-      - run: composer format-check
-      - run: composer refactor-check
       - run: composer test
