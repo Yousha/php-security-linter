@@ -24,7 +24,9 @@ A PHP tool to lint PHP files for security issues based on CIS and OWASP best pra
 
 ## Overview
 
-PHP Security Linter is a static analysis tool designed to identify security vulnerabilities in PHP code using CIS- and OWASP-oriented checks and optional MITRE ATT&CK behavior indicators. Built for developers and security teams, this linter scans codebases without execution(SAST) to detect risks like SQL injection, XSS, misconfigurations, and sensitive data exposure before they reach production.
+PHP Security Linter is a static application security testing (SAST) tool for identifying potentially insecure patterns in PHP source code. It applies CIS- and OWASP-oriented rules, with optional MITRE ATT&CK behavior indicators. It analyzes source files without executing the application and can report risks such as injection, cross-site scripting (XSS), insecure configuration, and sensitive-data exposure.
+
+Findings are heuristic indicators that require review in the context of the application. The linter does not prove that a vulnerability is exploitable and should be used alongside code review, testing, and other security controls.
 
 ## Features
 
@@ -45,23 +47,15 @@ PHP Security Linter is a static analysis tool designed to identify security vuln
 
 ### PHP Compatibility
 
-The current `main` branch (`dev-main`) requires PHP 8.0 or newer. Published 3.x tags retain their original Composer requirements.
+The current `main` branch requires PHP 8.0 or newer. The package declares this requirement in `composer.json`.
 
-| Package version | Branch name       | PHP version | Status      |
-|-----------------|-------------------|-------------|-------------|
-| dev-main        | `main`            | 8.0+        | Active      |
-| 3.* (released)  | `main`            | Per tag     | Active      |
-| dev-main-php7.4 | `main-php7.4`     | 7.4         | Maintenance |
-| 2.*             | `main-php7.4`     | 7.4         | Maintenance |
-| 1.*             |                   | 5.6         | EOL         |
+For the latest development version:
 
-* **Active**: Full support
-* **Maintenance**: Critical and security fixes only
-* **EOL**: Unsupported
+```shell
+composer require --dev yousha/php-security-linter:dev-main
+```
 
-The PHP 7.4 and PHP 5.6 entries refer only to older release lines; they are not supported by the current `main` branch or 3.x releases.
-
-To install the PHP 8.0-compatible branch before a tagged release, run `composer require --dev yousha/php-security-linter:dev-main`.
+For a released version, install the package without a branch constraint and Composer will select a compatible published release.
 
 ## Screenshots
 
@@ -184,9 +178,9 @@ File: /src/utils.php
 Summary: Scanned 24 files, found 3 potential issues.
 ```
 
-### QA/QC test
+### Tests
 
-Run tests to ensure everything works as expected:
+Run the PHPUnit test suite:
 
 ```shell
 composer test
