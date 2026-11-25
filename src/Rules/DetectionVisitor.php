@@ -40,7 +40,7 @@ final class DetectionVisitor extends NodeVisitorAbstract
             }
         } elseif ($node instanceof Expr\MethodCall) {
             $id = $this->inspectMethodCall($node);
-        } elseif ($node instanceof Expr\ShellExec && $this->isTainted($node->shell)) {
+        } elseif ($node instanceof Expr\ShellExec && $this->isTainted($node)) {
             $id = 'OWASP-A1-CMD';
         }
 
@@ -78,6 +78,13 @@ final class DetectionVisitor extends NodeVisitorAbstract
         }
         if ($node instanceof Expr\ArrayDimFetch) {
             return $this->isTainted($node->var);
+        }
+        if ($node instanceof Expr\ShellExec) {
+            foreach ($node->parts as $part) {
+                if ($this->isTainted($part)) {
+                    return true;
+                }
+            }
         }
         if ($node instanceof Expr\BinaryOp) {
             return $this->isTainted($node->left) || $this->isTainted($node->right);
