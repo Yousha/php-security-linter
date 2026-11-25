@@ -25,33 +25,23 @@ A PHP tool to lint PHP files for security issues based on CIS and OWASP best pra
 
 ## Overview
 
-PHP Security Linter is a static analysis tool designed to identify security vulnerabilities in PHP code by enforcing CIS benchmarks and OWASP Top 10 standards. Built for developers and security teams, this linter scans codebases without execution(SAST) to detect risks like SQL injection, XSS, misconfigurations, and sensitive data exposure before they reach production.
+This branch checks PHP 7.4 code and inline HTML templates for potential security issues. It parses PHP expressions to distinguish calls, arguments, and assignments from comments and strings. HTML checks inspect form controls and script sources in the template.
 
 ## Features
 
-* **200+ vuilt-in security rules**:
-  * Injection flaws (SQLi, Command, LDAP)
-  * Cryptographic weaknesses
-  * XSS and SSRF vulnerabilities
-  * Security misconfigurations
-  * Sensitive data exposure
-  * API security risks
-  * Cloud misconfigurations
-* **Multi-Standard support**:
-  * CIS PHP Benchmark v3.0
-  * OWASP Top 10 2021
-  * Custom rule sets
+* **22 built-in checks** across the CIS-oriented and OWASP-oriented rule catalogs.
+* Checks for directly observable input use, sensitive output, unsafe configuration, cookie-supplied session IDs, and literal credentials.
+* Template checks for static POST forms and versioned jQuery or Bootstrap script references.
 * **Fast static analysis** without executing code
 * **Text reports** with file paths and line numbers
-* **Configurable ruleset** with severity levels
 * **DevSecOps ready** CI/CD pipeline integration
 * **Exclusion support** for ignoring specific paths
-* **Supported PHP:** 7.4, 8.*
+* **Supported PHP on this branch:** 7.4.x
 * **Supported platforms:** Windows, GNU/Linux, MacOS
 
 ## Requirements
 
-1. PHP 7.4 or PHP 8.*
+1. PHP 7.4.x with PCRE, DOM, and tokenizer
 2. Composer >= 2
 
 ### Versions
@@ -97,21 +87,11 @@ composer global require yousha/php-security-linter
 
 ## Configuration
 
-Customize rules by creating a `php-security-config.json`:
+Use the built-in checks with path exclusions. The PHP checks follow direct expressions, including concatenation and interpolation. They do not trace variables across assignments or infer effective application middleware. The session check reports request-supplied session IDs. The rate-limit check reports explicit removal of throttle middleware from a route.
 
-```json
-{
-    "excludeRules": ["CIS-001", "OWASP-003"],
-    "severityLevel": "medium",
-    "customRules": {
-        "CUSTOM-001": {
-            "pattern": "dangerous_function\\s*\\(",
-            "message": "Custom dangerous function detected",
-            "severity": "high"
-        }
-    }
-}
-```
+A POST form finding means no recognized hidden CSRF field was visible in its static markup. PHP-generated forms with unknown content are skipped. Script version checks use literal JavaScript asset paths. A finding identifies a reference for review, rather than verifying deployed asset contents.
+
+The rule catalogs expose an ID, severity, and message for each detector. The two injection rules have distinct IDs, OWASP-A1-SQL and OWASP-A1-CMD. PHP parse errors produce an incomplete-scan warning; other files are still scanned.
 
 ## Usage
 

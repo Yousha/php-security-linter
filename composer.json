@@ -33,7 +33,9 @@
     },
     "require": {
         "php": "7.4.*",
-        "ext-pcre": "*"
+        "ext-pcre": "*",
+        "ext-dom": "*",
+        "nikic/php-parser": "^4.19"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "2.*",

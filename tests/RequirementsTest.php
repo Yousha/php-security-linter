@@ -82,6 +82,8 @@ namespace Yousha\PhpSecurityLinter\Tests {
         {
             $extensions = [
                 'pcre',
+                'dom',
+                'tokenizer',
             ];
 
             foreach ($extensions as $extension) {

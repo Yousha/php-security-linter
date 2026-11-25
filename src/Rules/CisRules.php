@@ -12,81 +12,20 @@ namespace Yousha\PhpSecurityLinter\Rules;
  */
 final class CisRules
 {
-    /**
-     * Get all CIS security rules
-     *
-     * @return array[] Array of rule definitions with:
-     *   - severity: string (critical/high/medium/low)
-     *   - message: string Description of the vulnerability
-     *   - pattern: string Regex pattern to detect the issue
-     *   - reference: string CIS Benchmark reference
-     */
+    /** Return metadata for the branch's built-in detectors. */
     public static function getRules(): array
     {
         return [
-            // PHP Configuration (15 rules)
-            [
-                'severity' => 'critical',
-                'message' => 'CIS-001: Dangerous functions not disabled',
-                'pattern' => '/disable_functions\s*=\s*[^\n]*(?!(exec|system|passthru|shell_exec|proc_open|popen|eval))/i',
-            ],
-            [
-                'severity' => 'high',
-                'message' => 'CIS-002: Error reporting exposes stack traces',
-                'pattern' => '/display_errors\s*\(\s*true\s*\)/i',
-            ],
-
-            // File System (20 rules)
-            [
-                'severity' => 'critical',
-                'message' => 'CIS-003: Directory traversal vulnerability',
-                'pattern' => '/(include|require)(_once)?\s*\([^)]*\.\.\//i',
-            ],
-            [
-                'severity' => 'high',
-                'message' => 'CIS-004: Unsafe temporary file creation',
-                'pattern' => '/tmpfile\s*\(\)|tempnam\s*\(/i',
-            ],
-
-            // Sessions (10 rules)
-            [
-                'severity' => 'high',
-                'message' => 'CIS-005: Session fixation possible',
-                'pattern' => '/session_start\s*\([^)]*\)\s*;\s*(?!.*session_regenerate_id)/i',
-            ],
-
-            // Cryptography (15 rules)
-            [
-                'severity' => 'critical',
-                'message' => 'CIS-006: Weak hash function detected',
-                'pattern' => '/(md5|sha1)\s*\(.*password/i',
-            ],
-            [
-                'severity' => 'high',
-                'message' => 'CIS-007: Hardcoded encryption keys',
-                'pattern' => '/\$key\s*=\s*[\'"][a-f0-9]{10,}[\'"]/i',
-            ],
-
-            // Database (15 rules)
-            [
-                'severity' => 'critical',
-                'message' => 'CIS-008: Raw SQL with user input',
-                'pattern' => '/mysql(i)?_query\s*\(.*\$_(GET|POST)/i',
-            ],
-
-            // Input Validation (15 rules)
-            [
-                'severity' => 'high',
-                'message' => 'CIS-009: Unvalidated redirect',
-                'pattern' => '/header\s*\(\s*[\'"]Location:\s*\'\.\$_(GET|POST)/i',
-            ],
-
-            // Network (10 rules)
-            [
-                'severity' => 'high',
-                'message' => 'CIS-010: SSL verification disabled',
-                'pattern' => '/curl_setopt\s*\(\s*.*CURLOPT_SSL_VERIFYPEER\s*,\s*false/i',
-            ],
+            ['id' => 'CIS-001', 'severity' => 'medium', 'message' => 'CIS-001: Attempt to change startup-only disable_functions at runtime'],
+            ['id' => 'CIS-002', 'severity' => 'high', 'message' => 'CIS-002: PHP error display explicitly enabled'],
+            ['id' => 'CIS-003', 'severity' => 'critical', 'message' => 'CIS-003: Request input used in an include path'],
+            ['id' => 'CIS-004', 'severity' => 'medium', 'message' => 'CIS-004: Fixed temporary path opened for nonexclusive writing'],
+            ['id' => 'CIS-005', 'severity' => 'high', 'message' => 'CIS-005: Session ID explicitly taken from request input'],
+            ['id' => 'CIS-006', 'severity' => 'critical', 'message' => 'CIS-006: Password passed to a fast legacy hash function'],
+            ['id' => 'CIS-007', 'severity' => 'high', 'message' => 'CIS-007: Literal encryption key in application code'],
+            ['id' => 'CIS-008', 'severity' => 'critical', 'message' => 'CIS-008: Request input used in SQL query text'],
+            ['id' => 'CIS-009', 'severity' => 'high', 'message' => 'CIS-009: Location header takes its destination from request input'],
+            ['id' => 'CIS-010', 'severity' => 'high', 'message' => 'CIS-010: TLS peer verification explicitly disabled'],
         ];
     }
 }

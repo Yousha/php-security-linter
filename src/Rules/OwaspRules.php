@@ -12,99 +12,22 @@ namespace Yousha\PhpSecurityLinter\Rules;
  */
 final class OwaspRules
 {
-    /**
-     * Get all OWASP security rules
-     *
-     * @return array[] Array of rule definitions with:
-     *   - severity: string (critical/high/medium/low)
-     *   - message: string Description of the vulnerability
-     *   - pattern: string Regex pattern to detect the issue
-     *   - reference: string OWASP standard reference
-     */
+    /** Return metadata for the branch's built-in detectors. */
     public static function getRules(): array
     {
         return [
-            // A1: Injection (20 rules)
-            [
-                'severity' => 'critical',
-                'message' => 'OWASP-A1: SQL Injection (concatenated)',
-                'pattern' => '/\$sql\s*=\s*["\'].*?\$_(GET|POST)/i',
-            ],
-            [
-                'severity' => 'critical',
-                'message' => 'OWASP-A1: Command Injection',
-                'pattern' => '/(exec|system|passthru)\s*\(.*\$_(GET|POST)/i',
-            ],
-
-            // A2: Cryptographic (15 rules)
-            [
-                'severity' => 'critical',
-                'message' => 'OWASP-A2: Hardcoded credentials',
-                'pattern' => '/\$?(user|pass|pwd)\s*=\s*[\'"][^\'"]+[\'"]/i',
-            ],
-
-            // A3: XSS (15 rules)
-            [
-                'severity' => 'high',
-                'message' => 'OWASP-A3: Reflected XSS',
-                'pattern' => '/echo\s+\$_(GET|POST)\s*\[.*\]/i',
-            ],
-
-            // A4: Insecure Design (10 rules)
-            [
-                'severity' => 'high',
-                'message' => 'OWASP-A4: Missing CSRF protection',
-                'pattern' => '/<form[^>]*>(?!.*(csrf|_token))/i',
-            ],
-
-            // A5: Misconfig (10 rules)
-            [
-                'severity' => 'high',
-                'message' => 'OWASP-A5: Debug mode enabled',
-                'pattern' => '/define\s*\(\s*[\'"]APP_DEBUG[\'"]\s*,\s*true\s*\)/i',
-            ],
-
-            // A6: Vulnerable Components (10 rules)
-            [
-                'severity' => 'high',
-                'message' => 'OWASP-A6: Known vulnerable library',
-                'pattern' => '/(jquery\s+1\.[0-9]|bootstrap\s+3\.[0-3])/i',
-            ],
-
-            // A7: Auth Failures (10 rules)
-            [
-                'severity' => 'high',
-                'message' => 'OWASP-A7: Weak password policy',
-                'pattern' => '/min_password_length\s*[<=]\s*6/i',
-            ],
-
-            // A8: Data Protection (10 rules)
-            [
-                'severity' => 'critical',
-                'message' => 'OWASP-A8: Plaintext sensitive data',
-                'pattern' => '/\$_(POST|GET)\s*\[[\'"]?(credit_card|ssn)[\'"]?\]/i',
-            ],
-
-            // A10: SSRF (10 rules)
-            [
-                'severity' => 'critical',
-                'message' => 'OWASP-A10: Potential SSRF',
-                'pattern' => '/file_get_contents\s*\(\s*\$_(GET|POST)/i',
-            ],
-
-            // API Security (15 rules)
-            [
-                'severity' => 'high',
-                'message' => 'OWASP-API1: Missing rate limiting',
-                'pattern' => '/function\s+api_\w+\s*\(\)[^{]*\{[^}]*\}(?!.*sleep\s*\(\d+\))/i',
-            ],
-
-            // Cloud (10 rules)
-            [
-                'severity' => 'high',
-                'message' => 'OWASP-CLOUD1: Hardcoded AWS keys',
-                'pattern' => '/\$aws_(key|secret)\s*=\s*[\'"][^\'"]+[\'"]/i',
-            ],
+            ['id' => 'OWASP-A1-SQL', 'severity' => 'critical', 'message' => 'OWASP-A1-SQL: Request input concatenated into SQL text'],
+            ['id' => 'OWASP-A1-CMD', 'severity' => 'critical', 'message' => 'OWASP-A1-CMD: Request input used in a shell command'],
+            ['id' => 'OWASP-A2', 'severity' => 'high', 'message' => 'OWASP-A2: Password variable assigned a literal credential'],
+            ['id' => 'OWASP-A3', 'severity' => 'high', 'message' => 'OWASP-A3: Request input directly included in output'],
+            ['id' => 'OWASP-A4', 'severity' => 'medium', 'message' => 'OWASP-A4: POST form has no recognizable hidden CSRF field; verify server-side protection'],
+            ['id' => 'OWASP-A5', 'severity' => 'high', 'message' => 'OWASP-A5: Debug mode explicitly enabled'],
+            ['id' => 'OWASP-A6', 'severity' => 'high', 'message' => 'OWASP-A6: Script references a library version predating a security fix'],
+            ['id' => 'OWASP-A7', 'severity' => 'high', 'message' => 'OWASP-A7: Configured minimum password length is six or less'],
+            ['id' => 'OWASP-A8', 'severity' => 'high', 'message' => 'OWASP-A8: Sensitive request field written directly to a file or log'],
+            ['id' => 'OWASP-A10', 'severity' => 'critical', 'message' => 'OWASP-A10: Request input used as a remote resource location'],
+            ['id' => 'OWASP-API1', 'severity' => 'medium', 'message' => 'OWASP-API1: Route explicitly removes throttle middleware; verify alternative rate limits'],
+            ['id' => 'OWASP-CLOUD1', 'severity' => 'high', 'message' => 'OWASP-CLOUD1: AWS credential variable assigned a key-shaped literal'],
         ];
     }
 }

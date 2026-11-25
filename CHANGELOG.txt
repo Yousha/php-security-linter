@@ -1,5 +1,6 @@
 Unreleased
 ----------
+* Use PHP syntax trees and inline HTML structure to reduce false positives across the 22 built-in checks. Add matching and clean fixtures for every detector.
 * Fix scan accounting, exclusions, file selection, multiline locations, and PCRE error reporting.
 * Validate CLI options, support custom Composer dependency directories, and distinguish findings and incomplete scans by exit status.
 

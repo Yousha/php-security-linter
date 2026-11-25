@@ -110,7 +110,7 @@ final class LinterTest extends TestCase
         $this->assertNotEmpty($rules);
         // Check some sample rule structure.
         $firstRule = reset($rules);
-        $this->assertArrayHasKey('pattern', $firstRule);
+        $this->assertArrayHasKey('id', $firstRule);
         $this->assertArrayHasKey('severity', $firstRule);
         $this->assertArrayHasKey('message', $firstRule);
     }

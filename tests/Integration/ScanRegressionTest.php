@@ -179,7 +179,7 @@ final class ScanRegressionTest extends TestCase
     public function testPcreFailureMarksScanIncomplete(): void
     {
         // Arrange
-        file_put_contents($this->root . '/config.php', '<?php /* disable_functions = exec */');
+        file_put_contents($this->root . '/config.php', "<?php header('Location: /home');");
 
         // Act
         [$code, $out, $err] = $this->cli(['-p', '.'], ['-d', 'pcre.jit=0', '-d', 'pcre.backtrack_limit=0']);

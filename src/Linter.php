@@ -22,6 +22,11 @@ declare(strict_types=1);
 
 namespace Yousha\PhpSecurityLinter;
 
+use PhpParser\ErrorHandler\Collecting;
+use PhpParser\NodeTraverser;
+use PhpParser\ParserFactory;
+use Yousha\PhpSecurityLinter\Rules\DetectionVisitor;
+use Yousha\PhpSecurityLinter\Rules\TemplateInspector;
 use Yousha\PhpSecurityLinter\Rules\CisRules;
 use Yousha\PhpSecurityLinter\Rules\OwaspRules;
 use Yousha\PhpSecurityLinter\Exceptions\LinterException;
@@ -38,16 +43,18 @@ final class Linter
      * @var array Security rules to check against.
      */
     private $rules = [];
+    private $parser;
 
     /**
      * Constructor initializes security rules based on CIS and OWASP guidelines.
      */
     public function __construct()
     {
-        $this->rules = array_merge(
+        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        $this->rules = array_column(array_merge(
             CisRules::getRules(),
             OwaspRules::getRules()
-        );
+        ), null, 'id');
     }
 
     /** Return findings by file and, for nonempty or incomplete scans, scan metadata. */
@@ -170,30 +177,28 @@ final class Linter
             return null;
         }
         $content = str_replace(["\r\n", "\r"], "\n", $content);
+        $errors = new Collecting();
+        $nodes = $this->parser->parse($content, $errors);
+        foreach ($errors->getErrors() as $error) {
+            $warnings[] = sprintf('Could not fully parse %s: %s', $file, $error->getMessage());
+        }
+
         $issues = [];
-        foreach ($this->rules as $rule) {
-            $cursor = 0;
-            $previousOffset = 0;
-            $line = 1;
-            $reportedLine = 0;
-            while (($matched = preg_match($rule['pattern'], $content, $match, PREG_OFFSET_CAPTURE, $cursor)) === 1) {
-                [$text, $offset] = $match[0];
-                if ($offset > $previousOffset) {
-                    $line += substr_count($content, "\n", $previousOffset, $offset - $previousOffset);
-                }
-                $previousOffset = $offset;
-                if ($line !== $reportedLine) {
-                    $issues[] = ['severity' => $rule['severity'], 'message' => $rule['message'], 'line' => $line];
-                    $reportedLine = $line;
-                }
-                $cursor = $offset + max(1, strlen($text));
-                if ($cursor > strlen($content)) {
-                    break;
-                }
+        $seen = [];
+        $report = function (string $id, int $line) use (&$issues, &$seen): void {
+            if (!isset($seen[$id][$line])) {
+                $seen[$id][$line] = true;
+                $rule = $this->rules[$id];
+                $issues[] = ['severity' => $rule['severity'], 'message' => $rule['message'], 'line' => $line];
             }
-            if ($matched === false) {
-                $warnings[] = sprintf('PCRE error %d in %s for %s', preg_last_error(), $file, $rule['message']);
-            }
+        };
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor(new DetectionVisitor($report));
+        try {
+            $traverser->traverse($nodes ?? []);
+            TemplateInspector::inspect($content, $report);
+        } catch (\RuntimeException $error) {
+            $warnings[] = sprintf('Incomplete analysis of %s: %s', $file, $error->getMessage());
         }
         return $issues;
     }
