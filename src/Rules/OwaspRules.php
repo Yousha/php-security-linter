@@ -18,7 +18,9 @@ final class OwaspRules
             ['id' => 'OWASP-A6', 'standardReference' => 'A06:2021', 'severity' => 'high', 'message' => 'OWASP-A6: Script references a library version predating a security fix'],
             ['id' => 'OWASP-A7', 'standardReference' => 'A07:2021', 'severity' => 'high', 'message' => 'OWASP-A7: Configured minimum password length is six or less'],
             ['id' => 'OWASP-A8', 'severity' => 'high', 'message' => 'OWASP-A8: Sensitive request field written directly to a file or log'],
-            ['id' => 'OWASP-A10', 'standardReference' => 'A10:2021', 'severity' => 'critical', 'message' => 'OWASP-A10: Request input used as a remote resource location'],
+            ['id' => 'OWASP-A10', 'standardReference' => 'A10:2021', 'severity' => 'critical', 'message' => 'OWASP-A10: Request-controlled data used as a remote resource location'],
+            ['id' => 'OWASP-WEAK-RNG', 'severity' => 'high', 'message' => 'OWASP-WEAK-RNG: Predictable random value used for a security-sensitive token or secret'],
+            ['id' => 'OWASP-DESERIALIZATION', 'severity' => 'high', 'message' => 'OWASP-DESERIALIZATION: Unrestricted PHP object deserialization'],
             ['id' => 'OWASP-API1', 'standardReference' => 'API4:2023', 'severity' => 'medium', 'message' => 'OWASP-API1: Route explicitly removes throttle middleware; verify alternative rate limits'],
             ['id' => 'OWASP-CLOUD1', 'severity' => 'high', 'message' => 'OWASP-CLOUD1: AWS credential variable assigned a key-shaped literal'],
         ];
