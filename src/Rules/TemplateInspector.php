@@ -97,7 +97,8 @@ final class TemplateInspector
             if (strcasecmp($input->getAttribute('type'), 'hidden') === 0
                 && (strpos($name, 'csrf') !== false
                     || in_array($name, ['_token', 'authenticity_token', 'csrfmiddlewaretoken',
-                        '__requestverificationtoken', 'requestverificationtoken', '_csrf_token'], true))) {
+                        '__requestverificationtoken', 'requestverificationtoken', '_csrf_token',
+                        'xsrf-token', 'xsrf_token', '_xsrf', 'x-xsrf-token'], true))) {
                 return true;
             }
         }
