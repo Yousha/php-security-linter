@@ -1,6 +1,6 @@
 # PHP Security Linter (Beta)
 
-Security checks for PHP 7.4 code and inline HTML. This page documents the main-php7.4 maintenance branch.
+PHP 7.4-compatible static analysis for PHP source code and inline HTML templates. This README documents the `main-php7.4` maintenance branch; it is maintained separately from the PHP 8.0+ `main` branch.
 
 [![Latest Packagist release across branches](https://img.shields.io/packagist/v/yousha/php-security-linter.svg)](https://packagist.org/packages/yousha/php-security-linter) [![PHP 7.4 CI](https://github.com/Yousha/php-security-linter/actions/workflows/main.yml/badge.svg?branch=main-php7.4)](https://github.com/Yousha/php-security-linter/actions/workflows/main.yml?query=branch%3Amain-php7.4) [![PHP](https://img.shields.io/badge/PHP-7.4-617CBE)](https://php.net/) [![issues](https://img.shields.io/github/issues/yousha/php-security-linter)](https://github.com/yousha/php-security-linter/issues) ![repo size](https://img.shields.io/github/repo-size/yousha/php-security-linter) [![GitHub license](https://img.shields.io/github/license/yousha/php-security-linter)](LICENSE) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.txt)
 
@@ -29,7 +29,7 @@ This branch checks PHP 7.4 code and inline HTML templates for potential security
 
 ## Features
 
-* **24 built-in checks** across two project catalogs (10 CIS-prefixed and 14 OWASP-prefixed).
+* **26 built-in checks** across two project catalogs (10 CIS-prefixed and 16 OWASP-prefixed), including AST-based PHP checks and inline HTML template checks.
 * Checks for request-data propagation through simple assignments, sensitive output, unsafe configuration, cookie-supplied session IDs, and literal credentials.
 * Template checks for static POST forms and versioned jQuery or Bootstrap script references.
 * **Fast static analysis** without executing code
@@ -41,7 +41,7 @@ This branch checks PHP 7.4 code and inline HTML templates for potential security
 
 ## Requirements
 
-1. PHP 7.4.x with PCRE, DOM, and tokenizer
+1. PHP 7.4.x with PCRE, DOM, and tokenizer; Composer dependencies include nikic/php-parser 4.x
 2. Composer >= 2
 
 ### Versions
@@ -86,7 +86,9 @@ Or Composer global installation:
 composer global require yousha/php-security-linter:dev-main-php7.4
 ```
 
-For a tagged release use the Composer constraint `2.*`. Features and requirements follow the selected tag. In a source checkout run `composer install` and invoke `php bin/php-sl`.
+For a tagged PHP 7.4 release, use the Composer constraint `2.*`. Features and requirements follow the selected tag. In a source checkout run `composer install` and invoke `php bin/php-sl`.
+
+The package on this branch requires PHP `7.4.*` and `ext-pcre`, `ext-dom`, plus `nikic/php-parser ^4.19`. Development tools include PHPUnit 9, PHP-CS-Fixer 3, PHPLint 3, Rector 2, and Composer Require Checker 3.
 
 ## Configuration
 
@@ -127,9 +129,9 @@ Lint with exclusions:
 php vendor/bin/php-sl --path=./app --exclude=vendor,tests
 ```
 
-A scan accepts one directory. It skips excluded subtrees, special files, directory symlinks, and file symlinks leading outside the scan root. Relative exclusions match complete path components within the root. Absolute exclusions match the named path and its descendants.
+A scan accepts one directory. The scanner parses PHP with nikic/php-parser and analyzes the resulting syntax tree; inline HTML is inspected separately with DOMDocument. It skips excluded subtrees, special files, directory symlinks, and file symlinks leading outside the scan root. Relative exclusions match complete path components within the root. Absolute exclusions match the named path and its descendants.
 
-The PHP 7.4 CLI produces text reports. Reports go to stdout. Warnings and argument errors go to stderr. An incomplete scan preserves findings from files it could check. The scanned-file count includes successfully read PHP files.
+The PHP 7.4 CLI produces text reports only. Reports go to stdout; warnings and argument errors go to stderr. SARIF output and the newer `--format`, `--output`, `--include-attack`, and `--exclude-rules` options from the PHP 8.0+ branch are not available here. An incomplete scan preserves findings from files it could check. The scanned-file count includes successfully read PHP files.
 
 | Exit code | Meaning |
 |---|---|
@@ -161,7 +163,7 @@ Summary: Scanned 1 files, found 1 potential issues.
 
 ### CI and local checks
 
-Pushes to `main-php7.4` and pull requests targeting it run these checks on Ubuntu with PHP 7.4 and Composer 2. From a source checkout:
+Pushes to `main-php7.4` and pull requests targeting it run the checks on Ubuntu and Windows with PHP 7.4 and Composer 2. From a source checkout:
 
 ```shell
 composer validate --strict
