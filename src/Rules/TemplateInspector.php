@@ -10,7 +10,7 @@ use DOMElement;
 
 final class TemplateInspector
 {
-    private const DYNAMIC = 'php_sl_dynamic_fragment';
+    private const DYNAMIC = 'php_sl_dynamic_csrf_fragment';
 
     public static function inspect(string $source, Closure $report): void
     {
@@ -18,21 +18,48 @@ final class TemplateInspector
             return;
         }
 
-        // Preserve source line numbers while keeping PHP examples and strings out of the markup.
+        // Keep only PHP fragments that visibly emit or reference a CSRF token.
+        // Arbitrary dynamic PHP must not suppress the whole form check.
         $html = '';
+        $inPhp = false;
+        $phpBuffer = '';
         foreach (token_get_all($source) as $token) {
             if (!is_array($token)) {
+                if ($inPhp) {
+                    $phpBuffer .= $token;
+                } else {
+                    $html .= $token;
+                }
                 continue;
             }
             if ($token[0] === T_INLINE_HTML) {
                 $html .= $token[1];
-            } else {
-                if ($token[0] === T_OPEN_TAG || $token[0] === T_OPEN_TAG_WITH_ECHO) {
+                continue;
+            }
+            if ($token[0] === T_OPEN_TAG || $token[0] === T_OPEN_TAG_WITH_ECHO) {
+                $inPhp = true;
+                $phpBuffer = '';
+                $html .= str_repeat("\n", substr_count($token[1], "\n"));
+                continue;
+            }
+            if ($token[0] === T_CLOSE_TAG) {
+                if (self::containsCsrfMarker($phpBuffer)) {
                     $html .= self::DYNAMIC;
                 }
                 $html .= str_repeat("\n", substr_count($token[1], "\n"));
+                $inPhp = false;
+                $phpBuffer = '';
+                continue;
             }
+            if ($inPhp) {
+                $phpBuffer .= $token[1];
+            }
+            $html .= str_repeat("\n", substr_count($token[1], "\n"));
         }
+        if ($inPhp && self::containsCsrfMarker($phpBuffer)) {
+            $html .= self::DYNAMIC;
+        }
+
         $dom = new DOMDocument();
         if (!$dom->loadHTML('<html><body>' . $html . '</body></html>', LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING)) {
             return;
@@ -55,12 +82,22 @@ final class TemplateInspector
         }
     }
 
+    private static function containsCsrfMarker(string $php): bool
+    {
+        return DetectionVisitor::matches(
+            '~(?:csrf_field|csrf_token|csrfmiddlewaretoken|authenticity_token|requestverificationtoken|_token|xsrf)~i',
+            $php
+        );
+    }
+
     private static function hasCsrfInput(DOMElement $form): bool
     {
         foreach ($form->getElementsByTagName('input') as $input) {
             $name = strtolower($input->getAttribute('name'));
             if (strcasecmp($input->getAttribute('type'), 'hidden') === 0
-                && (strpos($name, 'csrf') !== false || in_array($name, ['_token', 'authenticity_token'], true))) {
+                && (strpos($name, 'csrf') !== false
+                    || in_array($name, ['_token', 'authenticity_token', 'csrfmiddlewaretoken',
+                        '__requestverificationtoken', 'requestverificationtoken', '_csrf_token'], true))) {
                 return true;
             }
         }
