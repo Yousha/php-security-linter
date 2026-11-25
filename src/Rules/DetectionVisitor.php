@@ -15,9 +15,13 @@ use PhpParser\NodeVisitorAbstract;
 final class DetectionVisitor extends NodeVisitorAbstract
 {
     private Closure $report;
+
     private array $taintedVariables = [];
+
     private array $htmlSafeVariables = [];
+
     private array $sensitiveVariables = [];
+
     private array $weakRandomVariables = [];
 
     public function __construct(Closure $report)
@@ -433,9 +437,7 @@ final class DetectionVisitor extends NodeVisitorAbstract
             return false;
         }
         $arg = $node->args[0]->value ?? null;
-        $values = $arg instanceof Expr\Array_ ? array_map(static function ($item) {
-            return $item !== null ? $item->value : null;
-        }, $arg->items) : [$arg];
+        $values = $arg instanceof Expr\Array_ ? array_map(static fn($item) => $item !== null ? $item->value : null, $arg->items) : [$arg];
         foreach ($values as $value) {
             $alias = self::literal($value) ?? '';
             if (strpos(strtolower($alias), 'throttle') !== false || ($value instanceof Expr\ClassConstFetch

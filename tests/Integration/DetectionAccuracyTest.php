@@ -29,9 +29,7 @@ final class DetectionAccuracyTest extends TestCase
             self::assertSame(2, $result['_meta']['scanned_count']);
             self::assertArrayNotHasKey('warnings', $result['_meta']);
             self::assertSame(1, $result['_meta']['issue_count']);
-            $findingFiles = array_values(array_filter(array_keys($result), static function ($key): bool {
-                return $key !== '_meta';
-            }));
+            $findingFiles = array_values(array_filter(array_keys($result), static fn($key): bool => $key !== '_meta'));
             self::assertCount(1, $findingFiles);
             $finding = $result[$findingFiles[0]][0];
             self::assertStringStartsWith($id . ':', $finding['message']);
@@ -135,9 +133,7 @@ final class DetectionAccuracyTest extends TestCase
             // Assert
             self::assertSame(1, $result['_meta']['issue_count']);
             self::assertStringContainsString('broken.php', $result['_meta']['warnings'][0]);
-            $findingFiles = array_values(array_filter(array_keys($result), static function ($key): bool {
-                return $key !== '_meta';
-            }));
+            $findingFiles = array_values(array_filter(array_keys($result), static fn($key): bool => $key !== '_meta'));
             self::assertCount(1, $findingFiles);
             self::assertStringContainsString('/valid.php', str_replace('\\', '/', $findingFiles[0]));
         } finally {
