@@ -67,9 +67,9 @@ For a released version, install the package without a branch constraint and Comp
 
 ![C4 C2 Container View — PHP Security Linter](resources/images/diagrams/artifacts/Container-view.svg)
 
-* Dataflow diagram:
+* Dataflow — UML Activity Diagram:
 
-![Scan dataflow from rule selection and PHP file traversal to regex and token checks, findings, warnings, and text or SARIF output](resources/images/diagrams/artifacts/Dataflow-diagram.png)
+![UML activity diagram showing CLI validation, rule selection, PHP file traversal, exclusions, regex and token analysis, findings, warnings, report generation, and exit status](resources/images/diagrams/artifacts/Dataflow-diagram.svg)
 
 ## Installation
 
