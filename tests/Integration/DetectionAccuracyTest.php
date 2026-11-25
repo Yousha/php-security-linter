@@ -46,14 +46,14 @@ final class DetectionAccuracyTest extends TestCase
         } finally {
             // Antivirus and indexers can briefly lock generated PHP fixtures on Windows.
             foreach ([$hit, $clean] as $fixture) {
-                for ($attempt = 0; $attempt < 10 && file_exists($fixture); $attempt++) {
+                for ($attempt = 0; $attempt < 30 && file_exists($fixture); $attempt++) {
                     if (@unlink($fixture)) {
                         break;
                     }
                     usleep(100000);
                 }
             }
-            for ($attempt = 0; $attempt < 10 && is_dir($dir); $attempt++) {
+            for ($attempt = 0; $attempt < 30 && is_dir($dir); $attempt++) {
                 if (@rmdir($dir)) {
                     break;
                 }
@@ -135,7 +135,11 @@ final class DetectionAccuracyTest extends TestCase
             // Assert
             self::assertSame(1, $result['_meta']['issue_count']);
             self::assertStringContainsString('broken.php', $result['_meta']['warnings'][0]);
-            self::assertArrayHasKey($dir . '/valid.php', $result);
+            $findingFiles = array_values(array_filter(array_keys($result), static function ($key): bool {
+                return $key !== '_meta';
+            }));
+            self::assertCount(1, $findingFiles);
+            self::assertStringContainsString('/valid.php', str_replace('\\', '/', $findingFiles[0]));
         } finally {
             unlink($dir . '/broken.php');
             unlink($dir . '/valid.php');
