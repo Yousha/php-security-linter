@@ -30,32 +30,20 @@ Findings are heuristic indicators that require review in the context of the appl
 
 ## Features
 
-* **48 registered rules** across 16 CIS, 29 OWASP, and 3 optional MITRE ATT&CK checks.
-* **Fast static analysis** without executing code
-* **Console output** with file-level findings and scan summary
-* **SARIF 2.1.0 output** for interoperable security findings and CI/CD integrations
+* **48 registered rules**
+* **Fast static analysis**
+* **Console output** 
+* **SARIF 2.1.0 output**
 * **Configurable ruleset**
-* **DevSecOps ready** CI/CD pipeline integration
-* **Exclusion support** for ignoring specific paths
-* **Supported PHP:** 8.0 and newer
-* **Supported platforms:** Windows, GNU/Linux, MacOS
+* **DevSecOps ready**
+* **Exclusion support**
+* **Supported platforms:** Windows, GNU/Linux
 
 ## Requirements
 
+1. Windows or GNU/Linux OS
 1. PHP 8.0 or newer
 2. Composer 2 or newer
-
-### PHP Compatibility
-
-The current `main` branch requires PHP 8.0 or newer. The package declares this requirement in `composer.json`.
-
-For the latest development version:
-
-```shell
-composer require --dev yousha/php-security-linter:dev-main
-```
-
-For a released version, install the package without a branch constraint and Composer will select a compatible published release.
 
 ## Screenshots
 
@@ -66,10 +54,6 @@ For a released version, install the package without a branch constraint and Comp
 * C3 — Component View (UML):
 
 ![C4 C3 Component View — PHP Security Linter](resources/images/diagrams/artifacts/Component-diagram.svg)
-
-* C2 — Container View (UML):
-
-![C4 C2 Container View — PHP Security Linter](resources/images/diagrams/artifacts/Container-view.svg)
 
 * Dataflow — UML Activity Diagram:
 
@@ -134,8 +118,6 @@ Write SARIF to standard output:
 php vendor/bin/php-sl --path=./src --format=sarif > results.sarif
 ```
 
-The default `text` format remains unchanged. SARIF output includes rule descriptors, severity levels, source file URIs, line locations, and scan warnings as invocation notifications.
-
 ### Exit codes
 
 | Code | Meaning |
@@ -193,7 +175,7 @@ composer test
 Or:
 
 ```shell
-vendor/bin/phpunit tests/
+php vendor/bin/phpunit tests/
 ```
 
 ## FAQ
