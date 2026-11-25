@@ -86,7 +86,7 @@ final class LinterCoverageTest extends TestCase
             array_keys($results),
             static function ($key): bool {
                 return $key !== '_meta'
-                    && basename(str_replace('\\\\', '/', (string) $key)) === 'vuln.php';
+                    && basename(str_replace('\\', '/', (string) $key)) === 'vuln.php';
             }
         ));
         $this->assertCount(1, $findingFiles);
@@ -209,7 +209,7 @@ final class LinterCoverageTest extends TestCase
             array_keys($results),
             static function ($key): bool {
                 return $key !== '_meta'
-                    && basename(str_replace('\\\\', '/', (string) $key)) === 'crlf.php';
+                    && basename(str_replace('\\', '/', (string) $key)) === 'crlf.php';
             }
         ));
         $this->assertCount(1, $findingFiles);
