@@ -323,7 +323,7 @@ final class DetectionVisitor extends NodeVisitorAbstract
         if ($node instanceof Expr\BinaryOp) {
             return $this->isSensitiveInput($node->left) || $this->isSensitiveInput($node->right);
         }
-        if ($node instanceof Scalar\\Encapsed) {
+        if ($node instanceof Scalar\Encapsed) {
             foreach ($node->parts as $part) {
                 if ($this->isSensitiveInput($part)) {
                     return true;
