@@ -4,7 +4,7 @@
 declare(strict_types=1);
 
 // Include Composer autoloader to load dependencies.
-require_once addslashes(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR) . 'autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 // Error/Exception engine, always `E_ALL`.
 error_reporting(E_ALL);

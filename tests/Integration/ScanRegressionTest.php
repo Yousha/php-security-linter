@@ -11,6 +11,7 @@ use Yousha\PhpSecurityLinter\Linter;
 final class ScanRegressionTest extends TestCase
 {
     private string $root;
+
     private const FINDING = "<?php\ndefine('APP_DEBUG', true);";
 
     protected function setUp(): void
@@ -46,6 +47,21 @@ final class ScanRegressionTest extends TestCase
         fclose($pipes[1]);
         fclose($pipes[2]);
         return [proc_close($process), $out, $err];
+    }
+
+    public function testCliHelp(): void
+    {
+        // Arrange
+        $args = ['--help'];
+
+        // Act
+        [$code, $out, $err] = $this->cli($args);
+
+        // Assert
+        self::assertSame(0, $code);
+        self::assertStringContainsString('Usage:', $out);
+        self::assertStringContainsString('--path', $out);
+        self::assertSame('', $err);
     }
 
     /** @dataProvider invalidArguments */

@@ -200,9 +200,7 @@ final class DetectionVisitor extends NodeVisitorAbstract
             return false;
         }
         $arg = $node->args[0]->value ?? null;
-        $values = $arg instanceof Expr\Array_ ? array_map(static function ($item) {
-            return $item->value ?? null;
-        }, $arg->items) : [$arg];
+        $values = $arg instanceof Expr\Array_ ? array_map(static fn($item) => $item->value ?? null, $arg->items) : [$arg];
         foreach ($values as $value) {
             $alias = self::literal($value) ?? '';
             if (explode(':', $alias, 2)[0] === 'throttle' || ($value instanceof Expr\ClassConstFetch

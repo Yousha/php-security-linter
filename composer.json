@@ -40,7 +40,6 @@
     "require-dev": {
         "ergebnis/composer-normalize": "2.*",
         "friendsofphp/php-cs-fixer": "3.*",
-        "icanhazstring/composer-unused": "0.*",
         "maglnet/composer-require-checker": "3.*",
         "overtrue/phplint": "3.*",
         "phpunit/phpunit": "9.*",
@@ -70,7 +69,6 @@
     },
     "config": {
         "allow-plugins": {
-            "composer-unused/composer-unused-plugin": true,
             "ergebnis/composer-normalize": true
         },
         "archive-format": "zip",
@@ -88,7 +86,10 @@
         }
     },
     "scripts": {
-        "lint": "phplint",
+        "lint": [
+            "@php -l bin/php-sl",
+            "phplint"
+        ],
         "refactor": "rector process",
         "refactor-check": "rector --dry-run",
         "reformat": "php-cs-fixer fix",

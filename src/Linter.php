@@ -43,6 +43,7 @@ final class Linter
      * @var array Security rules to check against.
      */
     private $rules = [];
+
     private $parser;
 
     /**
@@ -197,8 +198,8 @@ final class Linter
         try {
             $traverser->traverse($nodes ?? []);
             TemplateInspector::inspect($content, $report);
-        } catch (\RuntimeException $error) {
-            $warnings[] = sprintf('Incomplete analysis of %s: %s', $file, $error->getMessage());
+        } catch (\RuntimeException $runtimeException) {
+            $warnings[] = sprintf('Incomplete analysis of %s: %s', $file, $runtimeException->getMessage());
         }
         return $issues;
     }

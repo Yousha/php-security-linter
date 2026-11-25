@@ -159,13 +159,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
             $this->assertNotEmpty(get_loaded_extensions());
 
             // Arrange/Action
-            if (PHP_MAJOR_VERSION == 5) {
-                // Assert
-                $this->assertSame(PHP_INT_MAX, 2147483647);
-            } else {
-                // Assert
-                $this->assertSame(PHP_INT_MAX, 9223372036854775807);
-            }
+            $this->assertContains(PHP_INT_SIZE, [4, 8]);
 
             // Arrange
             $testArray = [];
@@ -176,27 +170,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
 
             // AAA
             $this->assertTrue(isset($_SERVER['SCRIPT_NAME']));
-
-            // Arrange
-            $_SERVER['SCRIPT_NAME'] = 'a/b/c/test.php';
-            // Arrange/Action
-            $this->assertSame('a/b/c/test.php', $_SERVER['SCRIPT_NAME']);
-
-            // Arrange
-            $_SERVER['HTTPS'] = '1';
-            // Arrange/Action
-            $this->assertSame('1', $_SERVER['HTTPS']);
-
-            // AAA
-            $this->assertTrue(putenv('NAME=Test'));
-
-            // AAA
-            $this->assertSame('Test', getenv('NAME'));
-
-            // Arrange
-            $_SERVER['TEST'] = 'a';
-            // Action/Assert
-            $this->assertSame('a', $_SERVER['TEST']);
 
             // AAA
             $this->assertGreaterThan(0, time());

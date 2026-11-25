@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yousha\PhpSecurityLinter\Tests {
 
-    use Throwable;
     use PHPUnit\Framework\TestCase;
     use Yousha\PhpSecurityLinter\Linter;
 
@@ -88,25 +87,6 @@ namespace Yousha\PhpSecurityLinter\Tests {
             $this->assertNotNull($this->linter);
             // AAA
             $this->assertIsObject($this->linter);
-        }
-
-        /**
-         * @test
-         *
-         * @small
-         *
-         * @return void
-         */
-        public function testCliInclusion(): void
-        {
-            try {
-                $argv = ['--help'];
-                require_once addslashes(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR) . 'php-sl';
-            } catch (Throwable $throwable) {
-                $this->fail();
-            }
-
-            $this->assertTrue(true); // Explicit pass.
         }
     }
 }

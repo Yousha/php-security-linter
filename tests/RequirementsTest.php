@@ -109,7 +109,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
             ];
 
             foreach ($directories as $directory) {
-                $this->assertDirectoryExists($directory);
+                $this->assertDirectoryExists(dirname(__DIR__) . '/' . $directory);
             }
         }
 
@@ -145,7 +145,7 @@ namespace Yousha\PhpSecurityLinter\Tests {
             ];
 
             foreach ($files as $file) {
-                $this->assertFileExists($file);
+                $this->assertFileExists(dirname(__DIR__) . '/' . $file);
             }
         }
     }

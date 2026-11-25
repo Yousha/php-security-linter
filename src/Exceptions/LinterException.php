@@ -110,7 +110,7 @@ final class LinterException extends \RuntimeException
      */
     public function __toString(): string
     {
-        $str = __CLASS__ . ": [{$this->code}]: {$this->message}\n";
+        $str = self::class . ": [{$this->code}]: {$this->message}\n";
 
         if ($this->context) {
             $str .= "Context: {$this->context}\n";
