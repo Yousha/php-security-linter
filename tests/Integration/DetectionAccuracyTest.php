@@ -55,7 +55,7 @@ final class DetectionAccuracyTest extends TestCase
             ['CIS-004', 'fopen("/tmp/report.txt", "w");', 'tmpfile(); tempnam(sys_get_temp_dir(), "report"); fopen("/tmp/report.txt", "x");'],
             ['CIS-005', 'session_id($_COOKIE["id"]);', "session_start();\nsession_regenerate_id(true);"],
             ['CIS-006', 'md5($password);', 'hash("sha256", $asset); $passwordField = null;'],
-            ['CIS-006', "hash('md5', $password);", "hash('sha256', $password);"],
+            ['CIS-006', "hash('md5', \$password);", "hash('sha256', $password);"],
             ['CIS-006', 'crypt($password);', 'crypt($password, \'$6$strong-salt$\');'],
             ['CIS-007', 'openssl_encrypt($data, $cipher, "literal-test-key");', '$key = "0123456789abcdef";'],
             ['CIS-008', 'mysqli_query($db, $query . $_POST["field"]);', 'mysqli_query($db, "SELECT 1"); $form = $_POST;'],
