@@ -30,7 +30,7 @@ Q: How do I interpret the severity levels?
 * Low: Informational notice
 
 Q: Where can I see all available rules?
-A: See src/Rules/CisRules.php and src/Rules/OwaspRules.php.
+A: See src/Rules/CisRules.php (10 checks) and src/Rules/OwaspRules.php (12 checks). The README maps project IDs to versioned OWASP categories.
 
 Q: How do I contribute new rules?
 A: Fork the repository and submit a PR with your rule additions to the appropriate ruleset file.
@@ -51,4 +51,4 @@ Q: How does the linter handle obfuscated or dynamically generated code?
 A: Analysis uses the source available in the scanned file. It does not execute generated strings.
 
 Q: How are severity levels determined?
-A: Each built-in detector has a severity recorded in its rule catalog.
+A: Each severity is assigned by this project. A separate standardReference field identifies the OWASP category when a mapping is available.

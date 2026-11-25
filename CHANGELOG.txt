@@ -1,5 +1,6 @@
 Unreleased
 ----------
+* Distinguish project rule IDs from versioned OWASP references in both text and library output; document the PHP 7.4 catalog and installation commands.
 * Repair Rector configuration, lint the CLI, and verify CLI help in a real process. Make tests portable across checkout paths and integer sizes.
 * Remove the optional composer-unused development dependency that pulled in an abandoned package on PHP 7.4.
 * Use PHP syntax trees and inline HTML structure to reduce false positives across the 22 built-in checks. Add matching and clean fixtures for every detector.

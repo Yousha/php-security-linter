@@ -2,14 +2,7 @@
 
 namespace Yousha\PhpSecurityLinter\Rules;
 
-/**
- * CIS Security Rules Implementation
- *
- * Provides security rules based on CIS PHP Benchmark recommendations
- * covering server configuration, filesystem security, and PHP best practices.
- *
- * @package PhpSecurityLinter\Rules
- */
+/** Local PHP hardening heuristics with project-assigned CIS-prefixed IDs and severities. */
 final class CisRules
 {
     /** Return metadata for the branch's built-in detectors. */

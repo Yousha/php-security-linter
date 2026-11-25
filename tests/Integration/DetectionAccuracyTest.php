@@ -32,6 +32,13 @@ final class DetectionAccuracyTest extends TestCase
             self::assertArrayNotHasKey($clean, $result);
             self::assertStringStartsWith($id . ':', $result[$hit][0]['message']);
             self::assertSame(3, $result[$hit][0]['line']);
+            $references = [
+                'OWASP-A1-SQL' => 'A03:2021', 'OWASP-A1-CMD' => 'A03:2021', 'OWASP-A3' => 'A03:2021',
+                'OWASP-A2' => 'A02:2021', 'OWASP-A4' => 'A01:2021', 'OWASP-A5' => 'A05:2021',
+                'OWASP-A6' => 'A06:2021', 'OWASP-A7' => 'A07:2021', 'OWASP-A10' => 'A10:2021',
+                'OWASP-API1' => 'API4:2023',
+            ];
+            self::assertSame($references[$id] ?? null, $result[$hit][0]['standardReference'] ?? null);
         } finally {
             unlink($hit);
             unlink($clean);

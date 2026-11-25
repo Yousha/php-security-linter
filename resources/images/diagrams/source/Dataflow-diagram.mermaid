@@ -1,8 +1,13 @@
 flowchart TD
-    A[CLI Input] --> B[Directory Traversal]
-    B --> C[File Content Analysis]
-    C --> D[Rule Matching]
-    D --> E[Issue Aggregation]
-    E --> F[Results Output]
-    C -->|Error| G[Exception Handling]
-    G --> F
+    Root["Scan directory and exclusions"] --> Walk["Prune directories and select PHP files"]
+    Walk --> Read["Read file and normalize newlines"]
+    Read --> AST["Parse and inspect PHP expressions"]
+    Read --> HTML["Inspect inline HTML"]
+    AST --> Merge["Collect findings by rule and line"]
+    HTML --> Merge
+    Merge --> Report["Text report and counts to stdout"]
+    Walk --> Warn["Record warnings"]
+    Read --> Warn
+    AST --> Warn
+    HTML --> Warn
+    Warn --> Status["Warnings to stderr and incomplete status"]

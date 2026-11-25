@@ -1,8 +1,8 @@
 # PHP Security Linter (Beta)
 
-A PHP tool to lint PHP files for security issues based on CIS and OWASP best practices.
+Security checks for PHP 7.4 code and inline HTML. This page documents the main-php7.4 maintenance branch.
 
-[![current version](https://img.shields.io/packagist/v/yousha/php-security-linter.svg)](https://packagist.org/packages/yousha/php-security-linter) [![Dependabot Updates](https://github.com/Yousha/php-security-linter/actions/workflows/dependabot/dependabot-updates/badge.svg?branch=main-php7.4)](https://github.com/Yousha/php-security-linter/actions/workflows/dependabot/dependabot-updates) [![PHP](https://img.shields.io/badge/PHP-7.4-617CBE)](https://php.net/) [![issues](https://img.shields.io/github/issues/yousha/php-security-linter)](https://github.com/yousha/php-security-linter/issues) ![repo size](https://img.shields.io/github/repo-size/yousha/php-security-linter) [![GitHub license](https://img.shields.io/github/license/yousha/php-security-linter)](LICENSE) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.txt)
+[![Latest Packagist release across branches](https://img.shields.io/packagist/v/yousha/php-security-linter.svg)](https://packagist.org/packages/yousha/php-security-linter) [![Dependabot Updates](https://github.com/Yousha/php-security-linter/actions/workflows/dependabot/dependabot-updates/badge.svg?branch=main-php7.4)](https://github.com/Yousha/php-security-linter/actions/workflows/dependabot/dependabot-updates) [![PHP](https://img.shields.io/badge/PHP-7.4-617CBE)](https://php.net/) [![issues](https://img.shields.io/github/issues/yousha/php-security-linter)](https://github.com/yousha/php-security-linter/issues) ![repo size](https://img.shields.io/github/repo-size/yousha/php-security-linter) [![GitHub license](https://img.shields.io/github/license/yousha/php-security-linter)](LICENSE) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.txt)
 
 ## Contents
 
@@ -29,7 +29,7 @@ This branch checks PHP 7.4 code and inline HTML templates for potential security
 
 ## Features
 
-* **22 built-in checks** across the CIS-oriented and OWASP-oriented rule catalogs.
+* **22 built-in checks** across two project catalogs (10 CIS-prefixed and 12 OWASP-prefixed).
 * Checks for directly observable input use, sensitive output, unsafe configuration, cookie-supplied session IDs, and literal credentials.
 * Template checks for static POST forms and versioned jQuery or Bootstrap script references.
 * **Fast static analysis** without executing code
@@ -48,8 +48,9 @@ This branch checks PHP 7.4 code and inline HTML templates for potential security
 
 | Package version | Branch        | PHP version | Status         |
 |-----------------|---------------|-------------|----------------|
-| dev-main        | `main`        | 8.*         | Active         |
-| 3.*             | `main`        | 8.*         | Active         |
+| dev-main        | `main`        | 8.0+         | Active         |
+| 3.*             | `main`        | Per tag         | Active         |
+| dev-main-php7.4 | `main-php7.4` | 7.4.x       | Maintenance    |
 | 2.*             | `main-php7.4` | 7.4         | Maintenance    |
 | 1.*             |               | 5.6         | EOL            |
 
@@ -73,17 +74,19 @@ This branch checks PHP 7.4 code and inline HTML templates for potential security
 
 ## Installation
 
-Via [Composer](https://getcomposer.org/):
+To install the branch described here in a PHP 7.4 project:
 
 ```shell
-composer require --dev yousha/php-security-linter
+composer require --dev yousha/php-security-linter:dev-main-php7.4
 ```
 
 Or Composer global installation:
 
 ```shell
-composer global require yousha/php-security-linter
+composer global require yousha/php-security-linter:dev-main-php7.4
 ```
+
+For a tagged release use the Composer constraint `2.*`. Features and requirements follow the selected tag. In a source checkout run `composer install` and invoke `php bin/php-sl`.
 
 ## Configuration
 
@@ -91,7 +94,24 @@ Use the built-in checks with path exclusions. The PHP checks follow direct expre
 
 A POST form finding means no recognized hidden CSRF field was visible in its static markup. PHP-generated forms with unknown content are skipped. Script version checks use literal JavaScript asset paths. A finding identifies a reference for review, rather than verifying deployed asset contents.
 
-The rule catalogs expose an ID, severity, and message for each detector. The two injection rules have distinct IDs, OWASP-A1-SQL and OWASP-A1-CMD. PHP parse errors produce an incomplete-scan warning; other files are still scanned.
+### Rule IDs and standards references
+
+The scanner prints a stable project rule ID and severity with every finding. Mapped findings also carry `standardReference` in the library result and show a separate OWASP reference in the CLI. The category numbers refer to the edition shown.
+
+| Project rule IDs | OWASP reference |
+|---|---|
+| OWASP-A1-SQL, OWASP-A1-CMD, OWASP-A3 | A03:2021 Injection (SQL, commands, and reflected XSS) |
+| OWASP-A2 | A02:2021 Cryptographic Failures (hard-coded password) |
+| OWASP-A4 | A01:2021 Broken Access Control (CSRF) |
+| OWASP-A5 | A05:2021 Security Misconfiguration |
+| OWASP-A6 | A06:2021 Vulnerable and Outdated Components |
+| OWASP-A7 | A07:2021 Identification and Authentication Failures |
+| OWASP-A10 | A10:2021 Server-Side Request Forgery |
+| OWASP-API1 | API4:2023 Unrestricted Resource Consumption (throttle removal) |
+
+The two remaining OWASP-prefixed checks flag direct writes of sensitive fields (OWASP-A8) and credential-shaped literals (OWASP-CLOUD1). Their findings have no category mapping. CIS-001 through CIS-010 are local hardening identifiers. The project has no verified mapping from those IDs to numbered CIS Benchmark controls. Severity values express the project's review priorities.
+
+Sources: [OWASP Top 10:2021](https://top10.owasp.org/2021/), [OWASP API Security Top 10:2023, API4](https://api-security.owasp.org/editions/2023/en/0xa4-unrestricted-resource-consumption/).
 
 ## Usage
 
@@ -109,7 +129,7 @@ php vendor/bin/php-sl --path=./app --exclude=vendor,tests
 
 A scan accepts one directory. It skips excluded subtrees, special files, directory symlinks, and file symlinks leading outside the scan root. Relative exclusions match complete path components within the root. Absolute exclusions match the named path and its descendants.
 
-Reports go to stdout. Warnings and argument errors go to stderr. An incomplete scan preserves findings from files it could check. The scanned-file count includes successfully read PHP files.
+The PHP 7.4 CLI produces text reports. Reports go to stdout. Warnings and argument errors go to stderr. An incomplete scan preserves findings from files it could check. The scanned-file count includes successfully read PHP files.
 
 | Exit code | Meaning |
 |---|---|
@@ -117,7 +137,7 @@ Reports go to stdout. Warnings and argument errors go to stderr. An incomplete s
 | 1 | Findings |
 | 2 | Invalid arguments or scan target |
 | 3 | Fatal error |
-| 4 | Incomplete scan (read, traversal, or rule evaluation warning), including when findings are present |
+| 4 | Incomplete scan (read, traversal, parse, or rule evaluation warning), including when findings are present |
 
 ### Command options
 
@@ -130,17 +150,13 @@ Reports go to stdout. Warnings and argument errors go to stderr. An incomplete s
 ### Example console output
 
 ```shell
-Scan Results
+Scan results
 ========================================
 
-File: /src/auth.php
-  ✗ [CRITICAL] OWASP: SQL Injection vulnerability detected (Line 42)
-  ✗ [HIGH] CIS: Hardcoded database credentials (Line 15)
+File: example/settings.php
+  ✗ [HIGH] OWASP-A7: Configured minimum password length is six or less (Line 1) [OWASP A07:2021]
 
-File: /src/utils.php
-  ✗ [MEDIUM] OWASP: XSS vulnerability possible (Line 88)
-
-Summary: Scanned 24 files, found 3 potential issues.
+Summary: Scanned 1 files, found 1 potential issues.
 ```
 
 ### QA test

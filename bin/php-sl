@@ -78,10 +78,11 @@ function outputResults(array $results): void
         echo "File: {$file}\n";
         foreach ($issues as $issue) {
             echo sprintf(
-                "  ✗ [%s] %s (Line %d)\n",
+                "  ✗ [%s] %s (Line %d)%s\n",
                 strtoupper($issue['severity']),
                 $issue['message'],
-                $issue['line']
+                $issue['line'],
+                isset($issue['standardReference']) ? ' [OWASP ' . $issue['standardReference'] . ']' : ''
             );
         }
         echo PHP_EOL;

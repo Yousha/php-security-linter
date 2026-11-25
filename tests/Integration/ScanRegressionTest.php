@@ -113,6 +113,7 @@ final class ScanRegressionTest extends TestCase
         foreach ([$absolute, $relative] as [$code, $out]) {
             self::assertSame(1, $code);
             self::assertStringContainsString('omit-long.php', $out);
+            self::assertStringContainsString('[OWASP A05:2021]', $out);
             self::assertStringContainsString('Scanned 1 files, found 1', $out);
         }
         self::assertSame(0, $clean[0]);

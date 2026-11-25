@@ -2,13 +2,13 @@
 
 /*
  * Name: PHP Security Linter
- * Description: A PHP tool to lint PHP files for security issues based on CIS and OWASP best practices.
+ * Description: Static security checks for PHP 7.4 code and inline HTML.
  * Version: 2.0.2.4
  * Locale: en_International
  * Last update: 2025
  * Architecture: no-arch
  * API: 7.4
- * Executor: Apache module, FPM, CGI
+ * Executor: PHP CLI or Composer library
  * Builder:
  * License: GPL-3.0
  * Copyright: Copyright (c) 2025 Yousha Aleayoub.
@@ -190,7 +190,11 @@ final class Linter
             if (!isset($seen[$id][$line])) {
                 $seen[$id][$line] = true;
                 $rule = $this->rules[$id];
-                $issues[] = ['severity' => $rule['severity'], 'message' => $rule['message'], 'line' => $line];
+                $finding = ['severity' => $rule['severity'], 'message' => $rule['message'], 'line' => $line];
+                if (isset($rule['standardReference'])) {
+                    $finding['standardReference'] = $rule['standardReference'];
+                }
+                $issues[] = $finding;
             }
         };
         $traverser = new NodeTraverser();

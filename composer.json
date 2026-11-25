@@ -1,6 +1,6 @@
 {
     "name": "yousha/php-security-linter",
-    "description": "A PHP tool to lint PHP files for security issues based on CIS and OWASP best practices.",
+    "description": "Static analysis for PHP 7.4 code and inline HTML with project hardening rules and OWASP category references.",
     "license": "GPL-3.0-only",
     "type": "library",
     "keywords": [
