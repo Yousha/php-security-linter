@@ -82,12 +82,19 @@ final class LinterCoverageTest extends TestCase
         // Assert
         $this->assertSame(2, $results['_meta']['scanned_count']);
         $this->assertGreaterThan(0, $results['_meta']['issue_count']);
-        $this->assertArrayHasKey($matchFile, $results);
-        $this->assertNotEmpty($results[$matchFile]);
+        $findingFiles = array_values(array_filter(
+            array_keys($results),
+            static function ($key): bool {
+                return $key !== '_meta'
+                    && basename(str_replace('\\\\', '/', (string) $key)) === 'vuln.php';
+            }
+        ));
+        $this->assertCount(1, $findingFiles);
+        $this->assertNotEmpty($results[$findingFiles[0]]);
 
         // Verify at least one finding has a real line number > 1
         $hasNonFirstLine = false;
-        foreach ($results[$matchFile] as $issue) {
+        foreach ($results[$findingFiles[0]] as $issue) {
             if ($issue['line'] > 1) {
                 $hasNonFirstLine = true;
                 break;
@@ -198,8 +205,17 @@ final class LinterCoverageTest extends TestCase
 
         // Assert
         $this->assertGreaterThan(0, $results['_meta']['issue_count']);
+        $findingFiles = array_values(array_filter(
+            array_keys($results),
+            static function ($key): bool {
+                return $key !== '_meta'
+                    && basename(str_replace('\\\\', '/', (string) $key)) === 'crlf.php';
+            }
+        ));
+        $this->assertCount(1, $findingFiles);
+
         $found = false;
-        foreach ($results[$file] ?? [] as $issue) {
+        foreach ($results[$findingFiles[0]] as $issue) {
             if (str_contains($issue['message'], 'OWASP-014')) {
                 $found = true;
                 break;
