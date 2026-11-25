@@ -17,6 +17,7 @@ final class DetectionVisitor extends NodeVisitorAbstract
     private Closure $report;
     private array $taintedVariables = [];
     private array $htmlSafeVariables = [];
+    private array $sensitiveVariables = [];
 
     public function __construct(Closure $report)
     {
@@ -188,8 +189,448 @@ final class DetectionVisitor extends NodeVisitorAbstract
                 return in_array(strtolower(self::literal($first) ?? ''), ['md5', 'sha1'], true) ? 'CIS-006' : null;
             case 'crypt':
                 $salt = self::literal($second);
-                return $second === null || $salt === '' || ($salt !== null && strpos($salt, '$') !== 0 && strlen($salt) <= 2)
-                    ? 'CIS-006' : null;
+                return $second === null || $salt === '' || ($salt !== null && (strpos($salt, '$1
+            case 'openssl_encrypt':
+            case 'openssl_decrypt':
+                return self::literal($third) !== null && self::literal($third) !== '' ? 'CIS-007' : null;
+            case 'mysql_query':
+                return $this->isTainted($first) ? 'CIS-008' : null;
+            case 'mysqli_query':
+                return $this->isTainted($second) ? 'CIS-008' : null;
+            case 'pg_query':
+            case 'pg_send_query':
+                return $this->isTainted($second) || $this->isTainted($first) ? 'CIS-008' : null;
+            case 'pg_prepare':
+                return $this->isTainted($third) ? 'CIS-008' : null;
+            case 'header':
+                return self::matches('/^location:\s*(?:(?:https?:)?\/\/)?$/iD', self::prefix($first)) && $this->isTainted($first) ? 'CIS-009' : null;
+            case 'curl_setopt':
+                if ($second instanceof Expr\ConstFetch && strtoupper($second->name->toString()) === 'CURLOPT_URL' && $this->isTainted($third)) {
+                    return 'OWASP-A10';
+                }
+                return $second instanceof Expr\ConstFetch && strtoupper($second->name->toString()) === 'CURLOPT_SSL_VERIFYPEER'
+                    && self::boolean($third) === false ? 'CIS-010' : null;
+            case 'curl_setopt_array':
+                return $this->curlUrlOptionIsTainted($second) ? 'OWASP-A10' : null;
+            case 'exec':
+            case 'shell_exec':
+            case 'system':
+            case 'passthru':
+            case 'proc_open':
+            case 'popen':
+                return $this->isTainted($first) ? 'OWASP-A1-CMD' : null;
+            case 'define':
+                return $value === 'APP_DEBUG' && self::boolean($second) === true ? 'OWASP-A5' : null;
+            case 'error_log':
+            case 'file_put_contents':
+                return $this->isSensitiveInput($name === 'error_log' ? $first : $second) ? 'OWASP-A8' : null;
+            case 'file_get_contents':
+                return $this->isTainted($first) && in_array(strtolower(self::prefix($first)), ['', 'http://', 'https://'], true) ? 'OWASP-A10' : null;
+            case 'curl_init':
+                return $this->isTainted($first) ? 'OWASP-A10' : null;
+            case 'unserialize':
+                return $this->allowsNoClasses($second) ? null : 'OWASP-DESERIALIZATION';
+            case 'rand':
+            case 'mt_rand':
+            case 'lcg_value':
+            case 'uniqid':
+                return null;
+        }
+        return null;
+    }
+
+    private function inspectMethodCall(Expr\MethodCall $node): ?string
+    {
+        $method = $node->name instanceof Node\Identifier ? strtolower($node->name->name) : '';
+        $first = $node->args[0]->value ?? null;
+
+        if ($method === 'withoutmiddleware' && $this->removesThrottle($node)) {
+            return 'OWASP-API1';
+        }
+        if ((in_array($method, ['query', 'exec', 'prepare'], true)
+            || in_array($method, ['raw', 'selectraw', 'whereraw', 'havingraw', 'orderbyraw', 'groupbyraw', 'fromraw', 'joinraw', 'unionraw'], true))
+            && $this->isTainted($first)) {
+            return 'CIS-008';
+        }
+        if (in_array($method, ['request', 'get', 'post', 'put', 'patch', 'delete', 'send'], true)
+            && ($this->isTainted($first) || ($method === 'request' && $this->isTainted($node->args[1]->value ?? null)))) {
+            return 'OWASP-A10';
+        }
+        if ($method === 'setoption' && ($node->args[0]->value ?? null) instanceof Expr\ConstFetch
+            && strtoupper($node->args[0]->value->name->toString()) === 'CURLOPT_URL' && $this->isTainted($node->args[1]->value ?? null)) {
+            return 'OWASP-A10';
+        }
+        return null;
+    }
+
+    private function inspectStaticCall(Expr\StaticCall $node): ?string
+    {
+        $method = $node->name instanceof Node\Identifier ? strtolower($node->name->name) : '';
+        $first = $node->args[0]->value ?? null;
+        if (in_array($method, ['raw', 'selectraw', 'whereraw', 'havingraw', 'orderbyraw', 'groupbyraw', 'fromraw', 'joinraw', 'unionraw'], true)
+            && $this->isTainted($first)) {
+            return 'CIS-008';
+        }
+        if (in_array($method, ['get', 'post', 'put', 'patch', 'delete'], true) && $this->isTainted($first)) {
+            return 'OWASP-A10';
+        }
+        return null;
+    }
+
+    private function curlUrlOptionIsTainted(?Node $options): bool
+    {
+        if (!$options instanceof Expr\Array_) {
+            return false;
+        }
+        foreach ($options->items as $item) {
+            if ($item === null || !$item->key instanceof Expr\ConstFetch) {
+                continue;
+            }
+            if (strtoupper($item->key->name->toString()) === 'CURLOPT_URL' && $this->isTainted($item->value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function allowsNoClasses(?Node $options): bool
+    {
+        if (!$options instanceof Expr\Array_) {
+            return false;
+        }
+        foreach ($options->items as $item) {
+            if ($item !== null && self::literal($item->key) === 'allowed_classes' && self::boolean($item->value) === false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function isSensitiveInput(?Node $node): bool
+    {
+        if ($node instanceof Expr\\Variable && is_string($node->name)) {
+            return isset($this->sensitiveVariables[$node->name]);
+        }
+        if ($node instanceof Expr\\ArrayDimFetch) {
+            $field = strtolower(self::literal($node->dim) ?? '');
+            if (in_array($field, ['credit_card', 'ssn'], true)) {
+                return true;
+            }
+            return $this->isSensitiveInput($node->var);
+        }
+        if ($node instanceof Expr\\BinaryOp) {
+            return $this->isSensitiveInput($node->left) || $this->isSensitiveInput($node->right);
+        }
+        if ($node instanceof Scalar\\Encapsed) {
+            foreach ($node->parts as $part) {
+                if ($this->isSensitiveInput($part)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private function assignment(string $name, Expr $expr): ?string
+    {
+        $tainted = $this->isTainted($expr);
+        if ($this->isSensitiveInput($expr)) {
+            $this->sensitiveVariables[$name] = true;
+        } else {
+            unset($this->sensitiveVariables[$name]);
+        }
+        $htmlSafe = $expr instanceof Expr\FuncCall && $expr->name instanceof Name
+            && in_array(strtolower($expr->name->toString()), ['htmlspecialchars', 'htmlentities'], true);
+
+        if ($tainted) {
+            $this->taintedVariables[$name] = true;
+        } else {
+            unset($this->taintedVariables[$name]);
+        }
+        if ($htmlSafe) {
+            $this->htmlSafeVariables[$name] = true;
+        } else {
+            unset($this->htmlSafeVariables[$name]);
+        }
+
+        if ($name === 'sql' && $tainted
+            && self::matches('/^\s*(?:SELECT|INSERT|UPDATE|DELETE|REPLACE|WITH)\b/i', self::prefix($expr))) {
+            return 'OWASP-A1-SQL';
+        }
+        if ($name === 'min_password_length' && $expr instanceof Scalar\LNumber && $expr->value <= 6) {
+            return 'OWASP-A7';
+        }
+        if (in_array($name, ['pass', 'password', 'passwd', 'pwd'], true) && self::literal($expr) !== null && self::literal($expr) !== '') {
+            return 'OWASP-A2';
+        }
+        if (in_array($name, ['encryptionkey', 'encryption_key'], true)) {
+            return 'CIS-007';
+        }
+        if ($this->containsWeakRandom($expr) && self::matches('/(?:token|nonce|session|csrf|secret|key|otp|reset)/i', $name)) {
+            return 'OWASP-WEAK-RNG';
+        }
+        $value = self::literal($expr);
+        if ($value === null || $value === '' || strpos(strtoupper($value), 'EXAMPLE') !== false || strlen(count_chars($value, 3)) < 4) {
+            return null;
+        }
+        if (in_array($name, ['aws_key', 'aws_access_key_id'], true) && self::matches('/^(?:AKIA|ASIA)[A-Z0-9]{16}$/D', $value)) {
+            return 'OWASP-CLOUD1';
+        }
+        if (in_array($name, ['aws_secret', 'aws_secret_access_key'], true) && self::matches('~^[A-Za-z0-9/+=]{40}$~D', $value)) {
+            return 'OWASP-CLOUD1';
+        }
+        return null;
+    }
+
+    private function containsWeakRandom(Node $node): bool
+    {
+        if ($node instanceof Expr\FuncCall && $node->name instanceof Name
+            && in_array(strtolower($node->name->toString()), ['rand', 'mt_rand', 'lcg_value', 'uniqid'], true)) {
+            return true;
+        }
+        foreach ($node->getSubNodeNames() as $subNodeName) {
+            $child = $node->$subNodeName;
+            if ($child instanceof Node && $this->containsWeakRandom($child)) {
+                return true;
+            }
+            if (is_array($child)) {
+                foreach ($child as $item) {
+                    if ($item instanceof Node && $this->containsWeakRandom($item)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private function removesThrottle(Expr\MethodCall $node): bool
+    {
+        if (!$node->name instanceof Node\Identifier || strtolower($node->name->name) !== 'withoutmiddleware') {
+            return false;
+        }
+        $arg = $node->args[0]->value ?? null;
+        $values = $arg instanceof Expr\Array_ ? array_map(static function ($item) {
+            return $item !== null ? $item->value : null;
+        }, $arg->items) : [$arg];
+        foreach ($values as $value) {
+            $alias = self::literal($value) ?? '';
+            if (strpos(strtolower($alias), 'throttle') !== false || ($value instanceof Expr\ClassConstFetch
+                && $value->class instanceof Name && $value->class->getLast() === 'ThrottleRequests'
+                && $value->name instanceof Node\Identifier && strtolower($value->name->name) === 'class')) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+) === 0
+                    || (strpos($salt, '
+            case 'openssl_encrypt':
+            case 'openssl_decrypt':
+                return self::literal($third) !== null && self::literal($third) !== '' ? 'CIS-007' : null;
+            case 'mysql_query':
+                return $this->isTainted($first) ? 'CIS-008' : null;
+            case 'mysqli_query':
+                return $this->isTainted($second) ? 'CIS-008' : null;
+            case 'pg_query':
+            case 'pg_send_query':
+                return $this->isTainted($second) || $this->isTainted($first) ? 'CIS-008' : null;
+            case 'pg_prepare':
+                return $this->isTainted($third) ? 'CIS-008' : null;
+            case 'header':
+                return self::matches('/^location:\s*(?:(?:https?:)?\/\/)?$/iD', self::prefix($first)) && $this->isTainted($first) ? 'CIS-009' : null;
+            case 'curl_setopt':
+                if ($second instanceof Expr\ConstFetch && strtoupper($second->name->toString()) === 'CURLOPT_URL' && $this->isTainted($third)) {
+                    return 'OWASP-A10';
+                }
+                return $second instanceof Expr\ConstFetch && strtoupper($second->name->toString()) === 'CURLOPT_SSL_VERIFYPEER'
+                    && self::boolean($third) === false ? 'CIS-010' : null;
+            case 'curl_setopt_array':
+                return $this->curlUrlOptionIsTainted($second) ? 'OWASP-A10' : null;
+            case 'exec':
+            case 'shell_exec':
+            case 'system':
+            case 'passthru':
+            case 'proc_open':
+            case 'popen':
+                return $this->isTainted($first) ? 'OWASP-A1-CMD' : null;
+            case 'define':
+                return $value === 'APP_DEBUG' && self::boolean($second) === true ? 'OWASP-A5' : null;
+            case 'error_log':
+            case 'file_put_contents':
+                return $this->isTainted($name === 'error_log' ? $first : $second) ? 'OWASP-A8' : null;
+            case 'file_get_contents':
+                return $this->isTainted($first) && in_array(strtolower(self::prefix($first)), ['', 'http://', 'https://'], true) ? 'OWASP-A10' : null;
+            case 'curl_init':
+                return $this->isTainted($first) ? 'OWASP-A10' : null;
+            case 'unserialize':
+                return $this->allowsNoClasses($second) ? null : 'OWASP-DESERIALIZATION';
+            case 'rand':
+            case 'mt_rand':
+            case 'lcg_value':
+            case 'uniqid':
+                return null;
+        }
+        return null;
+    }
+
+    private function inspectMethodCall(Expr\MethodCall $node): ?string
+    {
+        $method = $node->name instanceof Node\Identifier ? strtolower($node->name->name) : '';
+        $first = $node->args[0]->value ?? null;
+
+        if ($method === 'withoutmiddleware' && $this->removesThrottle($node)) {
+            return 'OWASP-API1';
+        }
+        if ((in_array($method, ['query', 'exec', 'prepare'], true)
+            || in_array($method, ['raw', 'selectraw', 'whereraw', 'havingraw', 'orderbyraw', 'groupbyraw', 'fromraw', 'joinraw', 'unionraw'], true))
+            && $this->isTainted($first)) {
+            return 'CIS-008';
+        }
+        if (in_array($method, ['request', 'get', 'post', 'put', 'patch', 'delete', 'send'], true)
+            && ($this->isTainted($first) || ($method === 'request' && $this->isTainted($node->args[1]->value ?? null)))) {
+            return 'OWASP-A10';
+        }
+        if ($method === 'setoption' && ($node->args[0]->value ?? null) instanceof Expr\ConstFetch
+            && strtoupper($node->args[0]->value->name->toString()) === 'CURLOPT_URL' && $this->isTainted($node->args[1]->value ?? null)) {
+            return 'OWASP-A10';
+        }
+        return null;
+    }
+
+    private function inspectStaticCall(Expr\StaticCall $node): ?string
+    {
+        $method = $node->name instanceof Node\Identifier ? strtolower($node->name->name) : '';
+        $first = $node->args[0]->value ?? null;
+        if (in_array($method, ['raw', 'selectraw', 'whereraw', 'havingraw', 'orderbyraw', 'groupbyraw', 'fromraw', 'joinraw', 'unionraw'], true)
+            && $this->isTainted($first)) {
+            return 'CIS-008';
+        }
+        if (in_array($method, ['get', 'post', 'put', 'patch', 'delete'], true) && $this->isTainted($first)) {
+            return 'OWASP-A10';
+        }
+        return null;
+    }
+
+    private function curlUrlOptionIsTainted(?Node $options): bool
+    {
+        if (!$options instanceof Expr\Array_) {
+            return false;
+        }
+        foreach ($options->items as $item) {
+            if ($item === null || !$item->key instanceof Expr\ConstFetch) {
+                continue;
+            }
+            if (strtoupper($item->key->name->toString()) === 'CURLOPT_URL' && $this->isTainted($item->value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function allowsNoClasses(?Node $options): bool
+    {
+        if (!$options instanceof Expr\Array_) {
+            return false;
+        }
+        foreach ($options->items as $item) {
+            if ($item !== null && self::literal($item->key) === 'allowed_classes' && self::boolean($item->value) === false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function assignment(string $name, Expr $expr): ?string
+    {
+        $tainted = $this->isTainted($expr);
+        $htmlSafe = $expr instanceof Expr\FuncCall && $expr->name instanceof Name
+            && in_array(strtolower($expr->name->toString()), ['htmlspecialchars', 'htmlentities'], true);
+
+        if ($tainted) {
+            $this->taintedVariables[$name] = true;
+        } else {
+            unset($this->taintedVariables[$name]);
+        }
+        if ($htmlSafe) {
+            $this->htmlSafeVariables[$name] = true;
+        } else {
+            unset($this->htmlSafeVariables[$name]);
+        }
+
+        if ($name === 'sql' && $tainted
+            && self::matches('/^\s*(?:SELECT|INSERT|UPDATE|DELETE|REPLACE|WITH)\b/i', self::prefix($expr))) {
+            return 'OWASP-A1-SQL';
+        }
+        if ($name === 'min_password_length' && $expr instanceof Scalar\LNumber && $expr->value <= 6) {
+            return 'OWASP-A7';
+        }
+        if (in_array($name, ['pass', 'password', 'passwd', 'pwd'], true) && self::literal($expr) !== null && self::literal($expr) !== '') {
+            return 'OWASP-A2';
+        }
+        if (in_array($name, ['encryptionkey', 'encryption_key'], true)) {
+            return 'CIS-007';
+        }
+        if ($this->containsWeakRandom($expr) && self::matches('/(?:token|nonce|session|csrf|secret|key|otp|reset)/i', $name)) {
+            return 'OWASP-WEAK-RNG';
+        }
+        $value = self::literal($expr);
+        if ($value === null || $value === '' || strpos(strtoupper($value), 'EXAMPLE') !== false || strlen(count_chars($value, 3)) < 4) {
+            return null;
+        }
+        if (in_array($name, ['aws_key', 'aws_access_key_id'], true) && self::matches('/^(?:AKIA|ASIA)[A-Z0-9]{16}$/D', $value)) {
+            return 'OWASP-CLOUD1';
+        }
+        if (in_array($name, ['aws_secret', 'aws_secret_access_key'], true) && self::matches('~^[A-Za-z0-9/+=]{40}$~D', $value)) {
+            return 'OWASP-CLOUD1';
+        }
+        return null;
+    }
+
+    private function containsWeakRandom(Node $node): bool
+    {
+        if ($node instanceof Expr\FuncCall && $node->name instanceof Name
+            && in_array(strtolower($node->name->toString()), ['rand', 'mt_rand', 'lcg_value', 'uniqid'], true)) {
+            return true;
+        }
+        foreach ($node->getSubNodeNames() as $subNodeName) {
+            $child = $node->$subNodeName;
+            if ($child instanceof Node && $this->containsWeakRandom($child)) {
+                return true;
+            }
+            if (is_array($child)) {
+                foreach ($child as $item) {
+                    if ($item instanceof Node && $this->containsWeakRandom($item)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private function removesThrottle(Expr\MethodCall $node): bool
+    {
+        if (!$node->name instanceof Node\Identifier || strtolower($node->name->name) !== 'withoutmiddleware') {
+            return false;
+        }
+        $arg = $node->args[0]->value ?? null;
+        $values = $arg instanceof Expr\Array_ ? array_map(static function ($item) {
+            return $item !== null ? $item->value : null;
+        }, $arg->items) : [$arg];
+        foreach ($values as $value) {
+            $alias = self::literal($value) ?? '';
+            if (strpos(strtolower($alias), 'throttle') !== false || ($value instanceof Expr\ClassConstFetch
+                && $value->class instanceof Name && $value->class->getLast() === 'ThrottleRequests'
+                && $value->name instanceof Node\Identifier && strtolower($value->name->name) === 'class')) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+) !== 0 && strlen($salt) <= 2))) ? 'CIS-006' : null;
             case 'openssl_encrypt':
             case 'openssl_decrypt':
                 return self::literal($third) !== null && self::literal($third) !== '' ? 'CIS-007' : null;
