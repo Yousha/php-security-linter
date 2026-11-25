@@ -2,7 +2,7 @@
 
 Security checks for PHP 7.4 code and inline HTML. This page documents the main-php7.4 maintenance branch.
 
-[![Latest Packagist release across branches](https://img.shields.io/packagist/v/yousha/php-security-linter.svg)](https://packagist.org/packages/yousha/php-security-linter) [![Dependabot Updates](https://github.com/Yousha/php-security-linter/actions/workflows/dependabot/dependabot-updates/badge.svg?branch=main-php7.4)](https://github.com/Yousha/php-security-linter/actions/workflows/dependabot/dependabot-updates) [![PHP](https://img.shields.io/badge/PHP-7.4-617CBE)](https://php.net/) [![issues](https://img.shields.io/github/issues/yousha/php-security-linter)](https://github.com/yousha/php-security-linter/issues) ![repo size](https://img.shields.io/github/repo-size/yousha/php-security-linter) [![GitHub license](https://img.shields.io/github/license/yousha/php-security-linter)](LICENSE) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.txt)
+[![Latest Packagist release across branches](https://img.shields.io/packagist/v/yousha/php-security-linter.svg)](https://packagist.org/packages/yousha/php-security-linter) [![PHP 7.4 CI](https://github.com/Yousha/php-security-linter/actions/workflows/main.yml/badge.svg?branch=main-php7.4)](https://github.com/Yousha/php-security-linter/actions/workflows/main.yml?query=branch%3Amain-php7.4) [![PHP](https://img.shields.io/badge/PHP-7.4-617CBE)](https://php.net/) [![issues](https://img.shields.io/github/issues/yousha/php-security-linter)](https://github.com/yousha/php-security-linter/issues) ![repo size](https://img.shields.io/github/repo-size/yousha/php-security-linter) [![GitHub license](https://img.shields.io/github/license/yousha/php-security-linter)](LICENSE) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.txt)
 
 ## Contents
 
@@ -159,18 +159,18 @@ File: example/settings.php
 Summary: Scanned 1 files, found 1 potential issues.
 ```
 
-### QA test
+### CI and local checks
 
-Run tests to ensure everything works as expected:
+Pushes to `main-php7.4` and pull requests targeting it run these checks on Ubuntu with PHP 7.4 and Composer 2. From a source checkout:
 
 ```shell
+composer validate --strict
+composer install
+composer audit
+composer lint
+composer format-check
+composer refactor-check
 composer test
-```
-
-Or:
-
-```shell
-vendor/bin/phpunit tests/
 ```
 
 ## FAQ

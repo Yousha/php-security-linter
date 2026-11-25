@@ -193,6 +193,23 @@ final class ScanRegressionTest extends TestCase
         self::assertArrayNotHasKey($scan . '/external.php', $result);
     }
 
+    public function testParseWarningTakesPrecedenceOverFindingsInTheCli(): void
+    {
+        // Arrange
+        file_put_contents($this->root . '/good.php', self::FINDING);
+        file_put_contents($this->root . '/broken.php', '<?php function (');
+
+        // Act
+        [$code, $out, $err] = $this->cli(['--path=.']);
+
+        // Assert
+        self::assertSame(4, $code);
+        self::assertStringContainsString('OWASP-A5:', $out);
+        self::assertStringContainsString('[OWASP A05:2021]', $out);
+        self::assertStringContainsString('Scanned 2 files, found 1 potential issues.', $out);
+        self::assertStringContainsString('broken.php', $err);
+    }
+
     public function testPcreFailureMarksScanIncomplete(): void
     {
         // Arrange
