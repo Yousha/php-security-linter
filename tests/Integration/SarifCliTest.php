@@ -26,10 +26,18 @@ final class SarifCliTest extends TestCase
                 '--path=' . $directory,
                 '--format=sarif',
             ]);
+            // Assert the child process completed as expected before decoding its output.
+            self::assertSame(
+                1,
+                $process['exitCode'],
+                sprintf("CLI failed.\nSTDOUT:\n%s\nSTDERR:\n%s", $process['stdout'], $process['stderr'])
+            );
+            self::assertSame('', $process['stderr']);
+
+            // Decode only after process diagnostics have been checked.
             $document = json_decode($process['stdout'], true, 512, JSON_THROW_ON_ERROR);
 
             // Assert
-            self::assertSame(1, $process['exitCode']);
             self::assertSame('2.1.0', $document['version']);
             self::assertSame(
                 'OWASP-002',
@@ -203,7 +211,13 @@ final class SarifCliTest extends TestCase
     private function runCli(array $arguments): array
     {
         $projectRoot = dirname(__DIR__, 2);
-        $command = array_merge([PHP_BINARY, $projectRoot . '/bin/php-sl'], $arguments);
+        // Use an explicitly escaped command string for consistent Windows behavior on PHP 8.0.
+        // proc_open() argument-array handling differs across PHP/Windows combinations.
+        $commandParts = array_merge(
+            [PHP_BINARY, $projectRoot . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'php-sl'],
+            $arguments
+        );
+        $command = implode(' ', array_map('escapeshellarg', $commandParts));
         $descriptors = [
             0 => ['pipe', 'r'],
             1 => ['pipe', 'w'],
