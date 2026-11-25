@@ -20,14 +20,14 @@
     "authors": [
         {
             "name": "Yousha Aleayoub",
-            "email": "yousha.a@hotmail.com",
+            "email": "y.aleayoub@gmail.com",
             "homepage": "https://yousha.blog.ir/",
             "role": "Maintainer, Developer"
         }
     ],
     "homepage": "https://github.com/yousha/php-security-linter",
     "support": {
-        "email": "yousha.a@hotmail.com",
+        "email": "y.aleayoub@gmail.com",
         "issues": "https://github.com/yousha/php-security-linter/issues",
         "source": "https://github.com/yousha/php-security-linter"
     },

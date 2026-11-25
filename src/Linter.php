@@ -3,7 +3,7 @@
 /*
  * Name: PHP Security Linter
  * Description: Static security checks for PHP 7.4 code and inline HTML.
- * Version: 2.0.2.4
+ * Version: 2.1.0.5
  * Locale: en_International
  * Last update: 2025
  * Architecture: no-arch
@@ -11,10 +11,10 @@
  * Executor: PHP CLI or Composer library
  * Builder:
  * License: GPL-3.0
- * Copyright: Copyright (c) 2025 Yousha Aleayoub.
+ * Copyright: Copyright (c) 2026 Yousha Aleayoub.
  * Producer: Yousha Aleayoub
  * Maintainer: Yousha Aleayoub
- * Contact: yousha.a@hotmail.com
+ * Contact: y.aleayoub@gmail.com
  * Link: http://yousha.blog.ir
  */
 
