@@ -63,6 +63,10 @@ For a released version, install the package without a branch constraint and Comp
 
 ## Diagrams
 
+* C3 — Component View (UML):
+
+![C4 C3 Component View — PHP Security Linter](resources/images/diagrams/artifacts/Component-diagram.svg)
+
 * C2 — Container View (UML):
 
 ![C4 C2 Container View — PHP Security Linter](resources/images/diagrams/artifacts/Container-view.svg)
