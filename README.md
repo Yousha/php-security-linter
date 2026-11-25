@@ -29,8 +29,8 @@ This branch checks PHP 7.4 code and inline HTML templates for potential security
 
 ## Features
 
-* **22 built-in checks** across two project catalogs (10 CIS-prefixed and 12 OWASP-prefixed).
-* Checks for directly observable input use, sensitive output, unsafe configuration, cookie-supplied session IDs, and literal credentials.
+* **24 built-in checks** across two project catalogs (10 CIS-prefixed and 12 OWASP-prefixed).
+* Checks for request-data propagation through simple assignments, sensitive output, unsafe configuration, cookie-supplied session IDs, and literal credentials.
 * Template checks for static POST forms and versioned jQuery or Bootstrap script references.
 * **Fast static analysis** without executing code
 * **Text reports** with file paths and line numbers
@@ -90,9 +90,9 @@ For a tagged release use the Composer constraint `2.*`. Features and requirement
 
 ## Configuration
 
-Use the built-in checks with path exclusions. The PHP checks follow direct expressions, including concatenation and interpolation. They do not trace variables across assignments or infer effective application middleware. The session check reports request-supplied session IDs. The rate-limit check reports explicit removal of throttle middleware from a route.
+Use the built-in checks with path exclusions. The PHP checks follow request-controlled values through straightforward variable assignments, concatenation, and interpolation to supported SQL, command, output, include, and remote-resource sinks. This is a conservative single-pass analysis, not full interprocedural or control-flow taint analysis. SQL sinks include common MySQL, PostgreSQL, and PDO query APIs. The scanner also flags weak random generators assigned to security-sensitive names and unrestricted `unserialize()` calls. The session check reports request-supplied session IDs. The rate-limit check reports explicit removal of throttle middleware.
 
-A POST form finding means no recognized hidden CSRF field was visible in its static markup. PHP-generated forms with unknown content are skipped. Script version checks use literal JavaScript asset paths. A finding identifies a reference for review, rather than verifying deployed asset contents.
+A POST form finding means no recognized hidden CSRF field or recognizable PHP CSRF helper was visible in its static markup. Unrelated PHP fragments no longer suppress the form check. Dynamically generated token markup that does not use a recognized helper may still require manual review. Script version checks use literal JavaScript asset paths. A finding identifies a reference for review, rather than verifying deployed asset contents.
 
 ### Rule IDs and standards references
 
