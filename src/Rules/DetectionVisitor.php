@@ -40,6 +40,8 @@ final class DetectionVisitor extends NodeVisitorAbstract
             }
         } elseif ($node instanceof Expr\MethodCall) {
             $id = $this->inspectMethodCall($node);
+        } elseif ($node instanceof Expr\StaticCall) {
+            $id = $this->inspectStaticCall($node);
         } elseif ($node instanceof Expr\ShellExec && $this->isTainted($node)) {
             $id = 'OWASP-A1-CMD';
         }
@@ -245,7 +247,9 @@ final class DetectionVisitor extends NodeVisitorAbstract
         if ($method === 'withoutmiddleware' && $this->removesThrottle($node)) {
             return 'OWASP-API1';
         }
-        if (in_array($method, ['query', 'exec', 'prepare'], true) && $this->isTainted($first)) {
+        if ((in_array($method, ['query', 'exec', 'prepare'], true)
+            || in_array($method, ['raw', 'selectraw', 'whereraw', 'havingraw', 'orderbyraw', 'groupbyraw', 'fromraw', 'joinraw', 'unionraw'], true))
+            && $this->isTainted($first)) {
             return 'CIS-008';
         }
         if (in_array($method, ['request', 'get', 'post', 'put', 'patch', 'delete', 'send'], true)
@@ -254,6 +258,20 @@ final class DetectionVisitor extends NodeVisitorAbstract
         }
         if ($method === 'setoption' && ($node->args[0]->value ?? null) instanceof Expr\ConstFetch
             && strtoupper($node->args[0]->value->name->toString()) === 'CURLOPT_URL' && $this->isTainted($node->args[1]->value ?? null)) {
+            return 'OWASP-A10';
+        }
+        return null;
+    }
+
+    private function inspectStaticCall(Expr\StaticCall $node): ?string
+    {
+        $method = $node->name instanceof Node\Identifier ? strtolower($node->name->name) : '';
+        $first = $node->args[0]->value ?? null;
+        if (in_array($method, ['raw', 'selectraw', 'whereraw', 'havingraw', 'orderbyraw', 'groupbyraw', 'fromraw', 'joinraw', 'unionraw'], true)
+            && $this->isTainted($first)) {
+            return 'CIS-008';
+        }
+        if (in_array($method, ['get', 'post', 'put', 'patch', 'delete'], true) && $this->isTainted($first)) {
             return 'OWASP-A10';
         }
         return null;
