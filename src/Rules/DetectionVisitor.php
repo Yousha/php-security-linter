@@ -90,6 +90,13 @@ final class DetectionVisitor extends NodeVisitorAbstract
                 }
             }
         }
+        if ($node instanceof Expr\Array_) {
+            foreach ($node->items as $item) {
+                if ($item !== null && $this->isTainted($item->value)) {
+                    return true;
+                }
+            }
+        }
         if ($node instanceof Expr\BinaryOp) {
             return $this->isTainted($node->left) || $this->isTainted($node->right);
         }
