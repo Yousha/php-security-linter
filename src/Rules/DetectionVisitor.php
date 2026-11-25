@@ -249,7 +249,7 @@ final class DetectionVisitor extends NodeVisitorAbstract
         if ($method === 'withoutmiddleware' && $this->removesThrottle($node)) {
             return 'OWASP-API1';
         }
-        if ((in_array($method, ['query', 'exec', 'prepare'], true)
+        if ((in_array($method, ['query', 'exec', 'prepare', 'executequery', 'executestatement', 'createquery', 'createnativequery'], true)
             || in_array($method, ['raw', 'selectraw', 'whereraw', 'havingraw', 'orderbyraw', 'groupbyraw', 'fromraw', 'joinraw', 'unionraw'], true))
             && $this->isTainted($first)) {
             return 'CIS-008';
@@ -269,7 +269,7 @@ final class DetectionVisitor extends NodeVisitorAbstract
     {
         $method = $node->name instanceof Node\Identifier ? strtolower($node->name->name) : '';
         $first = $node->args[0]->value ?? null;
-        if (in_array($method, ['raw', 'selectraw', 'whereraw', 'havingraw', 'orderbyraw', 'groupbyraw', 'fromraw', 'joinraw', 'unionraw'], true)
+        if (in_array($method, ['raw', 'selectraw', 'whereraw', 'havingraw', 'orderbyraw', 'groupbyraw', 'fromraw', 'joinraw', 'unionraw', 'select', 'statement', 'unprepared', 'insert', 'update', 'delete'], true)
             && $this->isTainted($first)) {
             return 'CIS-008';
         }
