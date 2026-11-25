@@ -63,9 +63,9 @@ For a released version, install the package without a branch constraint and Comp
 
 ## Diagrams
 
-* Component diagram:
+* C2 — Container View (UML):
 
-![Component diagram](resources/images/diagrams/artifacts/Component-diagram.png)
+![C4 C2 Container View — PHP Security Linter](resources/images/diagrams/artifacts/Container-view.svg)
 
 * Dataflow diagram:
 
