@@ -29,7 +29,7 @@ This branch checks PHP 7.4 code and inline HTML templates for potential security
 
 ## Features
 
-* **24 built-in checks** across two project catalogs (10 CIS-prefixed and 12 OWASP-prefixed).
+* **24 built-in checks** across two project catalogs (10 CIS-prefixed and 14 OWASP-prefixed).
 * Checks for request-data propagation through simple assignments, sensitive output, unsafe configuration, cookie-supplied session IDs, and literal credentials.
 * Template checks for static POST forms and versioned jQuery or Bootstrap script references.
 * **Fast static analysis** without executing code
@@ -109,7 +109,7 @@ The scanner prints a stable project rule ID and severity with every finding. Map
 | OWASP-A10 | A10:2021 Server-Side Request Forgery |
 | OWASP-API1 | API4:2023 Unrestricted Resource Consumption (throttle removal) |
 
-The two remaining OWASP-prefixed checks flag direct writes of sensitive fields (OWASP-A8) and credential-shaped literals (OWASP-CLOUD1). Their findings have no category mapping. CIS-001 through CIS-010 are local hardening identifiers. The project has no verified mapping from those IDs to numbered CIS Benchmark controls. Severity values express the project's review priorities.
+Unmapped OWASP-prefixed checks flag direct writes of sensitive fields (OWASP-A8), credential-shaped literals (OWASP-CLOUD1), weak security-token randomness (OWASP-WEAK-RNG), and unrestricted deserialization (OWASP-DESERIALIZATION). These findings have no category mapping. CIS-001 through CIS-010 are local hardening identifiers. The project has no verified mapping from those IDs to numbered CIS Benchmark controls. Severity values express the project's review priorities.
 
 Sources: [OWASP Top 10:2021](https://top10.owasp.org/2021/), [OWASP API Security Top 10:2023, API4](https://api-security.owasp.org/editions/2023/en/0xa4-unrestricted-resource-consumption/).
 
